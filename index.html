@@ -615,7 +615,7 @@ async function adminDeleteAccount(encodedUid,encodedLabel){const uid=decodeURICo
 function toggleDayNight(){let day=!document.body.classList.contains('day-theme');document.body.classList.toggle('day-theme',day);localStorage.setItem('mahmoud_day_theme',day?'day':'night');let b=document.getElementById('dayNightToggle');if(b)b.textContent=day?'🌙 ليلي':'☀️ نهاري'}
 function applyDayNight(){let day=localStorage.getItem('mahmoud_day_theme')==='day';document.body.classList.toggle('day-theme',day);let b=document.getElementById('dayNightToggle');if(b)b.textContent=day?'🌙 ليلي':'☀️ نهاري'}
 function adminLogout(){go('home');toast('تم إغلاق لوحة الإدارة')}
-const oldGo=go;go=async function(id){if(!cloud.user){const gate=document.getElementById('authGate');if(gate)gate.hidden=false;toast('سجّل الدخول أولاً للوصول إلى المنصة');return}if(id==='admin'){try{const token=await cloud.user.getIdTokenResult(true),claims=token.claims||{};if(!(claims.admin===true||claims.moderator===true)){toast('هذا الحساب ليس لديه صلاحية إدارة معتمدة من Firebase');return}}catch(e){toast('تعذر التحقق من صلاحيات الإدارة');return}}oldGo(id);renderPlatform()};
+const oldGo=go;go=async function(id){if(!cloud.user){const gate=document.getElementById('authGate');if(gate)gate.hidden=false;toast('سجّل الدخول أولاً للوصول إلى المنصة');return}if(id==='admin'){const entered=prompt('أدخل كلمة مرور لوحة الإدارة:');if(entered===null)return;if(entered!=='472010'){toast('كلمة مرور الإدارة غير صحيحة');return}}oldGo(id);renderPlatform()};
 
 initializeFirebase();
 renderQuestionBuilder();applyDayNight();
