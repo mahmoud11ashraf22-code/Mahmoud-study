@@ -1067,7 +1067,12 @@ async function adminCall(action,extra={}){
  if(action==='deleteContent'){if(ALLOWED.indexOf(extra.collection)<0)throw new Error('مجموعة غير مسموحة');await col(extra.collection).doc(String(extra.id)).delete();return {}}
  if(action==='setForumOpen'){await col('publicSettings').doc('platform').set({forumOpen:!!extra.open,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});return {}}
  if(action==='publishAnnouncement'){await col('publicAnnouncements').add({text:String(extra.text||'').slice(0,2000),createdAt:firebase.firestore.FieldValue.serverTimestamp(),authorUid:u.uid});return {}}
- if(action==='gradeSubmission'){const ref=col('examSubmissions').doc(String(extra.submissionId));const snap=await ref.get();if(!snap.exists)throw new Error('التسليم غير موجود');const answers=(snap.data().answers||[]).slice();const i=Number(extra.answerIndex);if(!answers[i])throw new Error('رقم السؤال غير صحيح');const max=Math.max(0,Number(extra.maxPoints)||0);answers[i]={...answers[i],earned:Math.min(max,Math.max(0,Number(extra.earned)||0)),graded:true,manualGraded:true};await ref.update({answers,gradedAt:firebase.firestore.FieldValue.serverTimestamp(),gradedBy:u.uid});return {}}
+ if(action==='gradeSubmission'){const ref=col('examSubmissions').doc(String(extra.submissionId));const snap=await ref.get();if(!snap.exists)throw new Error('التسليم غير موجود');const answers=(snap.data().answers||[]).slice();const i=Number(extra.answerIndex);if(!answers[i])throw new Error('رقم السؤال غير صحيح');const max=Math.max(0,Number(extra.maxPoints)||0);answers[i]={...answers[i],earned:Math.min(max,Math.max(0,Number(extra.earned)||0)),graded:true,manualGraded:true};
+ /* GRADE-TOTALS:START recompute correct/total/percent/status from answers (mcq auto-scored + graded essays; pending essays excluded until graded) */
+ let c=0,t=0,gradedEssays=0,pendingEssays=0;answers.forEach(x=>{const p=Math.max(0,Number(x.points)||0);if(x.type==='essay'){if(x.graded===true||x.manualGraded===true){gradedEssays++;t+=p;c+=Math.min(p,Math.max(0,Number(x.earned)||0))}else pendingEssays++}else{t+=p;c+=Number(x.earned)||(x.isCorrect?p:0)}});
+ const pct=t?Math.round(c/t*100):0;
+ await ref.update({answers,correct:c,total:t,percent:pct,gradedEssayCount:gradedEssays,pendingEssayCount:pendingEssays,status:pendingEssays?'تم تصحيح الاختياري وبعض المقالي • '+pendingEssays+' مقالي بانتظار المراجعة':'تم التصحيح بالكامل',gradedAt:firebase.firestore.FieldValue.serverTimestamp(),gradedBy:u.uid});return {}}
+ /* GRADE-TOTALS:END */
  throw new Error('عملية غير معروفة: '+action)
 }
 /* ADMIN-AUTH:END */
