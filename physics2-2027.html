@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>امتحان الفيزياء (2) - ثانية بكالوريا 2027 - MAHMOUD STUDY</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: #f0f7ff;
+  color: #1e3a5f;
+  line-height: 1.7;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(30, 58, 95, 0.12);
+  overflow: hidden;
+}
+.header {
+  background: linear-gradient(135deg, #1e3a8a, #2563eb);
+  color: white;
+  padding: 30px 25px;
+  text-align: center;
+}
+.logo {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: block;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  border: 4px solid #fbbf24;
+  object-fit: cover;
+}
+.header h1 { font-size: 28px; margin-bottom: 8px; }
+.header p { opacity: 0.95; font-size: 15px; }
+.timer-bar {
+  background: #dbeafe;
+  padding: 12px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: #1e40af;
+  border-bottom: 2px solid #bfdbfe;
+}
+.timer { font-size: 22px; letter-spacing: 1px; }
+.content { padding: 25px; }
+.section-title {
+  background: #1e40af;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin: 25px 0 18px;
+  font-size: 18px;
+}
+.question {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+.question p { font-weight: 600; margin-bottom: 12px; color: #1e3a8a; }
+.options label {
+  display: block;
+  padding: 10px 14px;
+  margin: 6px 0;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.options label:hover { border-color: #3b82f6; background: #eff6ff; }
+.options input { margin-left: 10px; }
+textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  resize: vertical;
+  background: white;
+}
+textarea:focus { outline: none; border-color: #3b82f6; }
+.name-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 16px;
+  margin: 10px 0 20px;
+}
+.btn {
+  background: #1e40af;
+  color: white;
+  border: none;
+  padding: 14px 40px;
+  font-size: 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  display: block;
+  margin: 30px auto;
+  transition: background 0.2s;
+}
+.btn:hover { background: #1e3a8a; }
+.result-box {
+  display: none;
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 25px;
+}
+.score { font-size: 24px; color: #166534; text-align: center; margin-bottom: 15px; }
+.correct { color: #16a34a; font-weight: bold; }
+.wrong { color: #dc2626; }
+.model-answer {
+  background: #eff6ff;
+  border-right: 4px solid #3b82f6;
+  padding: 12px 15px;
+  margin-top: 10px;
+  border-radius: 8px;
+  font-size: 15px;
+}
+.student-answer {
+  background: #fffbeb;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin: 8px 0;
+  white-space: pre-wrap;
+}
+.footer {
+  text-align: center;
+  padding: 25px;
+  background: #f1f5f9;
+  border-top: 1px solid #e2e8f0;
+}
+.footer a {
+  color: #1e40af;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 17px;
+  background: #dbeafe;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: inline-block;
+}
+.footer a:hover { background: #bfdbfe; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="icon-192.png" alt="MAHMOUD STUDY" class="logo">
+    <h1>امتحان الفيزياء</h1>
+    <p>ثانية بكالوريا 2027 | الدروس من 7 إلى 12</p>
+  </div>
+  <div class="timer-bar">
+    <span>الوقت المتبقي</span>
+    <span class="timer" id="timer">60:00</span>
+  </div>
+  <div class="content">
+    <label style="font-weight:bold; color:#1e40af;">اسم الطالب:</label>
+    <input type="text" id="studentName" class="name-input" placeholder="اكتب اسمك هنا">
+
+    <div class="section-title">السؤال الأول: اختر الإجابة الصحيحة (20 درجة)</div>
+
+    <div class="question" id="q1">
+      <p>1) جسم كتلته 2 kg يتحرك بسرعة 3 m/s، فإن كمية تحركه تساوي:</p>
+      <div class="options">
+        <label><input type="radio" name="q1" value="أ"> أ) 2 kg.m/s</label>
+        <label><input type="radio" name="q1" value="ب"> ب) 5 kg.m/s</label>
+        <label><input type="radio" name="q1" value="ج"> ج) 6 kg.m/s</label>
+        <label><input type="radio" name="q1" value="د"> د) 9 kg.m/s</label>
+      </div>
+    </div>
+
+    <div class="question" id="q2">
+      <p>2) أثرت قوة مقدارها 20 N على جسم لمدة 0.2 s، فإن الدفع يساوي:</p>
+      <div class="options">
+        <label><input type="radio" name="q2" value="أ"> أ) 2 N.s</label>
+        <label><input type="radio" name="q2" value="ب"> ب) 4 N.s</label>
+        <label><input type="radio" name="q2" value="ج"> ج) 10 N.s</label>
+        <label><input type="radio" name="q2" value="د"> د) 40 N.s</label>
+      </div>
+    </div>
+
+    <div class="question" id="q3">
+      <p>3) في نظام معزول أثناء التصادم، فإن:</p>
+      <div class="options">
+        <label><input type="radio" name="q3" value="أ"> أ) الطاقة الحركية محفوظة دائمًا</label>
+        <label><input type="radio" name="q3" value="ب"> ب) كمية التحرك الكلية محفوظة</label>
+        <label><input type="radio" name="q3" value="ج"> ج) السرعة ثابتة لكل جسم</label>
+        <label><input type="radio" name="q3" value="د"> د) الكتلة تتغير</label>
+      </div>
+    </div>
+
+    <div class="question" id="q4">
+      <p>4) كرة كتلتها 2 kg تغيرت سرعتها من 3 m/s إلى 1 m/s في الاتجاه المضاد. مقدار التغير في كمية تحركها يساوي:</p>
+      <div class="options">
+        <label><input type="radio" name="q4" value="أ"> أ) 2 kg.m/s</label>
+        <label><input type="radio" name="q4" value="ب"> ب) 4 kg.m/s</label>
+        <label><input type="radio" name="q4" value="ج"> ج) 6 kg.m/s</label>
+        <label><input type="radio" name="q4" value="د"> د) 8 kg.m/s</label>
+      </div>
+    </div>
+
+    <div class="question" id="q5">
+      <p>5) العجلة المركزية لجسم يتحرك في مسار دائري منتظم تعطى بالعلاقة:</p>
+      <div class="options">
+        <label><input type="radio" name="q5" value="أ"> أ) v/r</label>
+        <label><input type="radio" name="q5" value="ب"> ب) v²/r</label>
+        <label><input type="radio" name="q5" value="ج"> ج) vr</label>
+        <label><input type="radio" name="q5" value="د"> د) r/v²</label>
+      </div>
+    </div>
+
+    <div class="question" id="q6">
+      <p>6) عند مضاعفة سرعة جسم في مسار دائري مع ثبات كتلته ونصف قطره، فإن القوة المركزية:</p>
+      <div class="options">
+        <label><input type="radio" name="q6" value="أ"> أ) تقل للنصف</label>
+        <label><input type="radio" name="q6" value="ب"> ب) تتضاعف</label>
+        <label><input type="radio" name="q6" value="ج"> ج) تصبح أربعة أمثال</label>
+        <label><input type="radio" name="q6" value="د"> د) لا تتغير</label>
+      </div>
+    </div>
+
+    <div class="question" id="q7">
+      <p>7) اتجاه القوة المركزية في الحركة الدائرية المنتظمة يكون:</p>
+      <div class="options">
+        <label><input type="radio" name="q7" value="أ"> أ) مماسًا للمسار</label>
+        <label><input type="radio" name="q7" value="ب"> ب) إلى الخارج</label>
+        <label><input type="radio" name="q7" value="ج"> ج) نحو مركز الدائرة</label>
+        <label><input type="radio" name="q7" value="د"> د) عكس الحركة</label>
+      </div>
+    </div>
+
+    <div class="question" id="q8">
+      <p>8) عند أعلى نقطة في مسار دائري رأسي، يكون اتجاه العجلة المركزية:</p>
+      <div class="options">
+        <label><input type="radio" name="q8" value="أ"> أ) لأعلى</label>
+        <label><input type="radio" name="q8" value="ب"> ب) لأسفل</label>
+        <label><input type="radio" name="q8" value="ج"> ج) أفقيًا</label>
+        <label><input type="radio" name="q8" value="د"> د) مماسًا</label>
+      </div>
+    </div>
+
+    <div class="question" id="q9">
+      <p>9) وفقًا لقانون كبلر الثالث، مربع الزمن الدوري يتناسب طرديًا مع:</p>
+      <div class="options">
+        <label><input type="radio" name="q9" value="أ"> أ) نصف قطر المدار</label>
+        <label><input type="radio" name="q9" value="ب"> ب) مكعب نصف قطر المدار</label>
+        <label><input type="radio" name="q9" value="ج"> ج) كتلة الكوكب</label>
+        <label><input type="radio" name="q9" value="د"> د) سرعته</label>
+      </div>
+    </div>
+
+    <div class="question" id="q10">
+      <p>10) إذا تضاعفت المسافة بين مركزي كتلتين، فإن قوة التجاذب بينهما:</p>
+      <div class="options">
+        <label><input type="radio" name="q10" value="أ"> أ) تتضاعف</label>
+        <label><input type="radio" name="q10" value="ب"> ب) تقل للنصف</label>
+        <label><input type="radio" name="q10" value="ج"> ج) تقل إلى الربع</label>
+        <label><input type="radio" name="q10" value="د"> د) تزداد أربعة أمثال</label>
+      </div>
+    </div>
+
+    <div class="section-title">السؤال الثاني: أجب عن الأسئلة الآتية (20 درجة) - مقالي</div>
+
+    <div class="question">
+      <p>1) جسم كتلته 0.5 kg أثرت عليه قوة متوسطة مقدارها 10 N لمدة 0.4 s.<br>احسب: أ) الدفع المؤثر على الجسم. ب) التغير في سرعة الجسم.</p>
+      <textarea id="essay1" placeholder="اكتب إجابتك هنا..."></textarea>
+    </div>
+
+    <div class="question">
+      <p>2) جسم كتلته 2 kg يتحرك بسرعة 5 m/s، اصطدم بجسم آخر كتلته 3 kg ساكن، والتحما معًا بعد التصادم.<br>أ) اكتب قانون حفظ كمية التحرك. ب) احسب السرعة المشتركة للجسمين بعد التصادم.</p>
+      <textarea id="essay2" placeholder="اكتب إجابتك هنا..."></textarea>
+    </div>
+
+    <div class="question">
+      <p>3) جسم كتلته 0.5 kg يتحرك في مسار دائري نصف قطره 2 m بسرعة ثابتة 4 m/s.<br>احسب: أ) العجلة المركزية. ب) القوة المركزية، ووضح اتجاهها.</p>
+      <textarea id="essay3" placeholder="اكتب إجابتك هنا..."></textarea>
+    </div>
+
+    <div class="question">
+      <p>4) أجب عما يأتي:<br>أ) اذكر نص قانون الجذب العام لنيوتن.<br>ب) ما العلاقة بين الزمن الدوري للكوكب ونصف قطر مداره وفق قانون كبلر الثالث؟<br>ج) ماذا يحدث لقوة التجاذب إذا زادت المسافة بين مركزي الجسمين إلى ثلاثة أمثالها؟</p>
+      <textarea id="essay4" placeholder="اكتب إجابتك هنا..."></textarea>
+    </div>
+
+    <button class="btn" id="submitBtn" onclick="showResults()">عرض النتيجة</button>
+
+    <div class="result-box" id="results"></div>
+
+    <div class="footer"><p style="margin-bottom:12px; color:#475569;">© MAHMOUD STUDY</p></div>
+  </div>
+</div>
+
+<script>
+const correctAnswers = {
+  q1: "ج", q2: "ب", q3: "ب", q4: "د", q5: "ب",
+  q6: "ج", q7: "ج", q8: "ب", q9: "ب", q10: "ج"
+};
+
+const modelAnswers = {
+  essay1: "أ) الدفع = القوة × الزمن = 10 × 0.4 = 4 N.s\nب) التغير في السرعة = الدفع ÷ الكتلة = 4 ÷ 0.5 = 8 m/s",
+  essay2: "أ) قانون حفظ كمية التحرك: مجموع كمية التحرك قبل التصادم = مجموعها بعد التصادم\nب) قبل = (2 × 5) + (3 × 0) = 10\nبعد = (2 + 3) × V = 5V\n5V = 10 ⇒ V = 2 m/s في نفس اتجاه الجسم الأول",
+  essay3: "أ) العجلة المركزية = v² / r = (4)² / 2 = 16 / 2 = 8 m/s²\nب) القوة المركزية = m × a = 0.5 × 8 = 4 N\nاتجاهها: نحو مركز الدائرة",
+  essay4: "أ) نص قانون الجذب العام: كل جسمين في الكون يتجاذبان بقوة تتناسب طرديًا مع حاصل ضرب كتلتيهما وعكسيًا مع مربع المسافة بين مركزيهما.\nالقانون: F = G × m1 × m2 / r²\nب) قانون كبلر الثالث: مربع الزمن الدوري للكوكب يتناسب طرديًا مع مكعب نصف قطر مداره (T² ∝ r³)\nج) إذا زادت المسافة إلى 3 أمثال، فإن القوة تقل إلى 1/9 من قيمتها الأصلية (لأن القوة تتناسب عكسيًا مع مربع المسافة)"
+};
+
+let timeLeft = 60 * 60;
+let timerInterval;
+let submitted = false;
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById("timer").textContent = 
+      `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById("timer").textContent = "انتهى الوقت!";
+      if (!submitted) showResults();
+    }
+  }, 1000);
+}
+
+function showResults() {
+  if (submitted) return;
+  submitted = true;
+  clearInterval(timerInterval);
+  document.getElementById("submitBtn").disabled = true;
+  document.getElementById("submitBtn").textContent = "تم عرض النتيجة";
+
+  let score = 0;
+  let mcqHtml = "<h3 style='color:#1e40af; margin-bottom:15px;'>تصحيح السؤال الأول (الاختياري)</h3>";
+
+  for (let i = 1; i <= 10; i++) {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    const studentAns = selected ? selected.value : "لم يُجب";
+    const correct = correctAnswers[`q${i}`];
+    const isCorrect = studentAns === correct;
+    if (isCorrect) score += 2;
+
+    mcqHtml += `<div style="margin-bottom:12px; padding:10px; background:${isCorrect ? '#f0fdf4' : '#fef2f2'}; border-radius:8px;">
+      <strong>سؤال ${i}:</strong> إجابتك: <span class="${isCorrect ? 'correct' : 'wrong'}">${studentAns}</span> 
+      | الإجابة الصحيحة: <span class="correct">${correct}</span>
+      ${isCorrect ? ' ✓' : ' ✗'}
+    </div>`;
+  }
+
+  let essayHtml = "<h3 style='color:#1e40af; margin:25px 0 15px;'>إجابات السؤال الثاني (المقالي) - للمراجعة فقط</h3>";
+  for (let i = 1; i <= 4; i++) {
+    const studentText = document.getElementById(`essay${i}`).value.trim() || "لم يكتب إجابة";
+    essayHtml += `<div style="margin-bottom:20px;">
+      <strong>السؤال ${i}:</strong>
+      <div class="student-answer"><strong>إجابتك:</strong><br>${studentText.replace(/\n/g, '<br>')}</div>
+      <div class="model-answer"><strong>الإجابة النموذجية:</strong><br>${modelAnswers[`essay${i}`].replace(/\n/g, '<br>')}</div>
+    </div>`;
+  }
+
+  const name = document.getElementById("studentName").value || "الطالب";
+  document.getElementById("results").innerHTML = `
+    <div class="score">نتيجة الطالب: ${name}<br>درجة السؤال الأول: ${score} من 20</div>
+    <p style="text-align:center; color:#64748b; margin-bottom:20px;">(السؤال الثاني مقالي ولا يُصحح تلقائيًا)</p>
+    ${mcqHtml}
+    ${essayHtml}
+  `;
+  document.getElementById("results").style.display = "block";
+  document.getElementById("results").scrollIntoView({ behavior: "smooth" });
+}
+
+startTimer();
+</script>
+</body>
+</html>
