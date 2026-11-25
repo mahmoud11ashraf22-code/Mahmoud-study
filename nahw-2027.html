@@ -109,14 +109,27 @@ function prog(){const n=A.filter(x=>x>=0).length;document.getElementById("pb").s
 qs.addEventListener("click",e=>{
  const b=e.target.closest(".o");if(!b||done)return;
  const i=+b.dataset.i,j=+b.dataset.j;A[i]=j;
- document.querySelectorAll("#q"+i+" .o").forEach(x=>x.classList.toggle("sel",+x.dataset.j===j));prog();
+ document.querySelectorAll("#q"+i+" .o").forEach(x=>x.classList.toggle("sel",+x.dataset.j===j));prog();try{rsSave()}catch(e){}
 });
+/* RESUME-NAHW:START */
+let RSU=null;try{RSU=JSON.parse(localStorage.getItem("ms_user")||"null")}catch(e){}
+const RSK="ms_resume_nahw-2027_"+((RSU&&RSU.uid)||"anon");
+function rsSave(){if(done)return;try{if(A.some(x=>x>=0))localStorage.setItem(RSK,JSON.stringify({t:Date.now(),A:A}))}catch(e){}}
+(function(){let d=null;try{d=JSON.parse(localStorage.getItem(RSK)||"null")}catch(e){}
+if(!d||!Array.isArray(d.A)||Date.now()-d.t>48*36e5||!d.A.some(x=>x>=0))return;
+const o=document.createElement("div");o.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999999;display:flex;align-items:center;justify-content:center;direction:rtl";
+o.innerHTML='<div style="background:#fff;color:#111;border-radius:16px;padding:22px;max-width:320px;text-align:center"><div style="font-size:38px">⏸️</div><h3 style="margin:6px 0">عندك امتحان لسه مخلصتوش</h3><p style="margin:6px 0;color:#444">إجاباتك اتحفظت ('+d.A.filter(x=>x>=0).length+' من '+Q.length+'). تكمل من حيث وقفت؟</p><button id="rsY" style="display:block;width:100%;margin:12px 0 8px;padding:12px;border:0;border-radius:10px;background:#16a34a;color:#fff;font-size:16px;font-weight:700;cursor:pointer">▶ أكمل الامتحان</button><button id="rsN" style="display:block;width:100%;padding:10px;border:1px solid #bbb;border-radius:10px;background:#fff;color:#333;cursor:pointer">ابدأ من جديد</button></div>';
+document.body.appendChild(o);
+document.getElementById("rsY").onclick=function(){d.A.forEach((j,i)=>{if(j>=0&&i<A.length){A[i]=j;document.querySelectorAll("#q"+i+" .o").forEach(x=>x.classList.toggle("sel",+x.dataset.j===j))}});prog();o.remove()};
+document.getElementById("rsN").onclick=function(){try{localStorage.removeItem(RSK)}catch(e){}o.remove()};
+})();
+/* RESUME-NAHW:END */
 const sub=document.getElementById("sub");
 sub.onclick=()=>{
  if(done){location.reload();return}
  const un=A.filter(x=>x<0).length;
  if(un&&!confirm("باقي "+un+" سؤال بدون إجابة. تنهي الامتحان؟"))return;
- done=true;let s=0;
+ done=true;let s=0;try{localStorage.removeItem(RSK)}catch(e){}
  Q.forEach((q,i)=>{
   const bs=document.querySelectorAll("#q"+i+" .o");
   bs.forEach((x,j)=>{x.classList.remove("sel");if(j===q[2])x.classList.add("ok");else if(j===A[i])x.classList.add("bad")});
