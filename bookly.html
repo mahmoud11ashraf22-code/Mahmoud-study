@@ -5,34 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BOOKLY | نظام حجوزات ذكي</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--p:#6c5ce7;--p2:#4834d4;--bg:#0f1023;--card:#181a35;--card2:#1f2244;--txt:#f2f3ff;--mut:#9aa0c7;--ok:#2ed573;--bad:#ff6b6b;--warn:#feca57}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
 body{background:var(--bg);color:var(--txt);min-height:100vh}
 .wrap{max-width:520px;margin:0 auto;padding:16px}
-.logo{text-align:center;padding:28px 0 8px;font-size:34px;font-weight:800;letter-spacing:2px}
+.logo{text-align:center;padding:28px 0 8px;font-size:34px;font-weight:900;letter-spacing:2px}
 .logo b{background:linear-gradient(135deg,#a29bfe,#6c5ce7);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tag{text-align:center;color:var(--mut);margin-bottom:20px;font-size:14px}
 .card{background:var(--card);border:1px solid #262a52;border-radius:18px;padding:18px;margin-bottom:14px}
 h2{font-size:18px;margin-bottom:12px}
-h3{font-size:15px;margin:14px 0 8px;color:var(--mut)}
 label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
 input,select,textarea{width:100%;background:var(--card2);border:1px solid #2c3060;color:var(--txt);border-radius:12px;padding:11px 12px;font-size:15px;outline:none}
 input:focus,select:focus{border-color:var(--p)}
-.btn{display:block;width:100%;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;cursor:pointer;margin-top:14px}
+.btn{display:block;width:100%;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;cursor:pointer;margin-top:14px;text-align:center;text-decoration:none}
 .btn:active{transform:scale(.98)}
 .btn.ghost{background:var(--card2);border:1px solid #343a70}
-.btn.small{width:auto;padding:7px 14px;font-size:13px;margin:0;border-radius:10px}
+.btn.small{width:auto;padding:7px 14px;font-size:13px;margin:0;border-radius:10px;display:inline-block}
 .btn.okb{background:linear-gradient(135deg,#2ed573,#20bf6b)}
 .btn.badb{background:linear-gradient(135deg,#ff6b6b,#ee5253)}
+.btn.warnb{background:linear-gradient(135deg,#feca57,#ff9f43);color:#201505}
 .row{display:flex;gap:8px;align-items:center}
 .row>*{flex:1}
 .muted{color:var(--mut);font-size:13px}
 .err{color:var(--bad);font-size:13px;margin-top:8px;min-height:18px;text-align:center}
 .okm{color:var(--ok);font-size:13px;margin-top:8px;text-align:center}
 .tabs{display:flex;background:var(--card2);border-radius:12px;padding:4px;margin-bottom:14px}
-.tabs button{flex:1;background:none;border:none;color:var(--mut);padding:9px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer}
+.tabs button{flex:1;background:none;border:none;color:var(--mut);padding:9px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer}
 .tabs button.on{background:var(--p);color:#fff}
 .days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px}
 .days label{background:var(--card2);border:1px solid #2c3060;border-radius:10px;text-align:center;padding:8px 0;margin:0;font-size:12px;color:var(--mut);cursor:pointer}
@@ -45,36 +45,66 @@ input:focus,select:focus{border-color:var(--p)}
 .slot.off{opacity:.3;pointer-events:none;text-decoration:line-through}
 .bk{background:var(--card2);border:1px solid #2c3060;border-radius:14px;padding:12px;margin-bottom:10px}
 .bk .st{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
-.st.p{background:#4a3f10;color:var(--warn)}.st.c{background:#0f4630;color:var(--ok)}.st.x{background:#4a1717;color:var(--bad)}
+.st.p{background:#4a3f10;color:var(--warn)}.st.c{background:#0f4630;color:var(--ok)}.st.x{background:#4a1717;color:var(--bad)}.st.d{background:#3a2a5c;color:#c9b8ff}
 .badge{display:inline-block;background:var(--bad);color:#fff;border-radius:20px;font-size:11px;padding:1px 8px;font-weight:700}
 .linkbox{display:flex;gap:6px;margin-top:8px}
 .linkbox input{font-size:12px;direction:ltr;text-align:left}
 .hide{display:none!important}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .notif{background:var(--card2);border-right:3px solid var(--p);border-radius:10px;padding:9px 12px;margin-bottom:7px;font-size:13px}
-.hero{text-align:center;padding:10px 0 4px}
-.hero .feat{display:flex;gap:8px;margin:14px 0}
-.hero .feat div{flex:1;background:var(--card2);border-radius:14px;padding:12px 6px;font-size:12px;color:var(--mut)}
-.hero .feat div b{display:block;color:var(--txt);font-size:14px;margin-bottom:3px}
+.notif.dep{border-right-color:var(--warn)}
 .codebox{font-size:30px;font-weight:800;letter-spacing:4px;text-align:center;background:var(--card2);border:1px dashed var(--p);border-radius:14px;padding:14px;margin:12px 0;direction:ltr}
 .footer{text-align:center;color:#565b8a;font-size:11px;padding:18px 0}
 .chip{display:inline-block;background:var(--card2);border:1px solid #2c3060;border-radius:20px;padding:4px 12px;font-size:12px;margin:2px}
+/* landing */
+.heroBig{text-align:center;padding:34px 10px 20px}
+.heroBig h1{font-size:27px;font-weight:900;line-height:1.5}
+.heroBig h1 span{background:linear-gradient(135deg,#a29bfe,#6c5ce7);-webkit-background-clip:text;background-clip:text;color:transparent}
+.heroBig p{color:var(--mut);margin:12px 0 4px;font-size:15px;line-height:1.8}
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.feats div{background:var(--card);border:1px solid #262a52;border-radius:16px;padding:14px 10px;font-size:12.5px;color:var(--mut);line-height:1.7}
+.feats div b{display:block;color:var(--txt);font-size:15px;margin-bottom:4px}
+.statsRow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.statB{background:var(--card);border:1px solid #262a52;border-radius:14px;padding:12px 4px;text-align:center}
+.statB b{display:block;font-size:22px;color:var(--p)}
+.statB span{font-size:11px;color:var(--mut)}
+.dep{background:linear-gradient(135deg,#2c1e4d,#1c1440);border:1px dashed var(--warn);border-radius:14px;padding:14px;margin:12px 0;text-align:center}
+.dep .num{font-size:22px;font-weight:800;letter-spacing:1px;direction:ltr;display:block;margin:6px 0}
+.dateChips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.dateChips .chip{cursor:pointer}
+.dateChips .chip:hover{border-color:var(--bad);color:var(--bad)}
+.sw{position:relative;width:44px;height:24px;flex:0 0 auto}
+.sw input{display:none}
+.sw i{position:absolute;inset:0;background:var(--card2);border:1px solid #2c3060;border-radius:20px;transition:.2s}
+.sw i:after{content:'';position:absolute;top:2px;right:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:.2s}
+.sw input:checked+i{background:var(--p)}
+.sw input:checked+i:after{transform:translateX(-20px)}
 </style>
 </head>
 <body>
 <div class="wrap">
-<div class="logo">BOOKLY<b>.</b></div>
-<div class="tag">نظام حجوزات ذكي للعيادات والسناتر والحلاقين</div>
 
-<!-- ============ LANDING / AUTH ============ -->
+<!-- ============ LANDING ============ -->
+<div id="vLand" class="hide">
+<div class="logo">BOOKLY<b>.</b></div>
+<div class="heroBig">
+<h1>خلّي عملاءك <span>يحجزوا أونلاين</span><br>وارتاح من تليفونات المواعيد 📅</h1>
+<p>نظام حجوزات ذكي للعيادات والسناتر والحلاقين.<br>لينك خاص بيك، حجوزات مؤكدة بعربون، ولوحة تحكم كاملة.</p>
+<button class="btn" style="max-width:280px;margin:18px auto 8px" onclick="goAuth(0)">ابدأ دلوقتي — مجانا 🚀</button>
+<button class="btn ghost" style="max-width:280px;margin:0 auto" onclick="goAuth(1)">عندي حساب — دخول</button>
+</div>
+<div class="feats">
+<div><b>🔗 لينك خاص بيك</b>لينك باسم نشاطك تبعته لعملائك واتساب</div>
+<div><b>💰 عربون الحجز</b>فodafone كاش يأكد الجدية ويلغي الحجوزات الوهمية</div>
+<div><b>📊 لوحة تحكم</b>تأكيد وإلغاء وإحصائيات وإشعارات فورية</div>
+<div><b>⏰ مواعيد ذكية</b>أجازات واستراحات ومواعيدك بس اللي تظهر</div>
+</div>
+<div class="footer">BOOKLY — من صناعة <b>محمود أشرف</b></div>
+</div>
+
+<!-- ============ AUTH ============ -->
 <div id="vAuth" class="hide">
-<div class="hero card">
-<div class="feat">
-<div><b>📅 حجز أونلاين</b>عملاؤك يحجزون من لينك خاص بيك</div>
-<div><b>📊 لوحة تحكم</b>أكّد أو ارفض الحجوزات بضغطة</div>
-<div><b>🔔 إشعارات</b>كل حجز جديد يوصلك فورا</div>
-</div>
-</div>
+<div class="logo">BOOKLY<b>.</b></div>
 <div class="card">
 <div class="tabs">
 <button id="tLogin" class="on" onclick="authTab(1)">تسجيل دخول</button>
@@ -88,8 +118,8 @@ input:focus,select:focus{border-color:var(--p)}
 <label>كلمة السر</label><input id="aPass" type="password" placeholder="6 حروف على الأقل">
 <div class="err" id="aErr"></div>
 <button class="btn" id="aBtn" onclick="doLogin()">دخول</button>
+<button class="btn ghost" onclick="show('vLand')">رجوع</button>
 </div>
-<div class="footer">BOOKLY — من صناعة <b>محمود أشرف</b></div>
 </div>
 
 <!-- ============ OWNER DASHBOARD ============ -->
@@ -97,6 +127,12 @@ input:focus,select:focus{border-color:var(--p)}
 <div class="top">
 <div><b id="dBizName">—</b><div class="muted" id="dBizType"></div></div>
 <button class="btn small ghost" onclick="logout()">خروج</button>
+</div>
+<div class="statsRow">
+<div class="statB"><b id="stToday">0</b><span>حجوزات النهارده</span></div>
+<div class="statB"><b id="stWeek">0</b><span>آخر 7 أيام</span></div>
+<div class="statB"><b id="stPend">0</b><span>بانتظارك</span></div>
+<div class="statB"><b id="stTop">—</b><span>أكتر خدمة</span></div>
 </div>
 <div class="tabs" style="position:sticky;top:8px;z-index:5">
 <button id="tb1" class="on" onclick="dashTab(1)">الحجوزات <span id="pendBadge" class="badge hide">0</span></button>
@@ -106,7 +142,7 @@ input:focus,select:focus{border-color:var(--p)}
 <div id="dp1">
 <div class="card">
 <label>لينك الحجز بتاعك (ابعته لعملائك)</label>
-<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink()">نسخ</button></div>
+<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink(this)">نسخ</button></div>
 </div>
 <div class="row" style="margin-bottom:10px">
 <input type="date" id="fltDate" onchange="renderBookings()">
@@ -116,6 +152,12 @@ input:focus,select:focus{border-color:var(--p)}
 </div>
 <div id="dp2" class="hide"><div id="notifList"></div></div>
 <div id="dp3" class="hide">
+<div class="card">
+<h2>لينك نشاطك</h2>
+<label>اسم اللينك (حروف إنجليزي أو أرقام)</label>
+<div class="row"><input id="slugIn" placeholder="hoda-clinic" style="direction:ltr;text-align:left"><button class="btn small" style="flex:0 0 auto" onclick="saveSlug()">حفظ</button></div>
+<div class="err" id="slugErr"></div><div class="okm" id="slugOk"></div>
+</div>
 <div class="card">
 <h2>الخدمات والأسعار</h2>
 <div id="svcRows"></div>
@@ -130,6 +172,22 @@ input:focus,select:focus{border-color:var(--p)}
 <div><label>إلى الساعة</label><input type="time" id="wTo" value="22:00"></div>
 </div>
 <label>مدة الكشف / الجلسة (دقيقة)</label><input type="number" id="wStep" value="30" min="10" step="5">
+<h2 style="margin-top:16px">استراحة يومية (اختياري)</h2>
+<div class="row">
+<div><label>من</label><input type="time" id="bFrom"></div>
+<div><label>إلى</label><input type="time" id="bTo"></div>
+</div>
+<h2 style="margin-top:16px">أجازات (أيام مقفولة)</h2>
+<div class="row"><input type="date" id="offDate"><button class="btn small ghost" style="flex:0 0 auto" onclick="addOffDate()">+ قفل اليوم</button></div>
+<div class="dateChips" id="offList"></div>
+</div>
+<div class="card">
+<div class="row" style="margin-bottom:6px"><h2 style="margin:0;flex:1">عربون الحجز 💰</h2><label class="sw"><input type="checkbox" id="depOn"><i></i></label></div>
+<div id="depBox" class="hide">
+<label>قيمة العربون (جنيه)</label><input type="number" id="depAmt" placeholder="مثال: 50" min="5">
+<label>رقم محفظة فodafone كاش اللي هيوصل عليها</label><input id="depWallet" inputmode="tel" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:left">
+<p class="muted" style="margin-top:6px">العميل هيشوف الرقم ده ويبعت العربون ويكتب رقم التحويل، وانت تؤكد الاستلام من لوحتك قبل ما الحجز يتثبت.</p>
+</div>
 <div class="err" id="sErr"></div><div class="okm" id="sOk"></div>
 <button class="btn" onclick="saveSettings()">حفظ الإعدادات</button>
 </div>
@@ -157,16 +215,22 @@ input:focus,select:focus{border-color:var(--p)}
 <h2>3) بياناتك</h2>
 <label>الاسم</label><input id="cName" placeholder="اسمك بالكامل">
 <label>رقم الموبايل</label><input id="cPhone" inputmode="tel" placeholder="01xxxxxxxxx">
+<div id="depStep" class="dep hide">
+💰 الحجز بعربون <b id="depAmtShow"></b> جنيه
+<p class="muted" style="margin:6px 0">حوّل على محفظة فodafone كاش:</p>
+<span class="num" id="depWalletShow"></span>
+<label>رقم التحويل / مرجع العملية</label><input id="cDepRef" placeholder="آخر 4 أرقام من رسالة التحويل" style="direction:ltr;text-align:left">
+</div>
 <div class="err" id="bErr"></div>
 <button class="btn" onclick="submitBooking()">تأكيد الحجز ✅</button>
 </div>
 </div>
 
-<!-- ============ BOOKING SUCCESS / STATUS ============ -->
+<!-- ============ SUCCESS / STATUS ============ -->
 <div id="vDone" class="hide">
 <div class="card" style="text-align:center">
 <div style="font-size:44px">🎉</div>
-<h2>تم استلام حجزك!</h2>
+<h2 id="doneTitle">تم استلام حجزك!</h2>
 <p class="muted" id="doneInfo"></p>
 <div class="codebox" id="doneCode"></div>
 <p class="muted">احتفظ بالكود ده عشان تتابع حالة حجزك</p>
@@ -177,6 +241,7 @@ input:focus,select:focus{border-color:var(--p)}
 <div class="card" style="text-align:center">
 <h2>حالة الحجز</h2>
 <div id="stBody"></div>
+<div id="stCancel"></div>
 <button class="btn ghost" onclick="location.href=location.pathname">حجز جديد</button>
 </div>
 </div>
@@ -187,7 +252,6 @@ input:focus,select:focus{border-color:var(--p)}
 </div>
 <div class="footer hide" id="pFooter">مدعوم بواسطة <b>BOOKLY</b> — احجز بذكاء</div>
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -200,16 +264,21 @@ const TYPES={clinic:'عيادة 🩺',tutor:'سنتر / دروس 📚',barber:'�
 const ICONS={clinic:'🩺',tutor:'📚',barber:'💈',other:'⭐'};
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const qp=new URLSearchParams(location.search);
-const pubBiz=qp.get('b'),pubCode=qp.get('code');
-function show(id){['vAuth','vDash','vBook','vDone','vStatus','vFind','pFooter'].forEach(v=>$(v).classList.add('hide'));if(id)$(id).classList.remove('hide');}
+const pubBiz=qp.get('b'),pubSlug=qp.get('s'),pubCode=qp.get('code');
+const isPub=!!(pubBiz||pubSlug);
+function show(id){['vLand','vAuth','vDash','vBook','vDone','vStatus','vFind','pFooter'].forEach(v=>$(v).classList.add('hide'));if(id)$(id).classList.remove('hide');}
 function normPhone(raw){let d=String(raw||'').replace(/[\s().-]/g,'');if(d.startsWith('00'))d='+'+d.slice(2);if(d.startsWith('01'))d='+20'+d.slice(1);else if(d.startsWith('20'))d='+'+d;else if(/^1[0125]\d{8}$/.test(d))d='+2'+d;return d;}
 const bkEmail=ph=>'bk'+ph.replace(/\D/g,'')+'@mahmoud-study.firebaseapp.com';
 function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function t12(t){let[h,m]=t.split(':').map(Number);const ap=h>=12?'م':'ص';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap;}
 function genCode(){const c='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<8;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+function esc(s){return String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
+const STXT={pending:'جديد ⏳',confirmed:'مؤكد ✅',cancelled:'ملغي ❌',awaiting_deposit:'بانتظار العربون 💰'};
+const SCLS={pending:'p',confirmed:'c',cancelled:'x',awaiting_deposit:'d'};
 
 /* ---------- AUTH ---------- */
 let regMode=false;
+function goAuth(reg){show('vAuth');authTab(reg?1:0);}
 function authTab(login){regMode=!login;$('tLogin').classList.toggle('on',login);$('tReg').classList.toggle('on',!login);$('fReg').classList.toggle('hide',login);$('aBtn').textContent=login?'دخول':'إنشاء الحساب';$('aErr').textContent='';}
 async function doLogin(){
 const ph=normPhone($('aPhone').value),pw=$('aPass').value;
@@ -220,42 +289,77 @@ try{
 if(regMode){
 const name=$('rName').value.trim();if(!name){$('aErr').textContent='اكتب اسم النشاط';return;}
 const cr=await auth.createUserWithEmailAndPassword(bkEmail(ph),pw);
-await db.collection('bookly_businesses').add({ownerUid:cr.user.uid,name:name,type:$('rType').value,phone:ph,createdAt:firebase.firestore.FieldValue.serverTimestamp(),services:[],schedule:{days:[1,2,3,4,6],from:'10:00',to:'22:00',step:30}});
+await db.collection('bookly_businesses').add({ownerUid:cr.user.uid,name:name,type:$('rType').value,phone:ph,createdAt:firebase.firestore.FieldValue.serverTimestamp(),services:[],schedule:{days:[1,2,3,4,6],from:'10:00',to:'22:00',step:30,offDates:[],breakFrom:'',breakTo:''},deposit:{on:false,amount:0,wallet:''}});
 }else{await auth.signInWithEmailAndPassword(bkEmail(ph),pw);}
 }catch(e){$('aErr').textContent=e.code==='auth/email-already-in-use'?'الرقم ده مسجل قبل كده، ادخل بيه':e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'كلمة السر غلط':e.code==='auth/user-not-found'?'مفيش حساب بالرقم ده، اعمل حساب جديد':'حصل خطأ: '+e.code;}
 }
 async function logout(){await auth.signOut();location.href=location.pathname;}
 
 /* ---------- DASHBOARD ---------- */
-let myBiz=null,myBizId=null,bkCache=[],seenPend=new Set(JSON.parse(localStorage.getItem('bk_seen')||'[]'));
+let myBiz=null,myBizId=null,bkCache=[];
 auth.onAuthStateChanged(async u=>{
-if(pubBiz)return; // public page handles itself
-if(!u){show('vAuth');return;}
+if(isPub)return;
+if(!u){show('vLand');return;}
 const q=await db.collection('bookly_businesses').where('ownerUid','==',u.uid).limit(1).get();
 if(q.empty){await auth.signOut();show('vAuth');$('aErr').textContent='مفيش نشاط مرتبط بالحساب ده';return;}
 myBiz={id:q.docs[0].id,...q.docs[0].data()};myBizId=q.docs[0].id;
 enterDash();
 });
+function myLink(){return location.origin+location.pathname+(myBiz.slug?'?s='+myBiz.slug:'?b='+myBizId);}
 function enterDash(){
 $('dBizName').textContent=myBiz.name;$('dBizType').textContent=TYPES[myBiz.type]||myBiz.type;
-$('myLink').value=location.origin+location.pathname+'?b='+myBizId;
+$('myLink').value=myLink();
+if(!myBiz.schedule)myBiz.schedule={days:[1,2,3,4,6],from:'10:00',to:'22:00',step:30,offDates:[],breakFrom:'',breakTo:''};
+if(!myBiz.deposit)myBiz.deposit={on:false,amount:0,wallet:''};
 if(!myBiz.services||!myBiz.services.length){myBiz.services=[{name:'كشف',dur:30,price:''}];dashTab(3);}else dashTab(1);
-renderSvcRows();renderDays();$('wFrom').value=myBiz.schedule?.from||'10:00';$('wTo').value=myBiz.schedule?.to||'22:00';$('wStep').value=myBiz.schedule?.step||30;
+renderSvcRows();renderDays();renderOff();
+$('wFrom').value=myBiz.schedule.from||'10:00';$('wTo').value=myBiz.schedule.to||'22:00';$('wStep').value=myBiz.schedule.step||30;
+$('bFrom').value=myBiz.schedule.breakFrom||'';$('bTo').value=myBiz.schedule.breakTo||'';
+$('depOn').checked=!!myBiz.deposit.on;$('depBox').classList.toggle('hide',!myBiz.deposit.on);
+$('depAmt').value=myBiz.deposit.amount||'';$('depWallet').value=myBiz.deposit.wallet||'';
+$('slugIn').value=myBiz.slug||'';
 show('vDash');listenBookings();
 }
 function dashTab(n){[1,2,3].forEach(i=>{$('tb'+i).classList.toggle('on',i===n);$('dp'+i).classList.toggle('hide',i!==n);});}
-function copyLink(){$('myLink').select();document.execCommand('copy');navigator.clipboard?.writeText($('myLink').value);event.target.textContent='تم ✅';setTimeout(()=>event.target.textContent='نسخ',1500);}
+function copyLink(el){navigator.clipboard?.writeText($('myLink').value);el.textContent='تم ✅';setTimeout(()=>el.textContent='نسخ',1500);}
+async function saveSlug(){
+const s=$('slugIn').value.trim().toLowerCase();
+$('slugErr').textContent='';$('slugOk').textContent='';
+if(!/^[a-z0-9][a-z0-9-]{2,29}$/.test(s)){$('slugErr').textContent='من 3 لـ 30 حرف: إنجليزي صغير، أرقام، أو شرطة';return;}
+try{
+const ex=await db.collection('bookly_slugs').doc(s).get();
+if(ex.exists&&ex.data().ownerUid!==auth.currentUser.uid){$('slugErr').textContent='الاسم ده محجوز، جرب اسم تاني';return;}
+await db.collection('bookly_slugs').doc(s).set({bizId:myBizId,ownerUid:auth.currentUser.uid});
+if(myBiz.slug&&myBiz.slug!==s){try{await db.collection('bookly_slugs').doc(myBiz.slug).delete();}catch(e){}}
+myBiz.slug=s;
+await db.collection('bookly_businesses').doc(myBizId).update({slug:s});
+$('myLink').value=myLink();
+$('slugOk').textContent='اتحفظ ✅ لينكك بقى: '+myLink();
+}catch(e){$('slugErr').textContent='حصل خطأ، حاول تاني';}
+}
+
 function listenBookings(){
-db.collection('bookly_businesses').doc(myBizId).collection('bookings').orderBy('date','desc').limit(100).onSnapshot(s=>{
+db.collection('bookly_businesses').doc(myBizId).collection('bookings').orderBy('date','desc').limit(200).onSnapshot(s=>{
 bkCache=s.docs.map(d=>({id:d.id,...d.data()}));
-const pend=bkCache.filter(b=>b.status==='pending');
-const fresh=pend.filter(b=>!seenPend.has(b.id));
-if(fresh.length){fresh.forEach(b=>seenPend.add(b.id));localStorage.setItem('bk_seen',JSON.stringify([...seenPend].slice(-200)));renderNotifs(fresh,true);}
-else renderNotifs(pend,false);
-$('pendBadge').textContent=pend.length;$('pendBadge').classList.toggle('hide',!pend.length);
-document.title=(pend.length?`(${pend.length}) `:'')+'BOOKLY | لوحة التحكم';
-renderBookings();
+const waiting=bkCache.filter(b=>b.status==='pending'||b.status==='awaiting_deposit');
+$('pendBadge').textContent=waiting.length;$('pendBadge').classList.toggle('hide',!waiting.length);
+document.title=(waiting.length?`(${waiting.length}) `:'')+'BOOKLY | لوحة التحكم';
+renderStats();renderBookings();renderNotifs();
+// free slots of cancelled bookings
+bkCache.filter(b=>b.status==='cancelled').forEach(b=>{
+db.collection('bookly_businesses').doc(myBizId).collection('slots').doc(b.date+'_'+b.time).delete().catch(()=>{});
 });
+});
+}
+function renderStats(){
+const today=fmtDate(new Date());
+const wk=new Date();wk.setDate(wk.getDate()-7);
+$('stToday').textContent=bkCache.filter(b=>b.date===today&&b.status!=='cancelled').length;
+$('stWeek').textContent=bkCache.filter(b=>b.date>=fmtDate(wk)&&b.status!=='cancelled').length;
+$('stPend').textContent=bkCache.filter(b=>b.status==='pending'||b.status==='awaiting_deposit').length;
+const cnt={};bkCache.filter(b=>b.status!=='cancelled').forEach(b=>cnt[b.service]=(cnt[b.service]||0)+1);
+const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+$('stTop').textContent=top?top[0].slice(0,8):'—';$('stTop').title=top?top[0]:'';
 }
 function renderBookings(){
 const f=$('fltDate').value;
@@ -265,11 +369,11 @@ if(!list.length){$('bkList').innerHTML='<div class="card muted" style="text-alig
 $('bkList').innerHTML=list.map(b=>`
 <div class="bk"><div class="top" style="margin:0 0 6px">
 <div><b>${esc(b.name)}</b> <span class="muted" style="font-size:12px">${esc(b.phone)}</span></div>
-<span class="st ${b.status==='pending'?'p':b.status==='confirmed'?'c':'x'}">${b.status==='pending'?'جديد':b.status==='confirmed'?'مؤكد':'ملغي'}</span></div>
+<span class="st ${SCLS[b.status]||'p'}">${STXT[b.status]||b.status}</span></div>
 <div class="muted" style="font-size:13px">${esc(b.service)} — ${b.date} الساعة ${t12(b.time)}</div>
-${b.status!=='cancelled'?`<div class="row" style="margin-top:8px">
-<button class="btn small okb" onclick="setStatus('${b.id}','confirmed')">تأكيد ✅</button>
-<button class="btn small badb" onclick="setStatus('${b.id}','cancelled')">إلغاء ❌</button></div>`:''}
+${b.status==='awaiting_deposit'?`<div class="muted" style="font-size:12px;margin-top:4px">💰 مرجع التحويل: <b style="direction:ltr;display:inline-block">${esc(b.depositRef||'—')}</b></div>`:''}
+${b.status==='awaiting_deposit'?`<div class="row" style="margin-top:8px"><button class="btn small warnb" onclick="setStatus('${b.id}','confirmed')">استلمت العربون — تأكيد 💰✅</button><button class="btn small badb" onclick="setStatus('${b.id}','cancelled')">إلغاء ❌</button></div>`
+:b.status!=='cancelled'?`<div class="row" style="margin-top:8px"><button class="btn small okb" onclick="setStatus('${b.id}','confirmed')">تأكيد ✅</button><button class="btn small badb" onclick="setStatus('${b.id}','cancelled')">إلغاء ❌</button></div>`:''}
 </div>`).join('');
 }
 async function setStatus(id,st){
@@ -277,9 +381,12 @@ const b=bkCache.find(x=>x.id===id);
 await db.collection('bookly_businesses').doc(myBizId).collection('bookings').doc(id).update({status:st});
 if(st==='cancelled'&&b){try{await db.collection('bookly_businesses').doc(myBizId).collection('slots').doc(b.date+'_'+b.time).delete();}catch(e){}}
 }
-function renderNotifs(fresh,isNew){
-const pend=bkCache.filter(b=>b.status==='pending').slice(0,20);
-$('notifList').innerHTML=(pend.length?pend.map(b=>`<div class="notif">🔔 حجز جديد: <b>${esc(b.name)}</b> — ${esc(b.service)} يوم ${b.date} الساعة ${t12(b.time)}</div>`).join(''):'<div class="card muted" style="text-align:center">مفيش إشعارات جديدة</div>');
+function renderNotifs(){
+const dep=bkCache.filter(b=>b.status==='awaiting_deposit').slice(0,10);
+const pend=bkCache.filter(b=>b.status==='pending').slice(0,10);
+const html=dep.map(b=>`<div class="notif dep">💰 عربون مستني تأكيدك: <b>${esc(b.name)}</b> — ${esc(b.service)} يوم ${b.date} الساعة ${t12(b.time)} (مرجع: ${esc(b.depositRef||'—')})</div>`).join('')
++pend.map(b=>`<div class="notif">🔔 حجز جديد: <b>${esc(b.name)}</b> — ${esc(b.service)} يوم ${b.date} الساعة ${t12(b.time)}</div>`).join('');
+$('notifList').innerHTML=html||'<div class="card muted" style="text-align:center">مفيش إشعارات جديدة</div>';
 }
 /* settings */
 function renderSvcRows(){
@@ -293,53 +400,78 @@ $('svcRows').innerHTML=myBiz.services.map((s,i)=>`
 }
 function addSvcRow(){myBiz.services.push({name:'',dur:30,price:''});renderSvcRows();}
 function renderDays(){
-const on=myBiz.schedule?.days||[];
+const on=myBiz.schedule.days||[];
 $('dayPicks').innerHTML=DAYS.map((d,i)=>`<label class="${on.includes(i)?'on':''}" data-d="${i}">${d}<input type="checkbox" ${on.includes(i)?'checked':''}></label>`).join('');
 $('dayPicks').querySelectorAll('label').forEach(l=>l.onclick=()=>{const c=l.querySelector('input');c.checked=!c.checked;l.classList.toggle('on',c.checked);});
 }
+function renderOff(){
+const off=myBiz.schedule.offDates||[];
+$('offList').innerHTML=off.map(d=>`<span class="chip" title="اضغط للمسح" onclick="delOff('${d}')">${d} ✕</span>`).join('')||'<span class="muted">مفيش أجازات مسجلة</span>';
+}
+function addOffDate(){
+const d=$('offDate').value;if(!d)return;
+if(!myBiz.schedule.offDates)myBiz.schedule.offDates=[];
+if(!myBiz.schedule.offDates.includes(d))myBiz.schedule.offDates.push(d);
+myBiz.schedule.offDates.sort();renderOff();
+}
+function delOff(d){myBiz.schedule.offDates=(myBiz.schedule.offDates||[]).filter(x=>x!==d);renderOff();}
+$('depOn')?.addEventListener('change',e=>$('depBox').classList.toggle('hide',!e.target.checked));
 async function saveSettings(){
 const days=[...$('dayPicks').querySelectorAll('input')].map((c,i)=>c.checked?i:null).filter(x=>x!==null);
 if(!days.length){$('sErr').textContent='اختار يوم واحد على الأقل';return;}
 myBiz.services=myBiz.services.filter(s=>s.name.trim());
 if(!myBiz.services.length){$('sErr').textContent='ضيف خدمة واحدة على الأقل';return;}
-myBiz.schedule={days:days,from:$('wFrom').value,to:$('wTo').value,step:Math.max(10,+$('wStep').value||30)};
-await db.collection('bookly_businesses').doc(myBizId).update({services:myBiz.services,schedule:myBiz.schedule});
+const depOn=$('depOn').checked,depAmt=+$('depAmt').value||0,depWal=normPhone($('depWallet').value);
+if(depOn&&(depAmt<5||!depWal)){$('sErr').textContent='لتفعيل العربون: اكتب المبلغ (5 جنيه فأكتر) ورقم المحفظة';return;}
+myBiz.schedule={days:days,from:$('wFrom').value,to:$('wTo').value,step:Math.max(10,+$('wStep').value||30),offDates:myBiz.schedule.offDates||[],breakFrom:$('bFrom').value,breakTo:$('bTo').value};
+myBiz.deposit={on:depOn,amount:depAmt,wallet:depWal};
+await db.collection('bookly_businesses').doc(myBizId).update({services:myBiz.services,schedule:myBiz.schedule,deposit:myBiz.deposit});
 $('sErr').textContent='';$('sOk').textContent='تم الحفظ ✅';setTimeout(()=>$('sOk').textContent='',2000);dashTab(1);
 }
-function esc(s){return String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
 
 /* ---------- PUBLIC BOOKING ---------- */
 let PB=null,PBID=null,selSvc=null,selSlot=null;
 async function bootPublic(){
-PBID=pubBiz;
+try{
+if(pubSlug){
+const sd=await db.collection('bookly_slugs').doc(pubSlug.toLowerCase()).get();
+if(!sd.exists)return deadLink();
+PBID=sd.data().bizId;
+}else{PBID=pubBiz;}
 const d=await db.collection('bookly_businesses').doc(PBID).get();
-if(!d.exists){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>اللينك ده مش شغال ❌</h2><p class="muted">اتأكد من اللينك مع صاحب النشاط</p></div>';return;}
+if(!d.exists)return deadLink();
 PB=d.data();
 $('pIcon').textContent=ICONS[PB.type]||'📅';$('pName').textContent=PB.name;$('pType').textContent=TYPES[PB.type]||'';
 $('pSvcs').innerHTML=(PB.services||[]).map(s=>`<span class="chip">${esc(s.name)}${s.price?' · '+esc(s.price)+'ج':''}</span>`).join('');
 $('svcPick').innerHTML=(PB.services||[]).map((s,i)=>`<div class="svc" style="cursor:pointer" onclick="pickSvc(${i},this)"><div class="row"><b>${esc(s.name)}</b><span class="muted" style="flex:0 0 auto;font-size:12px">${s.dur} دقيقة${s.price?' · '+esc(s.price)+' جنيه':''}</span></div></div>`).join('')||'<div class="muted">النشاط لسه مضافش خدمات</div>';
+if(PB.deposit&&PB.deposit.on){$('depStep').classList.remove('hide');$('depAmtShow').textContent=PB.deposit.amount;$('depWalletShow').textContent=PB.deposit.wallet;}
 const t=new Date();$('bDate').min=fmtDate(t);const mx=new Date();mx.setDate(mx.getDate()+14);$('bDate').max=fmtDate(mx);
 show('vBook');$('vFind').classList.remove('hide');$('pFooter').classList.remove('hide');
-if(pubCode){findBooking(pubCode);}
+if(pubCode)findBooking(pubCode);
+}catch(e){deadLink();}
 }
+function deadLink(){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>اللينك ده مش شغال ❌</h2><p class="muted">اتأكد من اللينك مع صاحب النشاط</p></div>';}
 function pickSvc(i,el){selSvc=PB.services[i];document.querySelectorAll('#svcPick .svc').forEach(x=>x.style.borderColor='');el.style.borderColor='var(--p)';$('stepTime').classList.remove('hide');$('stepInfo').classList.remove('hide');loadSlots();}
 async function loadSlots(){
 selSlot=null;
 const ds=$('bDate').value;if(!ds||!selSvc)return;
-const wd=new Date(ds+'T12:00:00').getDay();
 const sch=PB.schedule||{days:[0,1,2,3,4,5,6],from:'10:00',to:'22:00',step:30};
+if((sch.offDates||[]).includes(ds)){$('slotBox').innerHTML='<div class="muted" style="margin-top:8px">اليوم ده أجازة 🌴 اختار يوم تاني</div>';return;}
+const wd=new Date(ds+'T12:00:00').getDay();
 if(!sch.days.includes(wd)){$('slotBox').innerHTML='<div class="muted" style="margin-top:8px">اليوم ده مش من أيام العمل، اختار يوم تاني</div>';return;}
 $('slotBox').innerHTML='<div class="muted" style="margin-top:8px">بنجيب المواعيد...</div>';
 const taken=new Set();
 try{const s=await db.collection('bookly_businesses').doc(PBID).collection('slots').where('date','==',ds).get();s.docs.forEach(d=>taken.add(d.data().time));}catch(e){}
 const dur=selSvc.dur||sch.step||30;
 const [fh,fm]=sch.from.split(':').map(Number),[th,tm]=sch.to.split(':').map(Number);
+const bk=sch.breakFrom&&sch.breakTo?{f:sch.breakFrom.split(':').map(Number),t:sch.breakTo.split(':').map(Number)}:null;
 const now=new Date(),isToday=ds===fmtDate(now);
 let out=[];
 for(let t=fh*60+fm;t+dur<=th*60+tm;t+=sch.step||30){
 const tt=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+const inBreak=bk&&(t < bk.t[0]*60+bk.t[1])&&(t+dur > bk.f[0]*60+bk.f[1]);
 const past=isToday&&(t<=now.getHours()*60+now.getMinutes());
-out.push(`<div class="slot ${taken.has(tt)||past?'off':''}" data-t="${tt}" onclick="pickSlot(this)">${t12(tt)}</div>`);
+out.push(`<div class="slot ${taken.has(tt)||past||inBreak?'off':''}" data-t="${tt}" onclick="pickSlot(this)">${t12(tt)}</div>`);
 }
 $('slotBox').innerHTML=out.length?`<div class="slots">${out.join('')}</div>`:'<div class="muted" style="margin-top:8px">مفيش مواعيد فاضية في اليوم ده</div>';
 }
@@ -350,24 +482,30 @@ if(!selSvc){$('bErr').textContent='اختار الخدمة الأول';return;}
 if(!selSlot){$('bErr').textContent='اختار المعاد';return;}
 if(!name){$('bErr').textContent='اكتب اسمك';return;}
 if(!ph||ph.length<10){$('bErr').textContent='اكتب رقم موبايل صحيح';return;}
+const needDep=PB.deposit&&PB.deposit.on;
+const depRef=needDep?$('cDepRef').value.trim():'';
+if(needDep&&!depRef){$('bErr').textContent='اكتب رقم التحويل عشان نكمل الحجز';return;}
 $('bErr').textContent='...';
 const code=genCode(),slotId=ds+'_'+selSlot;
 const slotRef=db.collection('bookly_businesses').doc(PBID).collection('slots').doc(slotId);
 const bkRef=db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code);
+const data={code:code,name:name,phone:ph,service:selSvc.name,date:ds,time:selSlot,status:needDep?'awaiting_deposit':'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+if(needDep)data.depositRef=depRef.slice(0,40);
 try{
 await db.runTransaction(async tx=>{
 const sl=await tx.get(slotRef);
 if(sl.exists)throw'taken';
 tx.set(slotRef,{date:ds,time:selSlot});
-tx.set(bkRef,{code:code,name:name,phone:ph,service:selSvc.name,date:ds,time:selSlot,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+tx.set(bkRef,data);
 });
 }catch(e){
 if(e==='taken'){$('bErr').textContent='المعاد ده اتحجز للأسف، اختار معاد تاني';loadSlots();return;}
 $('bErr').textContent='حصل خطأ، حاول تاني';return;
 }
+$('doneTitle').textContent=needDep?'تم استلام طلبك! بانتظار تأكيد العربون 💰':'تم استلام حجزك!';
 $('doneInfo').textContent=`${selSvc.name} — يوم ${ds} الساعة ${t12(selSlot)}`;
 $('doneCode').textContent=code;
-history.replaceState(null,'',location.pathname+'?b='+PBID+'&code='+code);
+history.replaceState(null,'',location.pathname+'?'+(pubSlug?'s='+pubSlug:'b='+PBID)+'&code='+code);
 show('vDone');
 }
 async function findBooking(c){
@@ -377,18 +515,27 @@ try{
 const d=await db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code).get();
 if(!d.exists){if($('fErr'))$('fErr').textContent='الكود ده مش موجود';return;}
 const b=d.data();
-$('stBody').innerHTML=`<div style="font-size:34px;margin:8px 0">${b.status==='confirmed'?'✅':b.status==='cancelled'?'❌':'⏳'}</div>
-<p><b>${b.status==='confirmed'?'حجزك مؤكد!':b.status==='cancelled'?'حجزك اتلغى':'حجزك قيد المراجعة'}</b></p>
+const stMsg={confirmed:['✅','حجزك مؤكد!'],cancelled:['❌','حجزك اتلغى'],awaiting_deposit:['💰','بانتظار تأكيد العربون'],pending:['⏳','حجزك قيد المراجعة']}[b.status]||['⏳',b.status];
+$('stBody').innerHTML=`<div style="font-size:34px;margin:8px 0">${stMsg[0]}</div>
+<p><b>${stMsg[1]}</b></p>
 <p class="muted" style="margin-top:6px">${esc(b.name)} — ${esc(b.service)}<br>${b.date} الساعة ${t12(b.time)}</p>
-${PB.phone?`<a class="btn okb" style="text-decoration:none;margin-top:14px" href="https://wa.me/${PB.phone.replace('+','')}?text=${encodeURIComponent('أهلا، معايا حجز كود '+b.code)}">تواصل واتساب 💬</a>`:''}`;
+${PB.phone?`<a class="btn okb" style="margin-top:14px" href="https://wa.me/${PB.phone.replace('+','')}?text=${encodeURIComponent('أهلا، معايا حجز كود '+b.code)}">تواصل واتساب 💬</a>`:''}`;
+$('stCancel').innerHTML=b.status!=='cancelled'?`<button class="btn badb" onclick="clientCancel('${b.code}')">إلغاء حجزي</button>`:'';
 show('vStatus');$('pFooter').classList.remove('hide');
 }catch(e){if($('fErr'))$('fErr').textContent='حصل خطأ، حاول تاني';}
+}
+async function clientCancel(code){
+if(!confirm('متأكد إنك عايز تلغي الحجز؟'))return;
+try{
+await db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code).update({status:'cancelled'});
+findBooking(code);
+}catch(e){alert('حصل خطأ، حاول تاني');}
 }
 function checkStatus(){const c=$('doneCode').textContent.trim();if(c)findBooking(c);}
 
 /* ---------- BOOT ---------- */
-if(pubBiz){bootPublic().catch(e=>{document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>حصل خطأ في التحميل</h2></div>';});}
-else{show('vAuth');}
+if(isPub){bootPublic();}
+else{show('vLand');}
 </script>
 </body>
 </html>
