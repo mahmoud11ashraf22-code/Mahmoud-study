@@ -868,6 +868,7 @@ body.auth-locked .wa-fab{display:none}
 <!-- TEAMS:START arena -->
  <div class="card"><div class="row"><h2>⚔️ أولاد × بنات</h2><span class="tag">منافسة</span></div><div class="tmBoard"><p class="muted">جاري التحميل...</p></div></div>
 <!-- TEAMS:END arena -->
+ <!-- BADGES:START arena card --><div class="card"><div class="row"><h2>🏅 الأوسمة</h2><b class="gold" id="arBadgeCount">0</b></div><div id="arBadges"></div></div><!-- BADGES:END arena card -->
  <div class="card"><h2>📊 المتصدرين</h2><div id="arBoard"><p class="muted">جاري التحميل...</p></div></div>
  <div class="card"><h2>إزاي تكسب نقاط؟</h2><p class="muted">• تسليم امتحان: ١٠ نقاط + بونص حسب درجتك (مرة لكل امتحان في اليوم).</p><p class="muted">• التحدي اليومي: لحد ٣٥ نقطة + بونص السلسلة.</p><p class="muted">• تحدي الأسبوع: ٣ امتحانات + ٦٠ نقطة = بونص ٥٠ نقطة.</p></div>
 </section>
@@ -2648,6 +2649,69 @@ setInterval(function(){if(!done)run();else if(!document.getElementById('stkCard'
 })();
 </script>
 <!-- STREAK:END -->
+<!-- BADGES:START badges+achievements -->
+<style>
+#arBadges{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.bd{background:#0b0f0c;border:1px solid #29332c;border-radius:12px;padding:10px;text-align:center;opacity:.55}
+.bd.on{opacity:1;border-color:#d9a82b;background:linear-gradient(135deg,#2a2208,#121715)}
+.bd .bdi{font-size:30px}.bd b{display:block;color:#f4f7f4;font-size:13px}.bd small{color:#8a948d;font-size:11px}
+#bdPop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:99999;display:flex;align-items:center;justify-content:center}
+#bdPop .bdbox{background:#121715;border:2px solid #d9a82b;border-radius:18px;padding:22px;text-align:center;max-width:300px}
+#bdPop .bdbig{font-size:46px;margin:8px 0}#bdPop .bdname{color:#ffd166;margin:6px 0 12px}
+</style>
+<script>
+
+(function(){
+var DEFS=[
+ {id:'first',i:'🌱',n:'أول خطوة',d:'حلّ أول امتحان',t:function(c){return c.exams>=1}},
+ {id:'p100',i:'💯',n:'أول 100 نقطة',d:'اجمع 100 نقطة',t:function(c){return c.points>=100}},
+ {id:'p500',i:'💎',n:'500 نقطة',d:'اجمع 500 نقطة',t:function(c){return c.points>=500}},
+ {id:'ex10',i:'📝',n:'محلّل امتحانات',d:'حلّ 10 امتحانات',t:function(c){return c.exams>=10}},
+ {id:'str7',i:'🔥',n:'مواظب أسبوع كامل',d:'7 أيام متتالية',t:function(c){return c.streak>=7}},
+ {id:'str3',i:'⚡',n:'بداية قوية',d:'3 أيام متتالية',t:function(c){return c.streak>=3}},
+ {id:'daily',i:'🎯',n:'بطل التحدي اليومي',d:'خلّص التحدي اليومي',t:function(c){return c.daily>=1}},
+ {id:'daily5',i:'🏹',n:'قناص التحدي',d:'خلّص 5 تحديات يومية',t:function(c){return c.daily>=5}},
+ {id:'rev',i:'👑',n:'ملك المراجعة',d:'صلّح 5 أخطاء',t:function(c){return c.fixed>=5}},
+ {id:'ace',i:'🏆',n:'متفوق',d:'جيب 90% أو أكتر في امتحان',t:function(c){return c.best>=90}},
+ {id:'top',i:'🥇',n:'المتصدر',d:'كن الأول في لوحة المتصدرين',t:function(c){return c.top}}
+];
+function A(){try{return window.arenaGet?window.arenaGet():null}catch(_){return null}}
+function ctx(){
+  var a=A();if(!a||!a.st||!a.uid)return null;var s=a.st;
+  var fixed=0;try{var f=db.mistakeFix||{};Object.keys(f).forEach(function(k){if(f[k]>=2)fixed++})}catch(_){}
+  var best=0;try{(db.localSubmissions||[]).forEach(function(x){if((+x.percent||0)>best&&x.total>0)best=+x.percent})}catch(_){}
+  return{points:s.points|0,exams:s.exams|0,streak:Math.max(s.streak|0,0),daily:Object.keys(s.dailyDone||{}).length,fixed:fixed,best:best,top:!!(a.top&&a.top[0]&&a.top[0].uid===a.uid&&(a.top[0].points|0)>0)};
+}
+function owned(){db.badges=db.badges||{};return db.badges}
+function celebrate(list){
+  var old=document.getElementById('bdPop');if(old)old.remove();
+  var d=document.createElement('div');d.id='bdPop';
+  d.innerHTML='<div class="bdbox"><div class="bdconf">🎉 ✨ 🎊 ✨ 🎉</div><div class="bdbig">'+list.map(function(b){return b.i}).join(' ')+'</div><b>'+(list.length>1?'فتحت '+list.length+' أوسمة جديدة!':'وسام جديد!')+'</b><div class="bdname">'+list.map(function(b){return esc(b.n)}).join(' • ')+'</div><button class="btn greenbtn small" id="bdOk">تمام 👏</button></div>';
+  document.body.appendChild(d);
+  document.getElementById('bdOk').onclick=function(){d.remove()};
+  setTimeout(function(){if(d.parentNode)d.remove()},6000);
+}
+function check(){
+  var c=ctx();if(!c)return;var o=owned(),fresh=[];
+  DEFS.forEach(function(b){if(!o[b.id]&&b.t(c)){o[b.id]=localDayKey();fresh.push(b)}});
+  if(fresh.length){try{saveDB()}catch(_){}celebrate(fresh)}
+  if(document.getElementById('arena')&&document.getElementById('arena').classList.contains('active'))render();
+}
+function render(){
+  var h=document.getElementById('arBadges');if(!h)return;var o=owned(),n=0;
+  DEFS.forEach(function(b){if(o[b.id])n++});
+  var c=document.getElementById('arBadgeCount');if(c)c.textContent=n+' / '+DEFS.length;
+  h.innerHTML=DEFS.map(function(b){var u=!!o[b.id];return '<div class="bd'+(u?' on':'')+'"><div class="bdi">'+(u?b.i:'🔒')+'</div><b>'+esc(b.n)+'</b><small>'+esc(b.d)+'</small></div>'}).join('');
+}
+var _go=go;go=function(id){_go(id);if(id==='arena'){setTimeout(function(){check();render()},500);setTimeout(function(){check();render()},2200)}};
+setInterval(function(){try{check()}catch(e){}},4000);
+function homeStrip(){var s=document.getElementById('stkCard');if(!s||!s.parentNode)return;var o=owned(),n=0,ic='';DEFS.forEach(function(b){if(o[b.id]){n++;ic+=b.i}});var h=document.getElementById('bdHome');if(!h){h=document.createElement('div');h.id='bdHome';h.className='card ar-entry';h.onclick=function(){go('arena')};s.parentNode.insertBefore(h,s.nextSibling)}h.innerHTML='<div class="row"><h2>🏅 أوسمتك</h2><b class="gold">'+n+' / '+DEFS.length+' ›</b></div><p class="muted" style="font-size:22px;margin:4px 0">'+(ic||'🔒 اكسب أول وسام')+'</p>'}
+setInterval(function(){try{homeStrip()}catch(e){}},4000);
+window.badgesRender=render;
+})();
+
+</script>
+<!-- BADGES:END -->
 
 <script>
 /* MISTAKE-REVIEW:START (اختبرني في أخطائي) */
