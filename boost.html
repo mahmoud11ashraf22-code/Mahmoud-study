@@ -164,7 +164,7 @@ const svc=id=>SERVICES.find(s=>s.id===id);
 
 $('servicesGrid').innerHTML=SERVICES.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span><h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${money(s.price)} <small>/ ${fmt(s.per)}</small></div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join('');
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
-function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=QTYS.map(q=>`<option value="${q}">${fmt(q)} ${q%s.per===0?'':'('+(q/s.per*1).toFixed(1)+'x)'}</option>`).join('');calc()}
+function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=QTYS.map(q=>`<option value="${q}">${fmt(q)}</option>`).join('');calc()}
 function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(q/s.per*s.price)}
 function pick(id){$('fService').value=id;renderQty();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
 $('fService').onchange=renderQty;$('fQty').onchange=calc;renderQty();
