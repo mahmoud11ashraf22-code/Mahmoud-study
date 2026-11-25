@@ -2572,6 +2572,7 @@ async function finishDaily(){
 window.arenaBonus=async function(n){try{await load();if(!AR.st)return;weekRoll();AR.st.points+=n;AR.st.week.points+=n;await persist();paint()}catch(e){console.warn(e)}};
 window.arenaOpen=open;window.arenaGet=function(){return AR};window.arenaLoad=load;
 /* EXAM-BRIDGE:START api */window.arenaAwardExternal=async function(rec){await load();if(!AR.st)return 0;const add=award(rec);if(add){const wb=weekClaim();await persist();paint();toast('🏆 +'+add+' نقطة'+(wb?' + بونص الأسبوع +'+wb+' 🎉':''))}return add};/* EXAM-BRIDGE:END api */
+/* REFERRAL:START api */window.arenaReferrals=async function(){await load();if(!AR.st||!cloud||!cloud.ready||!AR.uid)return 0;let snap;try{snap=await cloud.store.collection('referrals').where('referrer','==',AR.uid).get()}catch(e){return AR.st.refs|0}const log=AR.st.refLog=AR.st.refLog||{};let add=0;snap.docs.forEach(function(d){if(!log[d.id]&&Object.keys(log).length<20){log[d.id]=1;add+=25}});AR.st.refs=Object.keys(log).length;if(add){AR.st.points+=add;await persist();paint();toast('🎉 صاحبك سجّل بلينكك +'+add+' نقطة')}return AR.st.refs};/* REFERRAL:END api */
 /* TEAMS:START api */window.arenaSetTeam=async function(t){if(t!=='boys'&&t!=='girls')return;await load();if(!AR.st||AR.st.team)return;AR.st.team=t;await persist();paint()};/* TEAMS:END api */
 const _go=go;go=function(id){_go(id);if(id==='arena')open()};
 const _sp=submitPlatformExam;
@@ -2944,5 +2945,58 @@ setInterval(function(){sync();proc()},3000);
 window.addEventListener('focus',proc);document.addEventListener('visibilitychange',proc);
 })();
 /* EXAM-BRIDGE:END */
+</script>
+<script>
+/* REFERRAL:START (نقاط الدعوة) */
+(function(){
+var BASE=location.origin+location.pathname.replace(/index\.html$/,'');
+var RP=25;
+try{var m=/[?&]ref=([A-Za-z0-9_-]{6,64})/.exec(location.search);if(m)localStorage.setItem('ms_ref',m[1])}catch(_){}
+function user(){try{return studentAuth&&studentAuth.currentUser?studentAuth.currentUser:null}catch(_){return null}}
+var sending=false,lastPoll=0;
+async function sendRef(u){
+  if(sending)return;var r=null;try{r=localStorage.getItem('ms_ref')}catch(_){}
+  if(!r)return;
+  var created=0;try{created=Date.parse(u.metadata.creationTime)}catch(_){}
+  if(r===u.uid||!created||Date.now()-created>15*60*1000){try{localStorage.removeItem('ms_ref')}catch(_){}return}
+  if(!cloud||!cloud.ready)return;
+  sending=true;
+  try{
+    var nm=((db.profile&&db.profile.name)||u.displayName||'طالب').slice(0,40);
+    await cloud.store.collection('referrals').doc(u.uid).set({referrer:r,name:nm,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    try{localStorage.removeItem('ms_ref')}catch(_){}
+  }catch(e){console.warn('referral',e&&e.code);if(e&&e.code==='permission-denied'){try{localStorage.removeItem('ms_ref')}catch(_){}}}
+  finally{sending=false}
+}
+function mk(id,beforeId,parentId){
+  var c=document.getElementById(id);if(c)return c;
+  var d=document.getElementById(beforeId),par=document.getElementById(parentId);if(!d&&!par)return null;
+  c=document.createElement('div');c.className='card';c.id=id;c.style.borderColor='#c9a227';
+  c.innerHTML='<div class="row"><h2>🎁 ادعو صحابك واكسب نقاط</h2><span class="tag">+'+RP+' نقطة</span></div>'+
+  '<p class="muted">ده لينكك الخاص. كل صاحب يسجّل بيه تاخد '+RP+' نقطة (لحد ٢٠ صاحب).</p>'+
+  '<input class="refLink" readonly style="width:100%;direction:ltr;text-align:left;margin:8px 0">'+
+  '<div class="row"><button class="btn refCopy" type="button">📋 انسخ اللينك</button><button class="btn refShare" type="button">📤 شارك</button></div>'+
+  '<p class="muted refCount" style="margin-top:8px">صحابك اللي سجّلوا: 0</p>';
+  if(d&&d.parentNode)d.parentNode.insertBefore(c,d);else par.appendChild(c);
+  c.querySelector('.refCopy').onclick=function(){var i=c.querySelector('.refLink');i.select();var t=i.value;try{navigator.clipboard.writeText(t).then(function(){toast('اتنسخ ✅')},function(){document.execCommand('copy');toast('اتنسخ ✅')})}catch(_){try{document.execCommand('copy');toast('اتنسخ ✅')}catch(__){}}};
+  c.querySelector('.refShare').onclick=function(){var t='سجّل في MAHMOUD STUDY من لينكي وذاكر معانا: '+c.querySelector('.refLink').value;if(navigator.share){navigator.share({text:t}).catch(function(){})}else{window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank')}};
+  return c;
+}
+function paintCard(){
+  var u=user();if(!u)return;
+  var cs=[mk('refCardHome','dailyGoalCard','home'),mk('refCard','arDailyCard','arena')];
+  var n=0;try{var g=window.arenaGet&&window.arenaGet();n=(g&&g.st&&g.st.refs)|0}catch(_){}
+  var l=BASE+'?ref='+u.uid;
+  cs.forEach(function(c){if(!c)return;var i=c.querySelector('.refLink');if(i.value!==l)i.value=l;c.querySelector('.refCount').textContent='صحابك اللي سجّلوا بلينكك: '+n+(n?' · نقاطك منهم: '+(n*RP):'')});
+}
+async function tick(){
+  var u=user();if(!u)return;
+  await sendRef(u);
+  if(Date.now()-lastPoll>60000&&window.arenaReferrals){lastPoll=Date.now();try{await window.arenaReferrals()}catch(e){console.warn('ref poll',e)}}
+  paintCard();
+}
+setInterval(tick,3000);
+})();
+/* REFERRAL:END */
 </script>
 </body></html>
