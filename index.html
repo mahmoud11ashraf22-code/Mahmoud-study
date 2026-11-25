@@ -2999,4 +2999,110 @@ setInterval(tick,3000);
 })();
 /* REFERRAL:END */
 </script>
+<script>
+/* CERT:START (شهادات أسبوعية) */
+(function(){
+var RANKS={1:'المركز الأول',2:'المركز الثاني',3:'المركز الثالث'};
+var MEDAL={1:['#fff1b8','#f0c45c','#b8861b'],2:['#f4f6f8','#c3cad2','#8a929b'],3:['#ffd9b5','#d08a4e','#8f5524']};
+function user(){try{return studentAuth&&studentAuth.currentUser?studentAuth.currentUser:null}catch(_){return null}}
+function sat(off){var x=new Date();x=new Date(x.getFullYear(),x.getMonth(),x.getDate());x.setDate(x.getDate()-((x.getDay()+1)%7)+(off||0));return x}
+function key(d){return localDayKey(d)}
+function range(k){var p=k.split('-'),a=new Date(+p[0],+p[1]-1,+p[2]),b=new Date(a);b.setDate(b.getDate()+6);var f=function(d){return d.toLocaleDateString('ar-EG',{day:'numeric',month:'long'})};return f(a)+' - '+f(b)}
+function nm(){var u=user();return ((typeof db!=='undefined'&&db.profile&&db.profile.name)||(u&&u.displayName)||'طالب').slice(0,40)}
+function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+function corner(c,x,y,sx,sy){c.save();c.translate(x,y);c.scale(sx,sy);c.strokeStyle='#f0c45c';c.lineWidth=3;c.beginPath();c.moveTo(0,70);c.lineTo(0,0);c.lineTo(70,0);c.stroke();c.beginPath();c.moveTo(14,56);c.lineTo(14,14);c.lineTo(56,14);c.stroke();c.fillStyle='#f0c45c';c.beginPath();c.arc(30,30,5,0,7);c.fill();c.restore()}
+async function draw(o){
+  try{await Promise.all([document.fonts.load('800 80px Cairo'),document.fonts.load('600 40px Cairo'),document.fonts.load('400 30px Cairo')])}catch(_){}
+  var W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;var c=cv.getContext('2d');
+  var F='Cairo,Tahoma,Arial,sans-serif';
+  var g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,'#04100b');g.addColorStop(.55,'#0a2218');g.addColorStop(1,'#050d09');c.fillStyle=g;c.fillRect(0,0,W,H);
+  var rg=c.createRadialGradient(W/2,430,20,W/2,430,640);rg.addColorStop(0,'rgba(240,196,92,.22)');rg.addColorStop(1,'rgba(240,196,92,0)');c.fillStyle=rg;c.fillRect(0,0,W,H);
+  c.save();c.strokeStyle='rgba(240,196,92,.07)';c.lineWidth=2;for(var i=1;i<14;i++){c.beginPath();c.arc(W/2,430,i*52,0,7);c.stroke()}c.restore();
+  c.save();c.strokeStyle='rgba(240,196,92,.05)';for(var j=-H;j<W;j+=46){c.beginPath();c.moveTo(j,0);c.lineTo(j+H,H);c.stroke()}c.restore();
+  c.strokeStyle='#f0c45c';c.lineWidth=5;rr(c,40,40,W-80,H-80,18);c.stroke();
+  c.strokeStyle='rgba(240,196,92,.45)';c.lineWidth=1.5;rr(c,62,62,W-124,H-124,12);c.stroke();
+  corner(c,62,62,1,1);corner(c,W-62,62,-1,1);corner(c,62,H-62,1,-1);corner(c,W-62,H-62,-1,-1);
+  c.textAlign='center';c.textBaseline='alphabetic';c.direction='rtl';
+  c.fillStyle='#f0c45c';c.font='700 34px '+F;try{c.letterSpacing='10px'}catch(_){}c.direction='ltr';c.fillText('MAHMOUD STUDY',W/2+5,150);try{c.letterSpacing='0px'}catch(_){}c.direction='rtl';
+  c.strokeStyle='rgba(240,196,92,.6)';c.lineWidth=2;c.beginPath();c.moveTo(W/2-210,176);c.lineTo(W/2-24,176);c.moveTo(W/2+24,176);c.lineTo(W/2+210,176);c.stroke();
+  c.fillStyle='#f0c45c';c.beginPath();c.moveTo(W/2,166);c.lineTo(W/2+10,176);c.lineTo(W/2,186);c.lineTo(W/2-10,176);c.fill();
+  var tg=c.createLinearGradient(0,220,0,330);tg.addColorStop(0,'#fff1b8');tg.addColorStop(.5,'#f0c45c');tg.addColorStop(1,'#b8861b');
+  c.fillStyle=tg;c.font='800 112px '+F;c.shadowColor='rgba(240,196,92,.35)';c.shadowBlur=30;c.fillText('شهادة تقدير',W/2,330);c.shadowBlur=0;
+  c.fillStyle='rgba(255,255,255,.72)';c.font='400 34px '+F;c.fillText('تُمنح هذه الشهادة إلى',W/2,408);
+  var n=o.name,fs=104;c.font='800 '+fs+'px '+F;while(c.measureText(n).width>W-260&&fs>44){fs-=4;c.font='800 '+fs+'px '+F}
+  c.fillStyle='#ffffff';c.shadowColor='rgba(0,0,0,.5)';c.shadowBlur=14;c.fillText(n,W/2,540);c.shadowBlur=0;
+  c.strokeStyle='rgba(240,196,92,.7)';c.lineWidth=2;var nw=Math.min(c.measureText(n).width+80,W-200);c.beginPath();c.moveTo(W/2-nw/2,578);c.lineTo(W/2+nw/2,578);c.stroke();
+  c.fillStyle='rgba(255,255,255,.78)';c.font='400 34px '+F;c.fillText('تقديرًا للتميّز والاجتهاد في منافسة الأسبوع',W/2,646);
+  c.fillText('وحصولًا على',W/2,694);
+  var m=MEDAL[o.rank]||MEDAL[3],cx=W/2,cy=870,R=118;
+  var rb=c.createLinearGradient(cx,cy-R,cx,cy+R);rb.addColorStop(0,m[0]);rb.addColorStop(.5,m[1]);rb.addColorStop(1,m[2]);
+  c.save();c.shadowColor='rgba(240,196,92,.45)';c.shadowBlur=45;c.fillStyle=rb;c.beginPath();c.arc(cx,cy,R,0,7);c.fill();c.restore();
+  c.strokeStyle='rgba(255,255,255,.55)';c.lineWidth=3;c.beginPath();c.arc(cx,cy,R-12,0,7);c.stroke();c.strokeStyle='rgba(0,0,0,.25)';c.beginPath();c.arc(cx,cy,R-24,0,7);c.stroke();
+  c.fillStyle='#2b1d02';c.font='800 150px '+F;c.direction='ltr';c.fillText(String(o.rank),cx,cy+52);c.direction='rtl';
+  var tg2=c.createLinearGradient(0,1010,0,1070);tg2.addColorStop(0,'#fff1b8');tg2.addColorStop(.6,'#f0c45c');tg2.addColorStop(1,'#d9a53a');c.fillStyle=tg2;c.font='800 62px '+F;c.fillText(RANKS[o.rank]||('المركز '+o.rank),W/2,1066);
+  var bw=640,bh=84,bx=W/2-bw/2,by=1100;c.fillStyle='rgba(240,196,92,.1)';rr(c,bx,by,bw,bh,42);c.fill();c.strokeStyle='rgba(240,196,92,.55)';c.lineWidth=2;rr(c,bx,by,bw,bh,42);c.stroke();
+  c.fillStyle='#fff';c.font='700 34px '+F;var tm=o.team==='girls'?'فريق البنات 👧':(o.team==='boys'?'فريق الأولاد 👦':'');c.fillText(o.points+' نقطة'+(tm?'  ·  '+tm:''),W/2,by+55);
+  c.fillStyle='rgba(255,255,255,.6)';c.font='400 28px '+F;c.fillText('أسبوع '+o.range,W/2,1226);
+  c.fillStyle='rgba(240,196,92,.85)';c.font='600 26px '+F;c.direction='ltr';c.fillText('mahmoud11ashraf22-code.github.io/Mahmoud-study',W/2,1264);c.direction='rtl';
+  return cv;
+}
+function modal(cv,o){
+  var old=document.getElementById('certModal');if(old)old.remove();
+  var m=document.createElement('div');m.id='certModal';m.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;gap:12px';
+  cv.style.cssText='max-width:100%;max-height:72vh;border-radius:14px;box-shadow:0 10px 50px rgba(0,0,0,.6)';
+  var r=document.createElement('div');r.style.cssText='display:flex;gap:10px;flex-wrap:wrap;justify-content:center';
+  function b(t,f){var x=document.createElement('button');x.className='btn';x.type='button';x.textContent=t;x.onclick=f;r.appendChild(x);return x}
+  function blob(){return new Promise(function(res){cv.toBlob(res,'image/png')})}
+  b('⬇️ نزّل الشهادة',async function(){var bl=await blob(),a=document.createElement('a');a.href=URL.createObjectURL(bl);a.download='MAHMOUD-STUDY-certificate.png';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},4000)});
+  b('📤 شارك',async function(){var bl=await blob(),f=new File([bl],'MAHMOUD-STUDY-certificate.png',{type:'image/png'});try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:'جبت '+(RANKS[o.rank]||'')+' في منافسة الأسبوع على MAHMOUD STUDY 🏆'});return}}catch(_){return}toast('نزّل الصورة وانشرها 📲')});
+  b('إغلاق',function(){m.remove()});
+  m.appendChild(cv);m.appendChild(r);m.onclick=function(e){if(e.target===m)m.remove()};document.body.appendChild(m);
+}
+window.msCertificate=async function(o){var cv=await draw(o);modal(cv,o);return cv};
+var cache=null,last=0,busy=false;
+async function standings(){
+  var u=user();if(!u||!cloud||!cloud.ready)return null;
+  var ks=[key(sat(0)),key(sat(-7))],out={};
+  for(var i=0;i<ks.length;i++){
+    try{var s=await cloud.store.collection('publicScores').where('weekKey','==',ks[i]).get();
+      var rows=s.docs.map(function(d){return d.data()}).filter(function(d){return (d.weekPoints|0)>0});
+      rows.sort(function(a,b){return (b.weekPoints|0)-(a.weekPoints|0)});
+      var idx=rows.findIndex(function(d){return d.uid===u.uid});
+      out[i]={key:ks[i],rank:idx<0?0:idx+1,points:idx<0?0:rows[idx].weekPoints|0,team:idx<0?'':(rows[idx].team||''),n:rows.length};
+    }catch(e){out[i]={key:ks[i],rank:0,points:0,n:0}}
+  }
+  return out;
+}
+function pick(st){if(!st)return null;var a=st[0],b=st[1];var c=[];if(a&&a.rank>=1&&a.rank<=3)c.push({w:a,cur:true});if(b&&b.rank>=1&&b.rank<=3)c.push({w:b,cur:false});c.sort(function(x,y){return x.w.rank-y.w.rank||(x.cur?-1:1)});return c[0]||null}
+function open(p){return window.msCertificate({name:nm(),rank:p.w.rank,points:p.w.points,team:p.w.team,range:range(p.w.key)})}
+function mkCard(){
+  var c=document.getElementById('certCard');if(c)return c;
+  var d=document.getElementById('arDailyCard'),par=document.getElementById('arena');if(!d&&!par)return null;
+  c=document.createElement('div');c.className='card';c.id='certCard';c.style.borderColor='#c9a227';
+  c.innerHTML='<div class="row"><h2>🏅 شهادة الأسبوع</h2><span class="tag">شهادة</span></div><p class="muted certMsg">جاري التحقق من ترتيبك...</p><div class="row"><button class="btn certBtn" type="button" style="display:none">🎓 اعرض شهادتي</button></div>';
+  if(d&&d.parentNode)d.parentNode.insertBefore(c,d);else par.appendChild(c);return c;
+}
+function banner(p){
+  var k='ms_cert_seen_'+p.w.key+'_'+(user()||{}).uid;try{if(localStorage.getItem(k))return}catch(_){}
+  var h=document.getElementById('home'),anchor=document.getElementById('dailyGoalCard');if(!h||document.getElementById('certBanner'))return;
+  var b=document.createElement('div');b.id='certBanner';b.className='card';b.style.cssText='border-color:#f0c45c;background:linear-gradient(135deg,#1a1405,#0d2218);text-align:center';
+  b.innerHTML='<h2>🎉 مبروك! '+(RANKS[p.w.rank]||'')+' في المنافسة الأسبوعية</h2><p class="muted">شهادتك جاهزة، نزّلها وانشرها 🏆</p><div class="row" style="justify-content:center;gap:10px"><button class="btn cbOpen" type="button">🎓 اعرض الشهادة</button><button class="btn cbX" type="button">لاحقًا</button></div>';
+  if(anchor&&anchor.parentNode)anchor.parentNode.insertBefore(b,anchor);else h.insertBefore(b,h.firstChild);
+  b.querySelector('.cbOpen').onclick=function(){try{localStorage.setItem(k,'1')}catch(_){}b.remove();open(p)};
+  b.querySelector('.cbX').onclick=function(){try{localStorage.setItem(k,'1')}catch(_){}b.remove()};
+  try{toast('🎉 مبروك! '+(RANKS[p.w.rank]||''))}catch(_){}
+}
+async function refresh(){
+  if(busy)return;busy=true;
+  try{
+    var st=await standings();if(!st)return;cache=st;var p=pick(st),c=mkCard();if(!c)return;
+    var msg=c.querySelector('.certMsg'),btn=c.querySelector('.certBtn');
+    if(p){msg.textContent='مبروك! جبت '+RANKS[p.w.rank]+(p.cur?' في أسبوع النهارده (لحد دلوقتي)':' في الأسبوع اللي فات')+' بـ '+p.w.points+' نقطة. نزّل شهادتك وانشرها 🏆';btn.style.display='';btn.onclick=function(){open(p)};if(p.w.rank===1||p.cur===false)banner(p)}
+    else{var w=st[0];msg.textContent='الشهادات بتتمنح لأول ٣ في ترتيب الأسبوع. '+(w&&w.rank?'ترتيبك دلوقتي '+w.rank+'. ':'')+'كمّل امتحانات واكسب نقاط وانت هتلاقيها هنا 💪';btn.style.display='none'}
+  }catch(e){console.warn('cert',e)}finally{busy=false}
+}
+setInterval(function(){if(!user())return;if(Date.now()-last>120000){last=Date.now();refresh()}else mkCard()},3000);
+})();
+/* CERT:END */
+</script>
 </body></html>
