@@ -639,9 +639,6 @@ body.auth-locked .wa-fab{display:none}
   <div class="stat"><b id="tasksStat">0</b><span>مهمة غير مكتملة</span></div>
   <div class="stat"><b id="studyStat">0</b><span>دقيقة تركيز اليوم</span></div>
  </div>
-<!-- SMART-TUTOR:START card -->
- <div class="card" id="stCard" style="border-color:#5d3d75"><div class="row"><h2>🧑‍🏫 المدرّس الذكي</h2><span class="tag">جديد</span></div><div id="stBody"></div></div>
-<!-- SMART-TUTOR:END card -->
  <div class="card" id="smartAssistantCard">
   <div class="row"><h2>🤖 مساعدك الدراسي الذكي</h2><span class="tag">يعمل على جهازك</span></div>
   <p class="smallnote">اسأله عن أفضل خطوة تذاكرها الآن، أو اكتب وقتك المتاح.</p>
@@ -717,6 +714,12 @@ body.auth-locked .wa-fab{display:none}
  <div class="card"><h2>📅 ملخص الأسبوع</h2><div class="grid"><div class="stat"><b id="weekMinutes">0</b><span>دقيقة تركيز آخر 7 أيام</span></div><div class="stat"><b id="weekTasks">0</b><span>مهمة منجزة آخر 7 أيام</span></div></div></div>
 </section>
 
+<!-- SMART-TUTOR:START page -->
+<section class="page" id="tutor">
+ <h1>🧑‍🏫 المدرّس الذكي</h1><p class="sub">بيقرا نتايجك ويقولك تذاكر إيه بعد كده.</p>
+ <div class="card" id="stCard" style="border-color:#5d3d75"><div class="row"><h2>توصياتك</h2><span class="tag">على جهازك</span></div><div id="stBody"></div></div>
+</section>
+<!-- SMART-TUTOR:END page -->
 <section class="page" id="more">
  <h1>🧩 المزيد</h1><p class="sub">أدوات إضافية وإعدادات المنصة.</p>
  <div class="dev-card" id="devContactCard">
@@ -820,12 +823,15 @@ body.auth-locked .wa-fab{display:none}
 <!-- ARENA:END page -->
 </main></div>
 
-<nav class="tabs"><div class="tabsin" style="grid-template-columns:repeat(6,1fr)">
+<nav class="tabs"><div class="tabsin" style="grid-template-columns:repeat(7,1fr)">
 <button class="tab active" data-page="home" onclick="go('home')"><span class="ico">⌂</span>الرئيسية</button>
 <button class="tab" data-page="exams" onclick="go('exams')"><span class="ico">📝</span>الامتحانات</button>
 <button class="tab" data-page="videos" onclick="go('videos')"><span class="ico">🎬</span>الفيديوهات</button>
 <button class="tab" data-page="forum" onclick="go('forum')"><span class="ico">💬</span>المنتدى</button>
 <button class="tab" data-page="planner" onclick="go('planner')"><span class="ico">📚</span>تنظيم المذاكرة</button>
+<!-- SMART-TUTOR:START tab -->
+<button class="tab" data-page="tutor" onclick="go('tutor')"><span class="ico">🧑‍🏫</span>المدرّس</button>
+<!-- SMART-TUTOR:END tab -->
 <button class="tab" data-page="more" onclick="go('more')"><span class="ico">☰</span>المزيد</button>
 </div></nav>
 <a class="wa-fab" id="waFab" href="https://wa.me/201558288143" target="_blank" rel="noopener" aria-label="تواصل مع المطور عبر واتساب" title="تواصل مع المطور"><svg style="color:#04200f" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#i-wa"/></svg></a>
@@ -2671,7 +2677,7 @@ function paint(){
   h.innerHTML=html;
   var t=document.getElementById('stToggle');if(t)t.onclick=function(){open=!open;paint()};
 }
-var _go=go;go=function(id){_go(id);if(id==='home')setTimeout(paint,50)};
+var _go=go;go=function(id){_go(id);if(id==='tutor')setTimeout(paint,50)};
 if(typeof refreshAllStudentViews==='function'){var _r=refreshAllStudentViews;refreshAllStudentViews=function(){var x=_r.apply(this,arguments);try{paint()}catch(_){}return x}}
 setTimeout(paint,1200);
 window.smartTutorPaint=paint;
