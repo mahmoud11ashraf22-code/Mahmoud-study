@@ -2736,7 +2736,7 @@ window.badgesRender=render;
 (function(){
 var SM={subj:'',q:''};
 function isAdmin(){try{return !!(studentAuth&&studentAuth.currentUser&&isAdminUid(studentAuth.currentUser.uid))}catch(_){return false}}
-function items(){try{return (platform.htmlExams||[]).filter(function(e){return e&&e.kind==='summary'&&/^https?:\/\//i.test(e.url||'')})}catch(_){return []}}
+function items(){try{return (platform.htmlExams||[]).filter(function(e){return e&&e.kind==='summary'&&isAdminUid(e.ownerUid)&&/^https?:\/\//i.test(e.url||'')})}catch(_){return []}}
 function render(){
   var host=document.getElementById('smList');if(!host)return;
   var all=items(),subs={};all.forEach(function(e){if(e.subject)subs[e.subject]=1});
@@ -2780,6 +2780,51 @@ window.summariesRender=render;
 })();
 </script>
 <!-- SUMMARIES:END -->
+<!-- RESUME-PLATFORM:START exam pause/resume for platform exams -->
+<script>
+(function(){
+var handled={},pending=false;
+function uid(){try{return studentAuth.currentUser.uid}catch(_){return null}}
+function eid(){try{return new URLSearchParams(location.search).get('exam')}catch(_){return null}}
+function key(){var u=uid(),e=eid();return u&&e?'ms_resume_plat_'+u+'_'+e:null}
+function box(){var b=document.getElementById('examTaking');return b&&b.style.display!=='none'?b:null}
+function snap(b){var r={},x={},n=0;b.querySelectorAll('input[type=radio][name^="exam_"]:checked').forEach(function(e){r[e.name]=e.value;n++});b.querySelectorAll('textarea[id^="essay_"]').forEach(function(t){if(t.value.trim()){x[t.id]=t.value;n++}});return{n:n,r:r,x:x}}
+function restore(b,d){Object.keys(d.r||{}).forEach(function(n){var el=b.querySelector('input[type=radio][name="'+n+'"][value="'+d.r[n]+'"]');if(el)el.checked=true});Object.keys(d.x||{}).forEach(function(i){var el=document.getElementById(i);if(el&&!el.value)el.value=d.x[i]})}
+function load(k){try{var d=JSON.parse(localStorage.getItem(k)||'null');if(d&&Date.now()-d.t<48*3600e3)return d}catch(_){}return null}
+function tick(){
+  var b=box(),k=key();if(!b||!k)return;
+  if(!b.querySelector('input[type=radio][name^="exam_"]'))return;
+  var mark=b.querySelector('.rsmMark');
+  if(!mark){
+    var m=document.createElement('span');m.className='rsmMark';m.hidden=true;b.insertBefore(m,b.firstChild);
+    var d=load(k);
+    if(d&&!handled[k]){
+      handled[k]=1;pending=true;
+      var bn=document.createElement('div');bn.className='item';bn.id='rsmBanner';bn.style.borderColor='var(--green)';
+      bn.innerHTML='<b>⏸️ عندك إجابات محفوظة للامتحان ده</b><p class="muted" style="margin:6px 0">تكمل من حيث وقفت؟</p><button class="btn" id="rsmGo">▶ أكمل الامتحان</button> <button class="btn ghost" id="rsmNew">ابدأ من جديد</button>';
+      b.insertBefore(bn,m.nextSibling);
+      document.getElementById('rsmGo').onclick=function(){restore(b,d);bn.remove();pending=false};
+      document.getElementById('rsmNew').onclick=function(){try{localStorage.removeItem(k)}catch(_){}bn.remove();pending=false};
+    }else if(d){restore(b,d)}
+    else handled[k]=1;
+    return;
+  }
+  if(pending)return;
+  var s=snap(b);if(!s.n)return;
+  try{localStorage.setItem(k,JSON.stringify({t:Date.now(),r:s.r,x:s.x}))}catch(_){}
+}
+setInterval(function(){try{tick()}catch(e){}},1500);
+document.addEventListener('change',function(){setTimeout(function(){try{tick()}catch(e){}},50)},true);
+document.addEventListener('input',function(){setTimeout(function(){try{tick()}catch(e){}},400)},true);
+var _sp=submitPlatformExam;
+submitPlatformExam=async function(id){
+  var u=uid(),r=await _sp.apply(this,arguments);
+  try{if(u){localStorage.removeItem('ms_resume_plat_'+u+'_'+id)}}catch(_){}
+  return r;
+};
+})();
+</script>
+<!-- RESUME-PLATFORM:END -->
 
 <script>
 /* MISTAKE-REVIEW:START (اختبرني في أخطائي) */
