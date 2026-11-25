@@ -617,6 +617,12 @@ body.auth-locked .wa-fab{display:none}
  <div class="hero"><div class="eyebrow">✦ لوحة التحكم الشخصية</div><h1 id="welcome">أهلاً بيك 👋</h1><p>منصة تعليمية تجمع الامتحانات والفيديوهات والمنتدى وتنظيم المذاكرة في مكان واحد.</p>
   <div class="hero-actions"><button class="hero-chip" onclick="go('exams')">📝 ابدأ امتحان</button><a class="hero-chip wa" href="https://wa.me/201558288143" target="_blank" rel="noopener" aria-label="تواصل مع المطور عبر واتساب"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#i-wa"/></svg> تواصل مع المطور</a></div>
   <div class="hero-art" aria-hidden="true"><svg class="o1" viewBox="0 0 48 48"><path d="M24 4 42 14v20L24 44 6 34V14z" fill="none" stroke="#34d995" stroke-width="2"/></svg><svg class="o2" viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="none" stroke="#f2c35b" stroke-width="2.5" stroke-dasharray="5 6"/></svg><svg class="o3" viewBox="0 0 48 48"><path d="M24 6l5 13 14 1-11 9 4 14-12-8-12 8 4-14L5 20l14-1z" fill="#34d995" fill-opacity=".55"/></svg><div class="shine"></div></div></div>
+<!-- TEAMS:START home -->
+ <div class="card" id="tmHome" style="border-color:#5d3d75"><div class="row"><h2>⚔️ أولاد × بنات</h2><span class="tag">منافسة</span></div><div class="tmBoard"><p class="muted">جاري التحميل...</p></div></div>
+<!-- TEAMS:END home -->
+<!-- GUIDE:START home -->
+ <div class="card ar-entry" onclick="go('guide')" style="cursor:pointer"><div class="row"><h2>📖 دليل الاستخدام</h2><b class="gold">اتعلم المنصة ›</b></div><p class="muted">شرح بسيط لكل قسم: الامتحانات، النقاط، التحديات، المدرّس وغيرها.</p></div>
+<!-- GUIDE:END home -->
  <div class="card streakwarn" id="streakWarnCard" style="display:none"><div class="row"><div class="sw-text" style="font-size:12px;line-height:1.8"></div></div><div class="formgrid" style="margin-top:8px"><button class="btn small" onclick="go('focus')">⏱ ابدأ جلسة دلوقتي</button><button class="btn ghost small" id="notifBtn" onclick="enableReminders()">🔔 فعّل التنبيه</button></div></div>
  <div class="card goalcard" id="dailyGoalCard"><div class="row"><h2>🎯 هدفي اليومي</h2><b class="green" id="goalPct">0%</b></div><div class="goalnums" id="goalNums">0 / 60 دقيقة</div><div class="progress"><i id="goalBar" style="width:0%"></i></div><p class="smallnote" id="goalMsg"></p><div class="goalrow"><select id="goalType" onchange="setGoalTypeDefault()"><option value="minutes">دقائق مذاكرة</option><option value="tasks">عدد مهام</option></select><input id="goalTarget" type="number" min="1" max="1000" value="60"><button class="btn small" onclick="saveDailyGoal()">حفظ</button></div></div>
  <div class="card" id="dailyBriefingCard" style="background:linear-gradient(135deg,#241c3a,#15182b);border-color:#5d3d75">
@@ -727,8 +733,27 @@ body.auth-locked .wa-fab{display:none}
 <!-- SMART-TUTOR:END chatcard -->
 </section>
 <!-- SMART-TUTOR:END page -->
+<!-- GUIDE:START page -->
+<section class="page" id="guide">
+ <h1>📖 دليل الاستخدام</h1><p class="sub">اتعلم المنصة في دقيقتين. اضغط على أي قسم.</p>
+<details class="gd"><summary>🚀 إزاي أسجّل وأبدأ؟</summary><div class="gdb"><p>من شاشة الدخول اختار "إنشاء حساب"، اكتب رقم موبايلك واختار باسورد، وادخل. المرة الجاية بتسجّل دخول بنفس البيانات. بعدها ادخل <b>⚙️ الإعدادات</b> (من المزيد) وحط اسمك وتاريخ امتحانك وساعات مذاكرتك.</p><p>وهتتسأل مرة واحدة تختار فريقك: <b>أولاد</b> ولا <b>بنات</b>.</p></div></details>
+<details class="gd"><summary>🧭 إزاي أتنقل في المنصة؟</summary><div class="gdb"><p>الشريط اللي تحت فيه الأقسام: <b>الرئيسية</b> (ملخصك وتحدياتك)، <b>الامتحانات</b>، <b>الفيديوهات</b>، <b>المنتدى</b>، <b>تنظيم المذاكرة</b> (الخطة والمهام)، <b>المدرّس</b>، و<b>المزيد</b> (المنافسات، التراكم، المراجعة، الإعدادات).</p></div></details>
+<details class="gd"><summary>📝 إزاي أحلّ امتحان؟</summary><div class="gdb"><p>ادخل <b>الامتحانات</b>، اختار امتحان واضغط ابدأ، جاوب الأسئلة واضغط تسليم. هتشوف درجتك فوراً والإجابات الصح. فيه كمان امتحانات فيزياء وإنجليزي بالإجابات في تاب الامتحانات.</p><p>أخطاءك بتتسجّل لوحدها عشان تراجعها بعدين.</p></div></details>
+<details class="gd"><summary>⭐ نظام النقاط وإزاي أكسب؟</summary><div class="gdb"><p>• تسليم امتحان: <b>10 نقاط</b> + بونص حسب درجتك (مرة لكل امتحان في اليوم).<br>• التحدي اليومي: لحد <b>35 نقطة</b> + بونص السلسلة.<br>• التحدي الأسبوعي: بونص لما تحقق هدف الأسبوع.<br>• تصليح الأخطاء في "اختبرني في أخطائي": <b>+2 نقطة</b> لكل غلطة.<br>• المذاكرة كل يوم بتبني <b>السلسلة 🔥</b> وبتزوّد البونص.</p></div></details>
+<details class="gd"><summary>⚡ التحدي اليومي والأسبوعي</summary><div class="gdb"><p>في صفحة <b>🏆 المنافسات</b>: التحدي اليومي 5 أسئلة جديدة كل يوم. التحدي الأسبوعي هدف بتحققه في الأسبوع وتاخد بونص. الأسبوع بيبدأ السبت وبيتصفّر نقط الأسبوع كل أسبوع.</p></div></details>
+<details class="gd"><summary>📊 لوحة المتصدرين وفريقك</summary><div class="gdb"><p>في <b>المنافسات</b> هتلاقي ترتيبك بين الطلبة. وفيه منافسة <b>أولاد × بنات</b>: كل نقطة بتكسبها بتتحسب لفريقك، وأكتر فريق نقاطاً في الأسبوع بيتصدّر وبيظهر على الرئيسية.</p></div></details>
+<details class="gd"><summary>🧑‍🏫 المدرّس الذكي</summary><div class="gdb"><p>تاب <b>المدرّس</b> بيقرا نتايجك ويقولك أقوى وأضعف مادة والخطوة الجاية. اكتبله في الشات أسئلة زي: "أذاكر إيه؟"، "راجع إيه؟"، "إيه ضعفي؟"، "عندي كام نقطة؟"، "جدولي النهارده"، "إزاي ألحق التراكم؟" وهو يرد من بياناتك. وزرار "اشرحلي أخطائي" بيعرض غلطاتك مع الإجابة الصح.</p></div></details>
+<details class="gd"><summary>🎯 مراجعة الأخطاء</summary><div class="gdb"><p>في صفحة <b>مراجعتي</b> كارت "اختبرني في أخطائي": بيديك لحد 5 أسئلة غلطت فيها قبل كده. جاوب صح <b>مرتين ورا بعض</b> والغلطة بتتصلّح وبتتشال من القايمة، وبتاخد +2 نقطة.</p></div></details>
+<details class="gd"><summary>🚑 خطة الإنقاذ من التراكمات</summary><div class="gdb"><p>في صفحة <b>التراكم</b>: سجّل موادك وعدد الدروس المتراكمة وتاريخ امتحانك. الخطة بتحسبلك كام درس في اليوم محتاج، وكام ساعة، وبترتّب المواد بالأولوية. وزرار "طبّق خطة الإنقاذ" بيظبط ساعات مذاكرتك ويعمل الجدول.</p></div></details>
+<details class="gd"><summary>📚 تنظيم المذاكرة</summary><div class="gdb"><p>من تاب <b>تنظيم المذاكرة</b>: ضيف مواد ومهام، وسجّل محاضراتك، وبعدين اعمل خطة أسبوعية أوتوماتيك على حسب وقتك. ولو اتأخرت اضغط "أعد ترتيب خطتي". جلسات التركيز في صفحة التركيز بتحسب لك نقط وسلسلة.</p></div></details>
+ <button class="btn greenbtn full" onclick="go('home')">ابدأ دلوقتي 🚀</button>
+</section>
+<!-- GUIDE:END page -->
 <section class="page" id="more">
  <h1>🧩 المزيد</h1><p class="sub">أدوات إضافية وإعدادات المنصة.</p>
+<!-- GUIDE:START more -->
+ <div class="card ar-entry" onclick="go('guide')" style="cursor:pointer"><div class="row"><h2>📖 دليل الاستخدام</h2><b class="gold">›</b></div></div>
+<!-- GUIDE:END more -->
  <div class="dev-card" id="devContactCard">
   <div class="dev-top"><div class="dev-av"><svg style="color:#fff" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#i-wa"/></svg></div><div><h2>💬 تواصل مع المطور</h2><p class="dev-sub">أي مشكلة أو اقتراح؟ كلمني مباشرة على واتساب</p></div></div>
   <div class="dev-num"><bdi>01558288143</bdi><span>محمود أشرف • المطور</span></div>
@@ -824,6 +849,9 @@ body.auth-locked .wa-fab{display:none}
  <div class="grid"><div class="stat"><b id="arExams">0</b><span>امتحانات اتحلّت</span></div><div class="stat"><b id="arStreak">0</b><span>أيام متتالية 🔥</span></div></div>
  <div class="card" id="arDailyCard"><h2>⚡ التحدي اليومي</h2><div id="arDaily"></div></div>
  <div class="card"><h2>📅 تحدي الأسبوع</h2><div id="arWeekly"></div></div>
+<!-- TEAMS:START arena -->
+ <div class="card"><div class="row"><h2>⚔️ أولاد × بنات</h2><span class="tag">منافسة</span></div><div class="tmBoard"><p class="muted">جاري التحميل...</p></div></div>
+<!-- TEAMS:END arena -->
  <div class="card"><h2>📊 المتصدرين</h2><div id="arBoard"><p class="muted">جاري التحميل...</p></div></div>
  <div class="card"><h2>إزاي تكسب نقاط؟</h2><p class="muted">• تسليم امتحان: ١٠ نقاط + بونص حسب درجتك (مرة لكل امتحان في اليوم).</p><p class="muted">• التحدي اليومي: لحد ٣٥ نقطة + بونص السلسلة.</p><p class="muted">• تحدي الأسبوع: ٣ امتحانات + ٦٠ نقطة = بونص ٥٠ نقطة.</p></div>
 </section>
@@ -2437,7 +2465,9 @@ async function pushScore(){
     const bp=old?(old.points|0):0,be=old?(old.exams|0):0;
     const tp=Math.min(s.points|0,bp+(old?300:300)),te=Math.max(be,Math.min(s.exams|0,5000));
     const wp=Math.min(s.week.points|0,old?50000:300);
-    await pref.set({uid:AR.uid,name:nm,points:tp,exams:te,streak:Math.min(s.streak|0,3650),weekKey:s.week.key||'',weekPoints:wp,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    const _doc={uid:AR.uid,name:nm,points:tp,exams:te,streak:Math.min(s.streak|0,3650),weekKey:s.week.key||'',weekPoints:wp,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    /* TEAMS:START push */if(s.team==='boys'||s.team==='girls')_doc.team=s.team;
+    try{await pref.set(_doc);if(_doc.team)AR.teamOk=true}catch(_e1){if(_doc.team){AR.teamOk=false;delete _doc.team;await pref.set(_doc)}else throw _e1}/* TEAMS:END push */
     AR.wOk=true;
   }catch(e){AR.wOk=false;console.warn('arena score',e&&e.code)}
 }
@@ -2528,7 +2558,8 @@ async function finishDaily(){
 }
 /* ARENA-DAILY:END */
 window.arenaBonus=async function(n){try{await load();if(!AR.st)return;weekRoll();AR.st.points+=n;AR.st.week.points+=n;await persist();paint()}catch(e){console.warn(e)}};
-window.arenaOpen=open;
+window.arenaOpen=open;window.arenaGet=function(){return AR};window.arenaLoad=load;
+/* TEAMS:START api */window.arenaSetTeam=async function(t){if(t!=='boys'&&t!=='girls')return;await load();if(!AR.st||AR.st.team)return;AR.st.team=t;await persist();paint()};/* TEAMS:END api */
 const _go=go;go=function(id){_go(id);if(id==='arena')open()};
 const _sp=submitPlatformExam;
 submitPlatformExam=async function(id){
@@ -2777,4 +2808,92 @@ window.smartTutorPaint=paint;
 })();
 /* SMART-TUTOR:END */
 </script>
+<script>
+/* TEAMS:START (أولاد × بنات) */
+(function(){
+var CACHE={t:0,docs:null},asked=false;
+function A(){try{return window.arenaGet?window.arenaGet():null}catch(_){return null}}
+function wk(d){d=d||new Date();var x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+1)%7));return localDayKey(x)}
+function prevWk(){var d=new Date();d.setDate(d.getDate()-7);return wk(d)}
+function nm(t){return t==='boys'?'الأولاد':'البنات'}
+async function fetchDocs(force){
+  if(!force&&CACHE.docs&&Date.now()-CACHE.t<180000)return CACHE.docs;
+  try{
+    if(typeof cloud==='undefined'||!cloud.ready)return CACHE.docs||[];
+    var snap=await cloud.store.collection('publicScores').limit(300).get();
+    CACHE.docs=snap.docs.map(function(d){return d.data()});CACHE.t=Date.now();
+  }catch(e){console.warn('teams board',e&&e.code);CACHE.docs=CACHE.docs||[]}
+  return CACHE.docs;
+}
+function totals(docs){
+  var w=wk(),r={boys:{p:0,w:0,n:0},girls:{p:0,w:0,n:0}};
+  docs.forEach(function(x){var t=x.team;if(t!=='boys'&&t!=='girls')return;r[t].p+=x.points|0;r[t].n++;if(x.weekKey===w)r[t].w+=x.weekPoints|0});
+  return r;
+}
+function lastWeek(r){
+  var cur=wk(),snap=null,prev=null;
+  try{snap=JSON.parse(localStorage.getItem('tm_snap')||'null');prev=JSON.parse(localStorage.getItem('tm_prev')||'null')}catch(_){}
+  if(snap&&snap.wk!==cur){prev=snap;try{localStorage.setItem('tm_prev',JSON.stringify(prev))}catch(_){}}
+  if(r.boys.n+r.girls.n>0){try{localStorage.setItem('tm_snap',JSON.stringify({wk:cur,b:r.boys.w,g:r.girls.w}))}catch(_){}}
+  return prev&&prev.wk===prevWk()?prev:null;
+}
+function html(r,a,pv){
+  var tot=r.boys.p+r.girls.p,bp=tot?Math.round(r.boys.p/tot*100):50;
+  var o='<div class="grid"><div class="stat"><b style="color:#5aa9ff">'+r.boys.p+'</b><span>👦 فريق الأولاد ('+r.boys.n+')</span></div><div class="stat"><b style="color:#ff7eb6">'+r.girls.p+'</b><span>👧 فريق البنات ('+r.girls.n+')</span></div></div>';
+  o+='<div style="display:flex;height:10px;border-radius:6px;overflow:hidden;margin:8px 0"><i style="width:'+bp+'%;background:#5aa9ff"></i><i style="flex:1;background:#ff7eb6"></i></div>';
+  var lead=r.boys.w===r.girls.w?'':(r.boys.w>r.girls.w?'boys':'girls');
+  o+='<p class="smallnote">📅 الأسبوع ده: الأولاد <b>'+r.boys.w+'</b> × البنات <b>'+r.girls.w+'</b></p>';
+  if(r.boys.n+r.girls.n===0)o+='<p class="muted">المنافسة هتبدأ أول ما الطلبة يختاروا فرقهم.</p>';
+  else if(lead)o+='<div class="helpbox" style="text-align:center"><b>🏆 فريق '+nm(lead)+' متصدر الأسبوع ده!</b></div>';
+  else o+='<div class="helpbox" style="text-align:center"><b>🤝 تعادل لحد دلوقتي</b></div>';
+  if(pv&&pv.b!==pv.g)o+='<p class="smallnote">🎖 فاز فريق '+nm(pv.b>pv.g?'boys':'girls')+' الأسبوع اللي فات ('+pv.b+' × '+pv.g+')</p>';
+  var me=a&&a.st&&a.st.team;
+  if(me)o+='<p class="smallnote">إنت في فريق <b>'+nm(me)+'</b> '+(me==='boys'?'👦':'👧')+' ونقطك بتتحسب لفريقك'+(a.teamOk===false?' (التسجيل العام لسه بيتفعّل)':'')+'.</p>';
+  else if(a&&a.st)o+='<button class="btn greenbtn full" onclick="teamPicker()">اختار فريقك</button>';
+  return o;
+}
+async function render(force){
+  var els=document.querySelectorAll('.tmBoard');if(!els.length)return;
+  var docs=await fetchDocs(force),r=totals(docs),a=A(),pv=lastWeek(r),h=html(r,a,pv);
+  els.forEach(function(e){e.innerHTML=h});
+}
+function picker(){
+  if(document.getElementById('tmPop'))return;
+  var d=document.createElement('div');d.id='tmPop';
+  d.style.cssText='position:fixed;inset:0;background:#000b;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px';
+  d.innerHTML='<div class="card" style="max-width:340px;text-align:center"><h2>⚔️ اختار فريقك</h2><p class="muted">أولاد × بنات. كل نقطة بتكسبها بتتحسب لفريقك، واختيارك مرة واحدة بس.</p><div class="grid"><button class="btn" style="background:#2a6fb8;color:#fff" data-t="boys">👦 فريق الأولاد</button><button class="btn" style="background:#c2437f;color:#fff" data-t="girls">👧 فريق البنات</button></div><button class="btn ghost small" id="tmLater" style="margin-top:8px">بعدين</button></div>';
+  document.body.appendChild(d);
+  d.querySelectorAll('button[data-t]').forEach(function(b){b.onclick=async function(){
+    b.disabled=true;await window.arenaSetTeam(b.dataset.t);d.remove();toast('اتسجّلت في فريق '+nm(b.dataset.t)+' 🎉');CACHE.t=0;render(true)}});
+  document.getElementById('tmLater').onclick=function(){d.remove()};
+}
+window.teamPicker=picker;
+async function ensureAsk(){
+  if(asked)return;
+  try{
+    if(!window.arenaLoad||typeof cloud==='undefined'||!cloud.ready)return;
+    var u=studentAuth&&studentAuth.currentUser;if(!u)return;
+    await window.arenaLoad();var a=A();if(!a||!a.st)return;
+    asked=true;if(!a.st.team)picker();
+  }catch(e){}
+}
+var _go=go;go=function(id){_go(id);if(id==='home'||id==='arena')setTimeout(function(){render(false)},400)};
+setInterval(ensureAsk,3000);
+setTimeout(function(){render(false)},2500);
+setInterval(function(){var h=document.getElementById('home'),a=document.getElementById('arena');if((h&&h.classList.contains('active'))||(a&&a.classList.contains('active')))render(false)},180000);
+})();
+/* TEAMS:END */
+</script>
+<style>
+/* GUIDE:START css */
+.gd{background:linear-gradient(145deg,#1a1626,#12101c);border:1px solid #3a2d52;border-radius:14px;margin:8px 0;overflow:hidden}
+.gd summary{padding:13px 14px;font-weight:800;font-size:13px;cursor:pointer;list-style:none}
+.gd summary::-webkit-details-marker{display:none}
+.gd summary:after{content:"＋";float:left;color:#ffb35f}
+.gd[open] summary:after{content:"－"}
+.gdb{padding:0 14px 13px;font-size:12px;line-height:2;color:#c9c2d8}
+.gdb p{margin:6px 0}
+.day-theme .gd{background:#fff;border-color:#d9dced}.day-theme .gdb{color:#44506b}
+/* GUIDE:END css */
+</style>
 </body></html>
