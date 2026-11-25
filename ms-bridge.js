@@ -1,7 +1,7 @@
 /* MS-BRIDGE: يربط صفحات الامتحانات المستقلة بحساب الطالب في المنصة (نفس الدومين) */
 (function(){
 var U=null;try{U=JSON.parse(localStorage.getItem('ms_user')||'null')}catch(_){}
-var NAMES={'physics-2027':'فيزياء','physics2-2027':'فيزياء','english-2027':'إنجليزي','networks-2027':'شبكات وأمن معلومات','math-2027':'رياضيات','history-2027':'تاريخ'};
+var NAMES={'physics-2027':'فيزياء','physics2-2027':'فيزياء','english-2027':'إنجليزي','networks-2027':'شبكات وأمن معلومات','math-2027':'رياضيات','history-2027':'تاريخ','nahw-2027':'نحو'};
 var page=(location.pathname.split('/').pop()||'').replace('.html','');
 function fill(){
   var el=document.getElementById('student')||document.getElementById('studentName');
