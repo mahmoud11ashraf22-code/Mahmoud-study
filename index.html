@@ -691,6 +691,9 @@ body.auth-locked .wa-fab{display:none}
 <section class="page" id="review">
  <h1>🔁 مراجعتي</h1><p class="sub">خطط مراجعاتك، وسجّل اللي راجعته عشان ما تنساش ترجعله.</p>
  <div class="card"><div class="row"><h2>مراجعات المواد</h2><button class="btn small" onclick="openReview()">+ مراجعة</button></div><div id="reviewsList"></div></div>
+<!-- MISTAKE-REVIEW:START card -->
+ <div class="card" id="mfCard"><div class="row"><h2>🎯 اختبرني في أخطائي</h2><span class="tag">جديد</span></div><div id="mfBody"></div></div>
+<!-- MISTAKE-REVIEW:END card -->
  <div class="card">
   <div class="row">
     <h2>❌ بنك الأخطاء للمراجعة اللاحقة</h2>
@@ -2505,6 +2508,7 @@ async function finishDaily(){
   toast('⚡ خلّصت التحدي: '+correct+'/'+total+' • +'+add+' نقطة'+(wb?' + بونص الأسبوع +'+wb+' 🎉':''));
 }
 /* ARENA-DAILY:END */
+window.arenaBonus=async function(n){try{await load();if(!AR.st)return;weekRoll();AR.st.points+=n;AR.st.week.points+=n;await persist();paint()}catch(e){console.warn(e)}};
 window.arenaOpen=open;
 const _go=go;go=function(id){_go(id);if(id==='arena')open()};
 const _sp=submitPlatformExam;
@@ -2529,5 +2533,48 @@ document.addEventListener('DOMContentLoaded',()=>{
 })();
 </script>
 <!-- ARENA:END -->
+
+<script>
+/* MISTAKE-REVIEW:START (اختبرني في أخطائي) */
+(function(){
+const MQ={list:[],i:0,ok:0};
+function qkey(examId,text){let h=0;const t=String(text||'');for(let i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0;return (examId||'x')+'#'+h}
+function findQ(sub,ans){try{const e=(platform.exams||[]).find(x=>x.id===sub.examId);if(!e)return null;const q=(e.questions||[]).find(x=>x.type!=='essay'&&x.text===ans.question);if(!q||!Array.isArray(q.choices))return null;const ch=q.choices.map(c=>String(c||''));const a=+q.answer;if(!ch[a])return null;return{text:q.text,choices:ch,answer:a}}catch(_){return null}}
+function state(){db.mistakeFix=db.mistakeFix||{};return db.mistakeFix}
+function collect(){
+  const fix=state(),latest={},subs=(db.localSubmissions||[]).slice().reverse();
+  subs.forEach(sub=>(sub.answers||[]).forEach(a=>{if(a.type!=='mcq')return;const k=qkey(sub.examId,a.question);latest[k]={ok:a.isCorrect!==false,sub,a}}));
+  const wrong=[];let mastered=0;
+  Object.keys(latest).forEach(k=>{const r=latest[k];if(r.ok)return;if((fix[k]||0)>=2){mastered++;return}const q=findQ(r.sub,r.a);if(q)wrong.push(Object.assign({k},q))});
+  return{wrong,mastered};
+}
+function host(){return document.getElementById('mfBody')}
+function paint(){
+  const h=host();if(!h)return;
+  if(MQ.list.length&&MQ.i<MQ.list.length)return draw();
+  const c=collect();
+  h.innerHTML='<div class="grid"><div class="stat"><b>'+c.wrong.length+'</b><span>أخطاء لسه محتاجة مراجعة</span></div><div class="stat"><b>'+c.mastered+'</b><span>أخطاء اتصلحت ✓</span></div></div>'+(c.wrong.length?'<p class="muted">جاوب صح مرتين ورا بعض على نفس السؤال وهيتحسب متصلّح (+٢ نقطة).</p><button class="btn greenbtn full" id="mfStart">🎯 اختبرني في أخطائي</button>':'<p class="muted">'+(c.mastered?'برافو! كل أخطائك اتصلحت 🎉':'حل امتحانات الأول وأخطاءك هتظهر هنا للمراجعة.')+'</p>');
+  const s=document.getElementById('mfStart');if(s)s.onclick=()=>{MQ.list=collect().wrong.sort(()=>Math.random()-.5).slice(0,5);MQ.i=0;MQ.ok=0;draw()};
+}
+function draw(){
+  const h=host(),q=MQ.list[MQ.i];if(!h)return;
+  if(!q){MQ.list=[];paint();return}
+  h.innerHTML='<div class="row"><b>سؤال '+(MQ.i+1)+' من '+MQ.list.length+'</b></div><p><b>'+esc(String(q.text))+'</b></p>'+q.choices.map((c,i)=>c?'<button class="btn ghost" style="display:block;width:100%;text-align:right;margin:5px 0" data-c="'+i+'">'+esc(c)+'</button>':'').join('');
+  h.querySelectorAll('button[data-c]').forEach(b=>b.onclick=()=>pick(+b.dataset.c));
+}
+function pick(c){
+  const q=MQ.list[MQ.i],fix=state(),good=c===q.answer;
+  h=host();h.querySelectorAll('button[data-c]').forEach(b=>{b.disabled=true;const i=+b.dataset.c;if(i===q.answer)b.style.borderColor='var(--green)';else if(i===c)b.style.borderColor='var(--red)'});
+  fix[q.k]=good?(fix[q.k]||0)+1:0;
+  if(good){MQ.ok++;if(fix[q.k]===2&&window.arenaBonus)window.arenaBonus(2)}
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(db))}catch(_){}
+  setTimeout(()=>{MQ.i++;if(MQ.i>=MQ.list.length){toast('خلّصت المراجعة: '+MQ.ok+' / '+MQ.list.length+' صح');MQ.list=[];}paint()},1000);
+}
+var h;
+const _go=go;go=function(id){_go(id);if(id==='review')setTimeout(paint,50)};
+window.mistakeReviewPaint=paint;
+})();
+/* MISTAKE-REVIEW:END */
+</script>
 
 </body></html>
