@@ -858,6 +858,25 @@ body.auth-locked .wa-fab{display:none}
  <div class="card"><h2>متابعة نتائج الامتحانات</h2><p class="smallnote">تظهر درجات الاختياري وإجابات المقالي المحفوظة للمراجعة.</p><div id="gradingQueue" class="empty">ستظهر هنا نتائج الطلاب بعد تفعيل المزامنة.</div></div>
 </section>
 <div id="wordsList" style="display:none"></div><div class="footer">MAHMOUD STUDY • منصة تعليمية<br><b>Developer: Mahmoud Ashraf</b><br><a class="dev-link" href="https://wa.me/201558288143" target="_blank" rel="noopener" dir="ltr"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#i-wa"/></svg> Contact: 01558288143</a></div>
+<!-- SUMMARIES:START page -->
+<style>
+#summaries .sm-item{display:flex;align-items:center;gap:10px;background:#0b0f0c;border:1px solid #29332c;border-radius:12px;padding:10px;margin:7px 0}
+#summaries .sm-ic{font-size:26px}#summaries .sm-t{flex:1;min-width:0}#summaries .sm-t b{display:block;color:#f4f7f4;font-size:14px}
+#summaries .sm-t small{color:#8a948d}
+#summaries .sm-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+#summaries .sm-chip{border:1px solid #29332c;background:#0b0f0c;color:#cfd8d1;border-radius:999px;padding:5px 12px;font-size:12px;cursor:pointer}
+#summaries .sm-chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+</style>
+<section class="page" id="summaries">
+ <h1>📚 الملخصات</h1><p class="sub">ملخصات PDF لكل مادة. افتح أو حمّل اللي محتاجه.</p>
+ <div class="card"><input id="smSearch" placeholder="ابحث في الملخصات..." style="width:100%"><div class="sm-chips" id="smChips"></div><div id="smList"><p class="muted">جاري التحميل...</p></div></div>
+ <div class="card" id="smAdmin" style="display:none"><h2>➕ إضافة ملخص (للإدارة)</h2><p class="smallnote">ارفع الـ PDF على GitHub أو Google Drive (مشاركة بالرابط) وحط الرابط هنا.</p>
+  <label>عنوان الملخص</label><input id="smTitle" placeholder="مثال: ملخص الباب الأول - فيزياء">
+  <label>المادة</label><input id="smSubject" list="smSubjects" placeholder="فيزياء"><datalist id="smSubjects"><option value="عربي"><option value="إنجليزي"><option value="فيزياء"><option value="كيمياء"><option value="أحياء"><option value="رياضيات"><option value="تاريخ"><option value="جغرافيا"><option value="برمجة"><option value="نحو"></datalist>
+  <label>رابط الملف (https)</label><input id="smUrl" placeholder="https://..." style="direction:ltr">
+  <button class="btn" id="smAddBtn" style="margin-top:8px">إضافة الملخص</button></div>
+</section>
+<!-- SUMMARIES:END page -->
 <!-- ARENA:START page -->
 <section class="page" id="arena">
  <h1>🏆 المنافسات</h1><p class="sub">نقاطك وترتيبك بين الطلبة. حلّ امتحانات واكسب نقاط.</p>
@@ -1000,7 +1019,7 @@ function render(){
  let subjectTotal=db.subjects.reduce((n,x)=>n+(+x.backlog||0),0),subjectDone=db.subjects.reduce((n,x)=>n+Math.min(+x.backlog||0,+x.backlogDone||0),0),allBacklog=db.backlogTotal+subjectTotal,allDone=db.backlogDone+subjectDone;let bPct=allBacklog?Math.round(allDone/allBacklog*100):0;document.getElementById('backlogProgressPct').textContent=bPct+'%';document.getElementById('backlogBar').style.width=bPct+'%';document.getElementById('backlogProgressText').textContent=allBacklog?`${allDone} من ${allBacklog} درس مكتمل`:'لم تبدأ الخطة بعد.';document.getElementById('backlogLessons').innerHTML=db.backlog.length?db.backlog.map(x=>`<div class="item row"><strong style="${x.done?'text-decoration:line-through;opacity:.5':''}">${esc(x.name)}</strong><button class="btn ghost small" onclick="toggleBacklog(${x.id})">${x.done?'تم ✓':'إنجاز'}</button></div>`).join(''):'';
  document.getElementById('generatedPlan').innerHTML=db.plan.length?db.plan.map(s=>`<div class="item"><div class="row"><strong class="green">${s.day}</strong><span class="chip">${s.minutes} دقيقة دراسة</span></div>${(s.items||[]).map(i=>`<p>• ${String(i.start/60|0).padStart(2,'0')}:${String(i.start%60).padStart(2,'0')}–${String(i.end/60|0).padStart(2,'0')}:${String(i.end%60).padStart(2,'0')} | ${esc(i.name)} — ${esc(i.subject)} (${i.duration} د) ${i.kind==='backlog'?'🔥 تراكم':i.kind==='review'?'🔁 مراجعة':''} ${i.kind==='backlog'?`<button class="btn ghost small" onclick="completeSubjectBacklog(${i.subjectId})">أنجزت الدرس</button>`:''} <button class="btn greenbtn small" onclick="startPlanItem(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(i))}')))">ابدأ الجلسة</button></p>`).join('')}${s.lessonNotes?.length?`<p class="gold">دروس ثابتة: ${s.lessonNotes.map(l=>esc(l.subject)+' '+esc(l.time)+' ('+esc(l.type)+')').join('، ')}</p>`:''}</div>`).join('')+ (db.planMeta?.unplaced?`<div class="item"><strong class="gold">تنبيه</strong><p>في ${db.planMeta.unplaced} مهمة/درس لم يجد مكاناً مناسباً ضمن ساعاتك الحالية. زوّد مدة الخطة أو قلّل الحمل.</p></div>`:''):'<div class="empty">'+(db.planMeta?.unplaced?'/*PLAN-FIX*/ مفيش مكان للعناصر في ساعاتك الحالية. زوّد ساعات المذاكرة اليومية أو قلّل مدة المهام.':'اضغط إنشاء جدول الأسبوع بعد إضافة موادك ومهامك.')+'</div>';
  document.getElementById('reviewsList').innerHTML=db.reviews.length?db.reviews.map(r=>`<div class="item"><div class="row"><strong style="${r.done?'text-decoration:line-through;opacity:.5':''}">${esc(r.name)}</strong><button class="btn ghost small" onclick="toggleReview(${r.id})">${r.done?'تمت':'إنجاز ✓'}</button></div><p>${r.date||'بدون تاريخ'} • ${r.duration} دقيقة</p></div>`).join(''):'<div class="empty">أضف مراجعة للمادة أو الدرس اللي محتاج ترجعله.</div>';
- let sharedHtmlExams=platform.htmlExams||[];document.getElementById('examsList').innerHTML=sharedHtmlExams.length?sharedHtmlExams.map(e=>`<div class="item"><div class="row"><strong>${esc(e.name)}</strong><button class="btn ghost small" onclick="openExam('${esc(e.id)}')">فتح ↗</button></div><p>${e.fileName?'ملف: '+esc(e.fileName):e.url?'رابط خارجي':'ملف على Firebase'}</p>${adminDeleteControl('publicHtmlExams',e.id)}</div>`).join(''):'<div class="empty">لم تضف امتحانات بعد.</div>';
+ let sharedHtmlExams=(platform.htmlExams||[]).filter(e=>e.kind!=='summary');document.getElementById('examsList').innerHTML=sharedHtmlExams.length?sharedHtmlExams.map(e=>`<div class="item"><div class="row"><strong>${esc(e.name)}</strong><button class="btn ghost small" onclick="openExam('${esc(e.id)}')">فتح ↗</button></div><p>${e.fileName?'ملف: '+esc(e.fileName):e.url?'رابط خارجي':'ملف على Firebase'}</p>${adminDeleteControl('publicHtmlExams',e.id)}</div>`).join(''):'<div class="empty">لم تضف امتحانات بعد.</div>';
  document.getElementById('wordsList').innerHTML=db.words.length?db.words.map(w=>`<div class="item row"><div><strong>${esc(w.word)}</strong><p>${esc(w.meaning)}</p></div><button class="btn ghost small" onclick="speak(${JSON.stringify(w.word)})">🔊 نطق</button></div>`).join(''):'<div class="empty">أضف كلمات جديدة وراجع نطقها.</div>';
  document.getElementById('focusSessions').textContent=db.focus.sessions;document.getElementById('focusMinutes').textContent=db.focus.minutes;
  let fs=document.getElementById('focusTaskSelect');if(fs){let prev=focusTargetId;fs.innerHTML='<option value="">جلسة عامة</option>'+db.tasks.filter(t=>!t.done).map(t=>`<option value="${t.id}">${esc(t.subject)} — ${esc(t.name)}</option>`).join('');fs.value=prev;}
@@ -2712,6 +2731,55 @@ window.badgesRender=render;
 
 </script>
 <!-- BADGES:END -->
+<!-- SUMMARIES:START logic -->
+<script>
+(function(){
+var SM={subj:'',q:''};
+function isAdmin(){try{return !!(studentAuth&&studentAuth.currentUser&&isAdminUid(studentAuth.currentUser.uid))}catch(_){return false}}
+function items(){try{return (platform.htmlExams||[]).filter(function(e){return e&&e.kind==='summary'&&/^https?:\/\//i.test(e.url||'')})}catch(_){return []}}
+function render(){
+  var host=document.getElementById('smList');if(!host)return;
+  var all=items(),subs={};all.forEach(function(e){if(e.subject)subs[e.subject]=1});
+  var ch=document.getElementById('smChips');
+  if(ch){var names=Object.keys(subs);ch.innerHTML=names.length?['الكل'].concat(names).map(function(n){var on=(n==='الكل'&&!SM.subj)||n===SM.subj;return '<span class="sm-chip'+(on?' on':'')+'" data-s="'+esc(n==='الكل'?'':n)+'">'+esc(n)+'</span>'}).join(''):'';
+    ch.querySelectorAll('.sm-chip').forEach(function(c){c.onclick=function(){SM.subj=c.getAttribute('data-s')||'';render()}})}
+  var q=SM.q.trim().toLowerCase();
+  var list=all.filter(function(e){return (!SM.subj||e.subject===SM.subj)&&(!q||((e.name||'')+' '+(e.subject||'')).toLowerCase().indexOf(q)>=0)});
+  var adm=isAdmin();
+  host.innerHTML=list.length?list.map(function(e){return '<div class="sm-item"><span class="sm-ic">📄</span><div class="sm-t"><b>'+esc(e.name||'ملخص')+'</b><small>'+esc(e.subject||'')+'</small></div><a class="btn small" href="'+esc(e.url)+'" target="_blank" rel="noopener">فتح / تحميل</a>'+(adm?'<button class="btn danger small" data-del="'+esc(e.id)+'">حذف</button>':'')+'</div>'}).join(''):'<p class="muted">'+(all.length?'مفيش نتايج.':'لسه مفيش ملخصات. هتتضاف قريب إن شاء الله 📚')+'</p>';
+  host.querySelectorAll('[data-del]').forEach(function(b){b.onclick=function(){del(b.getAttribute('data-del'))}});
+  var a=document.getElementById('smAdmin');if(a)a.style.display=adm?'block':'none';
+}
+async function add(){
+  if(!isAdmin())return toast('للإدارة فقط');
+  var t=document.getElementById('smTitle').value.trim(),s=document.getElementById('smSubject').value.trim(),u=document.getElementById('smUrl').value.trim();
+  if(!t||!u)return toast('اكتب العنوان والرابط');
+  if(!/^https:\/\//i.test(u))return toast('الرابط لازم يبدأ بـ https://');
+  if(!cloud.ready)return toast('انتظر اتصال Firebase');
+  var id='SUM'+Date.now().toString(36).toUpperCase();
+  try{
+    await cloud.store.collection('publicHtmlExams').doc(id).set({id:id,name:t,subject:s,url:u,kind:'summary',fileName:'',downloadUrl:'',storagePath:'',ownerUid:studentAuth.currentUser.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    ['smTitle','smUrl'].forEach(function(i){document.getElementById(i).value=''});toast('تمت إضافة الملخص ✓');
+  }catch(e){toast('تعذر الإضافة: '+(e.code||e.message))}
+}
+async function del(id){
+  if(!isAdmin()||!confirm('تحذف الملخص ده؟'))return;
+  try{await cloud.store.collection('publicHtmlExams').doc(String(id)).delete();toast('تم الحذف')}catch(e){toast('تعذر الحذف: '+(e.code||e.message))}
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var s=document.getElementById('smSearch');if(s)s.oninput=function(){SM.q=s.value;render()};
+  var b=document.getElementById('smAddBtn');if(b)b.onclick=add;
+  function mk(id,ref,html,after){if(!ref||document.getElementById(id))return;var c=document.createElement('div');c.className='card ar-entry';c.id=id;c.innerHTML=html;c.onclick=function(){go('summaries')};ref.parentNode.insertBefore(c,after?ref.nextSibling:ref)}
+  var h='<div class="row"><h2>📚 الملخصات</h2><b class="gold">افتح ›</b></div><p class="muted">ملخصات PDF لكل مادة، حمّلها وذاكر منها.</p>';
+  mk('smHomeCard',document.getElementById('dailyGoalCard'),h,false);
+  var ex=document.querySelector('#exams h1');if(ex)mk('smExamCard',ex.nextElementSibling,h,true);
+});
+var _go=go;go=function(id){_go(id);if(id==='summaries')setTimeout(render,100)};
+setInterval(function(){var p=document.getElementById('summaries');if(p&&p.classList.contains('active'))render()},2500);
+window.summariesRender=render;
+})();
+</script>
+<!-- SUMMARIES:END -->
 
 <script>
 /* MISTAKE-REVIEW:START (اختبرني في أخطائي) */
