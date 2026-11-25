@@ -40,33 +40,40 @@ h3.sec{font-size:19px;font-weight:800;margin:28px 0 14px;display:flex;align-item
 .btn:hover{filter:brightness(1.08)}
 .btn.ghost{background:#0e1512;color:var(--green);border:1px solid var(--line)}
 .btn.wa{background:linear-gradient(115deg,#1fae55,#4bd17e);color:#03150b}
-.btn.danger{background:#2a1512;color:var(--red);border:1px solid #55222033}
+.btn.sm{width:auto;padding:8px 16px;font-size:13.5px;margin-top:0}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:16px}
 label{display:block;font-size:13.5px;font-weight:700;margin:14px 0 6px}
-input,select,textarea{width:100%;background:#0b100d;border:1px solid var(--line);border-radius:11px;color:#e8f2ec;padding:12px 14px;font-size:15px;font-family:'Cairo',sans-serif}
+input,select{width:100%;background:#0b100d;border:1px solid var(--line);border-radius:11px;color:#e8f2ec;padding:12px 14px;font-size:15px;font-family:'Cairo',sans-serif}
 input:focus,select:focus{outline:none;border-color:var(--primary)}
 .total{display:flex;justify-content:space-between;align-items:center;background:#0b100d;border:1px dashed var(--primary);border-radius:12px;padding:12px 16px;margin-top:16px}
 .total b{font-size:22px;color:var(--gold)}
 .paybox{background:linear-gradient(110deg,#12261c,#101a15);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:16px}
 .paynum{display:flex;align-items:center;justify-content:space-between;background:#0b100d;border-radius:12px;padding:12px 14px;margin-top:10px;direction:ltr}
 .paynum b{font-size:20px;letter-spacing:1px}
+.codebox{background:#0b100d;border:2px dashed var(--gold);border-radius:12px;padding:16px;text-align:center;margin-top:12px}
+.codebox b{font-size:26px;letter-spacing:3px;color:var(--gold);direction:ltr;display:block}
 .copy{background:#142019;border:1px solid var(--line);color:var(--green);border-radius:9px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cairo',sans-serif}
 .note{color:var(--muted);font-size:13px;line-height:1.9;margin-top:10px}
 .status-ok{background:#0f241a;border:1px solid #1f5c3d;color:var(--green);border-radius:12px;padding:14px;margin-top:14px;font-size:14px;line-height:1.9;display:none}
 .status-err{background:#2a1512;border:1px solid #552220;color:var(--red);border-radius:12px;padding:12px 14px;margin-top:12px;font-size:13.5px;display:none}
 .pill{font-size:12px;font-weight:700;border-radius:999px;padding:3px 12px}
-.pill.new{background:#2a230f;color:var(--gold)}
-.pill.done{background:#0f241a;color:var(--green)}
+.pill.new,.pill.pending{background:#2a230f;color:var(--gold)}
+.pill.done,.pill.approved{background:#0f241a;color:var(--green)}
 .pill.rejected{background:#2a1512;color:var(--red)}
-.order-row{background:#0b100d;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px;font-size:13.5px}
-.order-row .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.order-row .meta{color:var(--muted);line-height:1.9;word-break:break-all}
-.order-row .acts{display:flex;gap:8px;margin-top:10px}
-.order-row .acts button{flex:1;padding:8px;border-radius:9px;border:1px solid var(--line);background:#142019;color:var(--green);font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
-.order-row .acts button.del{color:var(--red)}
-.tabs{display:flex;gap:8px;justify-content:center;margin:20px 0}
+.row-item{background:#0b100d;border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px;font-size:13.5px}
+.row-item .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.row-item .meta{color:var(--muted);line-height:1.9;word-break:break-all}
+.row-item .acts{display:flex;gap:8px;margin-top:10px}
+.row-item .acts button{flex:1;padding:8px;border-radius:9px;border:1px solid var(--line);background:#142019;color:var(--green);font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
+.row-item .acts button.del{color:var(--red)}
+.tabs{display:flex;gap:8px;justify-content:center;margin:14px 0;flex-wrap:wrap}
 .tabs button{background:#0e1512;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:8px 22px;font-family:'Cairo',sans-serif;font-weight:700;font-size:14px;cursor:pointer}
 .tabs button.active{background:linear-gradient(115deg,#10ae80,#37d99c);color:#04150e;border-color:transparent}
+.wallet{background:linear-gradient(110deg,#12261c,#101a15);border:1px solid var(--primary);border-radius:var(--r);padding:22px;text-align:center;margin-bottom:16px}
+.wallet .bal{font-size:40px;font-weight:800;color:var(--gold)}
+.wallet .lbl{color:var(--muted);font-size:13px}
+.userbar{display:flex;justify-content:space-between;align-items:center;background:#0e1512;border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:14px}
+.userbar button{background:none;border:none;color:var(--red);font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;font-size:13px}
 footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:40px;line-height:2}
 a{color:var(--green);text-decoration:none}
 .hidden{display:none!important}
@@ -76,49 +83,73 @@ a{color:var(--green);text-decoration:none}
 <div class="wrap">
 <header>
 <img src="https://mahmoud11ashraf22-code.github.io/Mahmoud-study/icon-192.png" alt="MAHMOUD BOOST">
-<div><h1>MAHMOUD <b>BOOST</b></h1><p>شحن متابعين ولايكات ومشاهدات ⚡</p></div>
+<div><h1>MAHMOUD <b>BOOST</b></h1><p>منصة شحن متابعين ولايكات ومشاهدات ⚡</p></div>
 </header>
+
 <section class="hero">
 <h2>زوّد حسابك <span>في دقايق</span> 🚀</h2>
-<p>متابعين ولايكات ومشاهدات لتيك توك وإنستجرام بأفضل الأسعار في مصر. اطلب، حوّل، وابعت السكرينشوت واتساب، وطلبك يتنفذ في نفس اليوم.</p>
-<div class="badges"><span class="badge">⚡ تنفيذ سريع</span><span class="badge">💳 فودافون كاش وانستاباي</span><span class="badge">🛡️ دفع عند الطلب</span></div>
+<p>سجّل حسابك، اشحن محفظتك بفودافون كاش أو انستاباي، واطلب أي خدمة برصيدك فوراً. كل طلباتك وشحناتك محفوظة في حسابك.</p>
+<div class="badges"><span class="badge">👤 حساب ومحفظة خاصة بيك</span><span class="badge">⚡ تنفيذ سريع</span><span class="badge">🛡️ كود دفع لكل شحنة</span></div>
 </section>
 
 <h3 class="sec">🛒 الخدمات والأسعار</h3>
 <div class="grid" id="servicesGrid"></div>
 
-<h3 class="sec">📝 اطلب دلوقتي</h3>
+<div id="authSec">
+<h3 class="sec">👤 حسابك</h3>
 <div class="panel">
-<label>الخدمة</label>
-<select id="fService"></select>
-<label>الكمية</label>
-<select id="fQty"></select>
+<div class="tabs"><button class="active" id="tabLogin">دخول</button><button id="tabReg">حساب جديد</button></div>
+<div id="regName" class="hidden"><label>الاسم</label><input id="fName" type="text" placeholder="اسمك"></div>
+<label>رقم الموبايل</label>
+<input id="fPhoneAuth" type="tel" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:right">
+<label>كلمة السر</label>
+<input id="fPass" type="password" placeholder="6 أحرف أو أكثر" style="direction:ltr;text-align:right">
+<button class="btn" id="authBtn">دخول</button>
+<div class="status-err" id="authErr"></div>
+<div class="note">بالتسجيل هتقدر تشحن محفظتك وتطلب وتتابع كل حاجة من مكان واحد.</div>
+</div>
+</div>
+
+<div id="dashSec" class="hidden">
+<div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><button id="logoutBtn">تسجيل خروج</button></div>
+<div class="wallet"><div class="lbl">رصيد محفظتك</div><div class="bal" id="uBal">0</div><div class="lbl">جنيه</div></div>
+
+<h3 class="sec">💳 شحن المحفظة</h3>
+<div class="panel">
+<label>المبلغ اللي هتشحن بيه (جنيه)</label>
+<select id="tAmount"><option value="50">50 جنيه</option><option value="100" selected>100 جنيه</option><option value="200">200 جنيه</option><option value="300">300 جنيه</option><option value="500">500 جنيه</option><option value="1000">1000 جنيه</option></select>
+<button class="btn" id="genCodeBtn">اعمل كود الدفع 🔑</button>
+<div class="status-err" id="topErr"></div>
+<div id="codeArea" class="hidden">
+<div class="paybox">
+<b>💳 حوّل المبلغ على الرقم ده (فودافون كاش أو انستاباي):</b>
+<div class="paynum"><b>01558288143</b><button class="copy" data-c="01558288143">نسخ الرقم</button></div>
+<div class="codebox"><div class="note" style="margin:0 0 4px">كود الدفع بتاعك - اكتبه مع التحويل أو ابعته واتساب:</div><b id="payCode"></b><button class="copy" id="copyCodeBtn">نسخ الكود</button></div>
+<div class="note">مهم: الكود ده هو اللي بيربط التحويل بطلبك. ابعت سكرينشوت التحويل + الكود على واتساب 👇</div>
+</div>
+<a id="waTopBtn" class="btn wa" target="_blank" rel="noopener">ابعت التحويل والكود واتساب 📲</a>
+</div>
+<div id="myTopups"></div>
+</div>
+
+<h3 class="sec">📝 اطلب برصيدك</h3>
+<div class="panel">
+<label>الخدمة</label><select id="fService"></select>
+<label>الكمية</label><select id="fQty"></select>
 <label>رابط الحساب أو البوست</label>
 <input id="fLink" type="text" placeholder="مثال: https://tiktok.com/@username أو @username">
-<label>رقم موبايلك (اختياري، عشان نتواصل معاك)</label>
-<input id="fPhone" type="tel" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:right">
 <div class="total"><span>الإجمالي:</span><b id="fTotal">-</b></div>
-<div class="paybox">
-<b>💳 طريقة الدفع</b>
-<div class="note">حوّل المبلغ على الرقم ده بفودافون كاش أو انستاباي:</div>
-<div class="paynum"><b id="payNum">01558288143</b><button class="copy" id="copyBtn">نسخ الرقم</button></div>
-<div class="note">بعد التحويل: اضغط "تأكيد الطلب" وبعدين ابعت سكرينشوت التحويل على واتساب عشان نبدأ التنفيذ فوراً.</div>
-</div>
-<button class="btn" id="submitBtn">تأكيد الطلب ✅</button>
-<div class="status-err" id="formErr"></div>
-<div class="status-ok" id="formOk"></div>
-<div id="waWrap" class="hidden"><a id="waBtn" class="btn wa" target="_blank" rel="noopener">ابعت سكرينشوت التحويل واتساب 📲</a></div>
+<div class="note">الخصم بيتم من رصيد محفظتك فور تأكيد الطلب.</div>
+<button class="btn" id="orderBtn">تأكيد الطلب ✅</button>
+<div class="status-err" id="ordErr"></div>
+<div class="status-ok" id="ordOk"></div>
 </div>
 
-<h3 class="sec">🔍 تابع طلبك</h3>
-<div class="panel">
-<label>رقم الطلب</label>
-<input id="tId" type="text" placeholder="مثال: MB-XXXXXX" style="direction:ltr;text-align:right">
-<button class="btn ghost" id="trackBtn">استعلام</button>
-<div class="order-row hidden" id="trackRes"></div>
+<h3 class="sec">📦 طلباتي</h3>
+<div class="panel"><div id="myOrders"><div class="note">لسه مفيش طلبات.</div></div></div>
 </div>
 
-<h3 class="sec" id="adminHead">🔐 لوحة الأدمن</h3>
+<h3 class="sec">🔐 لوحة الأدمن</h3>
 <div class="panel" id="adminLogin">
 <div class="note">الدخول بنفس رقم الموبايل وكلمة السر بتاعت أدمن منصة MAHMOUD STUDY.</div>
 <label>رقم الموبايل</label>
@@ -129,9 +160,9 @@ a{color:var(--green);text-decoration:none}
 <div class="status-err" id="loginErr"></div>
 </div>
 <div class="panel hidden" id="adminPanel">
-<div class="tabs"><button class="active" data-f="new">جديدة 🕐</button><button data-f="done">منفذة ✅</button><button data-f="rejected">مرفوضة ❌</button><button data-f="all">الكل</button></div>
-<div id="ordersList"></div>
-<button class="btn ghost" id="logoutBtn">تسجيل خروج</button>
+<div class="tabs"><button class="active" data-f="topups">شحنات مستنية 🕐</button><button data-f="orders">طلبات جديدة 🛒</button><button data-f="allOrders">كل الطلبات</button></div>
+<div id="adminList"></div>
+<button class="btn ghost" id="adminLogoutBtn">تسجيل خروج</button>
 </div>
 
 <footer>
@@ -145,7 +176,7 @@ const OWNER_NUMBER='01558288143';
 const WA_NUMBER='201558288143';
 const ADMIN_UIDS=['82rhSBXtd5YveBr1WO6Bcgyxu8t2','9I683tus04VUo9gmsVFDwaqbnof1','9aKVRBoMCmOgklU3sYkroNGOcLg1','pMsFOwdTQOR1qPdJGWO6rMvWB5D2'];
 const SERVICES=[
- {id:'tt-fol',plat:'tiktok',platName:'تيك توك',icon:'🎵',name:'متابعين تيك توك',desc:'متابعين حقيقيين الجودة، بداية التنفيذ خلال ساعات',per:1000,price:120},
+ {id:'tt-fol',plat:'tiktok',platName:'تيك توك',icon:'🎵',name:'متابعين تيك توك',desc:'متابعين جودة عالية، بداية التنفيذ خلال ساعات',per:1000,price:120},
  {id:'tt-like',plat:'tiktok',platName:'تيك توك',icon:'❤️',name:'لايكات تيك توك',desc:'لايكات على أي فيديو تختاره',per:1000,price:40},
  {id:'tt-view',plat:'tiktok',platName:'تيك توك',icon:'👀',name:'مشاهدات تيك توك',desc:'مشاهدات سريعة لأي فيديو',per:1000,price:15},
  {id:'ig-fol',plat:'insta',platName:'إنستجرام',icon:'📸',name:'متابعين إنستجرام',desc:'متابعين جودة عالية مع ضمان التعويض',per:1000,price:150},
@@ -158,94 +189,169 @@ const firebaseConfig={apiKey:"AIzaSyBlnCzvRKHFPFTR0KQRKbmEHObCP0fQakM",authDomai
 firebase.initializeApp(firebaseConfig);
 const store=firebase.firestore(),auth=firebase.auth();
 const $=id=>document.getElementById(id);
-const fmt=n=>n.toLocaleString('ar-EG');
+const fmt=n=>Number(n||0).toLocaleString('ar-EG');
 const money=n=>fmt(Math.round(n))+' جنيه';
 const svc=id=>SERVICES.find(s=>s.id===id);
+const esc=t=>String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const STATUS_AR={new:'🕐 جديد',done:'✅ تم التنفيذ',rejected:'❌ مرفوض',pending:'🕐 مستني التأكيد',approved:'✅ اتشحن'};
+function showErr(id,m){const e=$(id);e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',6000)}
+document.querySelectorAll('.copy[data-c]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.c);b.textContent='اتنسخ ✅';setTimeout(()=>b.textContent='نسخ الرقم',1800)});
 
 $('servicesGrid').innerHTML=SERVICES.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span><h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${money(s.price)} <small>/ ${fmt(s.per)}</small></div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join('');
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
-function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=QTYS.map(q=>`<option value="${q}">${fmt(q)}</option>`).join('');calc()}
+function renderQty(){$('fQty').innerHTML=QTYS.map(q=>`<option value="${q}">${fmt(q)}</option>`).join('');calc()}
 function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(q/s.per*s.price)}
-function pick(id){$('fService').value=id;renderQty();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
+function pick(id){if(!ME){$('authSec').scrollIntoView({behavior:'smooth'});return}$('fService').value=id;renderQty();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
 $('fService').onchange=renderQty;$('fQty').onchange=calc;renderQty();
 
-$('copyBtn').onclick=()=>{navigator.clipboard.writeText(OWNER_NUMBER).then(()=>{$('copyBtn').textContent='اتنسخ ✅';setTimeout(()=>$('copyBtn').textContent='نسخ الرقم',1800)})};
-
-function err(m){const e=$('formErr');e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',5000)}
-let lastOrder=null;
-$('submitBtn').onclick=async()=>{
- const s=svc($('fService').value),q=+$('fQty').value,link=$('fLink').value.trim(),phone=$('fPhone').value.trim();
- if(link.length<3)return err('اكتب رابط الحساب أو البوست الأول.');
- const price=Math.round(q/s.per*s.price);
- const btn=$('submitBtn');btn.disabled=true;btn.textContent='جارٍ تسجيل الطلب...';
+/* ====== الحسابات ====== */
+let ME=null,PROFILE=null,unsubProfile=null,unsubOrders=null,unsubTopups=null;
+function normalizePhone(raw){let d=String(raw||'').replace(/[\s().-]/g,'');if(d.startsWith('00'))d='+'+d.slice(2);if(d.startsWith('01'))d='+20'+d.slice(1);else if(d.startsWith('20'))d='+'+d;else if(/^1[0125]\d{8}$/.test(d))d='+20'+d;if(!/^\+201[0125]\d{8}$/.test(d))throw new Error('اكتب رقم موبايل مصري صحيح، مثال 01012345678');return d}
+const boostEmail=ph=>'b'+ph.replace(/\D/g,'')+'@mahmoud-study.firebaseapp.com';
+let regMode=false;
+$('tabLogin').onclick=()=>{regMode=false;$('tabLogin').classList.add('active');$('tabReg').classList.remove('active');$('regName').classList.add('hidden');$('authBtn').textContent='دخول'};
+$('tabReg').onclick=()=>{regMode=true;$('tabReg').classList.add('active');$('tabLogin').classList.remove('active');$('regName').classList.remove('hidden');$('authBtn').textContent='إنشاء الحساب'};
+const AUTH_MSG={'auth/email-already-in-use':'الرقم ده مسجل بالفعل. جرب تدخل.','auth/weak-password':'كلمة السر ضعيفة؛ 6 أحرف أو أكثر.','auth/user-not-found':'مفيش حساب بالرقم ده. اعمل حساب جديد الأول.','auth/wrong-password':'الرقم أو كلمة السر غلط.','auth/invalid-credential':'الرقم أو كلمة السر غلط.','auth/too-many-requests':'محاولات كتير. استنى شوية وجرب تاني.','auth/network-request-failed':'اتأكد من النت.'};
+$('authBtn').onclick=async()=>{
+ const btn=$('authBtn');btn.disabled=true;btn.textContent='جارٍ...';
  try{
-  let short='';
-  for(let t=0;t<5;t++){
-   short='MB-'+Array.from({length:6},()=>'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
-   try{await store.collection('smmOrders').doc(short).set({service:s.name,serviceId:s.id,platform:s.platName,quantity:q,price:price,accountLink:link,customerPhone:phone,status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});break}catch(ex){if(t===4)throw ex}
+  const ph=normalizePhone($('fPhoneAuth').value),pw=$('fPass').value;
+  if(pw.length<6)throw new Error('كلمة السر 6 أحرف أو أكثر.');
+  if(regMode){
+   const name=$('fName').value.trim();if(name.length<2)throw new Error('اكتب اسمك.');
+   const cred=await auth.createUserWithEmailAndPassword(boostEmail(ph),pw);
+   await store.collection('boostUsers').doc(cred.user.uid).set({name,phone:ph,balance:0,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  }else{
+   await auth.signInWithEmailAndPassword(boostEmail(ph),pw);
   }
-  lastOrder={id:short,short,s:s.name,q,price,link};
-  $('formOk').innerHTML=`✅ طلبك اتسجل! رقم الطلب: <b style="direction:ltr;display:inline-block">${short}</b><br>احفظ الرقم ده عشان تتابع بيه طلبك. دلوقتي ابعت سكرينشوت التحويل على واتساب 👇`;
-  $('formOk').style.display='block';
-  const msg=`طلب جديد من MAHMOUD BOOST ⚡%0aرقم الطلب: ${short}%0aالخدمة: ${encodeURIComponent(s.name)}%0aالكمية: ${fmt(q)}%0aالمبلغ: ${money(price)}%0aالحساب: ${encodeURIComponent(link)}%0a%0a(هبعت سكرينشوت التحويل هنا 👇)`;
-  $('waBtn').href=`https://wa.me/${WA_NUMBER}?text=${msg}`;
-  $('waWrap').classList.remove('hidden');
-  $('formOk').scrollIntoView({behavior:'smooth',block:'center'});
- }catch(e){console.error(e);err('حصلت مشكلة في تسجيل الطلب. جرب تاني أو كلمنا واتساب.')}
- btn.disabled=false;btn.textContent='تأكيد الطلب ✅';
+ }catch(e){showErr('authErr',e.code?(AUTH_MSG[e.code]||'حصل خطأ: '+e.code):(e.message||'حصل خطأ'))}
+ btn.disabled=false;btn.textContent=regMode?'إنشاء الحساب':'دخول';
+};
+$('logoutBtn').onclick=()=>auth.signOut();
+auth.onAuthStateChanged(user=>{
+ if(user&&ADMIN_UIDS.indexOf(user.uid)<0){ME=user;startDash()}else{ME=null;PROFILE=null;stopDash();if(user){/* admin handled separately */}}
+});
+function stopDash(){[unsubProfile,unsubOrders,unsubTopups].forEach(u=>{try{u&&u()}catch(_){}});unsubProfile=unsubOrders=unsubTopups=null;$('dashSec').classList.add('hidden');$('authSec').classList.remove('hidden')}
+function startDash(){
+ $('authSec').classList.add('hidden');$('dashSec').classList.remove('hidden');
+ unsubProfile=store.collection('boostUsers').doc(ME.uid).onSnapshot(d=>{
+  if(!d.exists)return;PROFILE=d.data();$('uName').textContent=PROFILE.name||'';$('uBal').textContent=fmt(PROFILE.balance);
+ },e=>console.warn(e));
+ unsubOrders=store.collection('boostOrders').where('uid','==',ME.uid).limit(50).onSnapshot(s=>{
+  const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+  $('myOrders').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+   return `<div class="row-item"><div class="top"><b>${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div><div class="meta">الكمية: ${fmt(o.quantity)} • السعر: ${money(o.price)}<br>${t}</div></div>`}).join(''):'<div class="note">لسه مفيش طلبات.</div>';
+ },e=>{$('myOrders').innerHTML='<div class="note">تعذر تحميل الطلبات</div>'});
+ unsubTopups=store.collection('boostTopups').where('uid','==',ME.uid).limit(20).onSnapshot(s=>{
+  const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+  $('myTopups').innerHTML=docs.length?('<label style="margin-top:18px">شحناتي السابقة</label>'+docs.map(d=>{const o=d.data();
+   return `<div class="row-item"><div class="top"><b>${money(o.amount)} • ${esc(d.id)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div></div>`}).join('')):'';
+ },e=>console.warn(e));
+}
+
+/* ====== شحن المحفظة ====== */
+$('genCodeBtn').onclick=async()=>{
+ if(!ME||!PROFILE)return showErr('topErr','سجل دخول الأول.');
+ const amt=+$('tAmount').value;
+ const btn=$('genCodeBtn');btn.disabled=true;btn.textContent='جارٍ...';
+ try{
+  let code='';
+  for(let t=0;t<6;t++){
+   code='PAY-'+Math.floor(1000+Math.random()*9000);
+   try{await store.collection('boostTopups').doc(code).set({uid:ME.uid,name:PROFILE.name||'',phone:PROFILE.phone||'',amount:amt,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});break}catch(ex){if(t===5)throw ex}
+  }
+  $('payCode').textContent=code;
+  $('codeArea').classList.remove('hidden');
+  const msg=`شحن محفظة MAHMOUD BOOST ⚡%0aكود الدفع: ${code}%0aالمبلغ: ${money(amt)}%0aالاسم: ${encodeURIComponent(PROFILE.name||'')}%0a%0a(سكرينشوت التحويل 👇)`;
+  $('waTopBtn').href=`https://wa.me/${WA_NUMBER}?text=${msg}`;
+  $('copyCodeBtn').onclick=()=>{navigator.clipboard.writeText(code);$('copyCodeBtn').textContent='اتنسخ ✅';setTimeout(()=>$('copyCodeBtn').textContent='نسخ الكود',1800)};
+  $('codeArea').scrollIntoView({behavior:'smooth',block:'center'});
+ }catch(e){console.error(e);showErr('topErr','حصلت مشكلة. جرب تاني.')}
+ btn.disabled=false;btn.textContent='اعمل كود الدفع 🔑';
 };
 
-const STATUS_AR={new:'🕐 جديد - تحت المراجعة',done:'✅ تم التنفيذ',rejected:'❌ مرفوض'};
-$('trackBtn').onclick=async()=>{
- const v=$('tId').value.trim().toUpperCase();
- if(!v)return;
- const box=$('trackRes');box.className='order-row';box.innerHTML='بندور...';
+/* ====== الطلب بالرصيد ====== */
+$('orderBtn').onclick=async()=>{
+ if(!ME)return showErr('ordErr','سجل دخول الأول.');
+ if(!PROFILE)return showErr('ordErr','جارٍ تحميل حسابك...');
+ const s=svc($('fService').value),q=+$('fQty').value,link=$('fLink').value.trim();
+ if(link.length<3)return showErr('ordErr','اكتب رابط الحساب أو البوست الأول.');
+ const price=Math.round(q/s.per*s.price);
+ if((PROFILE.balance||0)<price)return showErr('ordErr','رصيدك مش كفاية (معاك '+money(PROFILE.balance||0)+' والطلب بـ'+money(price)+'). اشحن محفظتك الأول من فوق 👆');
+ const btn=$('orderBtn');btn.disabled=true;btn.textContent='جارٍ تنفيذ الطلب...';
  try{
-  const id=v.startsWith('MB-')?v:'MB-'+v;
-  const doc=await store.collection('smmOrders').doc(id).get();
-  if(!doc.exists){box.innerHTML='مفيش طلب بالرقم ده. تأكد من الرقم.';return}
-  const d=doc.data();
-  box.innerHTML=`<div class="top"><b>${d.service}</b><span class="pill ${d.status}">${STATUS_AR[d.status]||d.status}</span></div><div class="meta">الكمية: ${fmt(d.quantity)} • المبلغ: ${money(d.price)}</div>`;
- }catch(e){box.innerHTML='تعذر الاستعلام دلوقتي. جرب بعد شوية.'}
+  const uref=store.collection('boostUsers').doc(ME.uid);
+  const oref=store.collection('boostOrders').doc();
+  await store.runTransaction(async tx=>{
+   const udoc=await tx.get(uref);
+   const bal=(udoc.data().balance||0);
+   if(bal<price)throw new Error('رصيدك مش كفاية.');
+   tx.update(uref,{balance:bal-price});
+   tx.set(oref,{uid:ME.uid,service:s.name,serviceId:s.id,platform:s.platName,quantity:q,price:price,accountLink:link,status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  });
+  const ok=$('ordOk');ok.innerHTML=`✅ طلبك اتسجل واتخصم من رصيدك ${money(price)}.<br>رصيدك الحالي: ${money((PROFILE.balance||0)-price)}. هيتنفذ في أسرع وقت وتقدر تتابعه من "طلباتي".`;ok.style.display='block';
+  $('fLink').value='';
+  ok.scrollIntoView({behavior:'smooth',block:'center'});
+ }catch(e){console.error(e);showErr('ordErr',e.message&&e.message.indexOf('كفاية')>=0?e.message:'حصلت مشكلة في تنفيذ الطلب. جرب تاني.')}
+ btn.disabled=false;btn.textContent='تأكيد الطلب ✅';
 };
 </script>
 <script>
 /* ====== الأدمن ====== */
-let adminUser=null,unsubOrders=null,curFilter='new';
-function normalizePhone(raw){let d=String(raw||'').replace(/[\s().-]/g,'');if(d.startsWith('00'))d='+'+d.slice(2);if(d.startsWith('01'))d='+20'+d.slice(1);else if(d.startsWith('20'))d='+'+d;else if(/^1[0125]\d{8}$/.test(d))d='+20'+d;return d}
+let adminUser=null,unsubAdmin=null,curView='topups';
 $('loginBtn').onclick=async()=>{
  const e=$('loginErr');e.style.display='none';
  try{
   const ph=normalizePhone($('aPhone').value);
-  const email='p'+ph.replace(/\D/g,'')+'@mahmoud-study.firebaseapp.com';
   $('loginBtn').disabled=true;$('loginBtn').textContent='جارٍ الدخول...';
-  const cred=await auth.signInWithEmailAndPassword(email,$('aPass').value);
+  const cred=await auth.signInWithEmailAndPassword('p'+ph.replace(/\D/g,'')+'@mahmoud-study.firebaseapp.com',$('aPass').value);
   if(ADMIN_UIDS.indexOf(cred.user.uid)<0){await auth.signOut();throw new Error('الحساب ده مش أدمن.')}
   adminUser=cred.user;
   $('adminLogin').classList.add('hidden');$('adminPanel').classList.remove('hidden');
-  startOrders();
+  startAdmin();
  }catch(ex){e.textContent=ex.message&&ex.message.indexOf('أدمن')>=0?ex.message:'رقم الموبايل أو كلمة السر غلط.';e.style.display='block'}
  $('loginBtn').disabled=false;$('loginBtn').textContent='دخول';
 };
-$('logoutBtn').onclick=async()=>{await auth.signOut();adminUser=null;if(unsubOrders)unsubOrders();$('adminPanel').classList.add('hidden');$('adminLogin').classList.remove('hidden')};
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');curFilter=b.dataset.f;startOrders()});
-function esc(t){return String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function startOrders(){
- if(unsubOrders)unsubOrders();
- let q=store.collection('smmOrders').orderBy('createdAt','desc').limit(100);
- unsubOrders=q.onSnapshot(snap=>{
-  let docs=snap.docs;
-  if(curFilter!=='all')docs=docs.filter(d=>d.data().status===curFilter);
-  $('ordersList').innerHTML=docs.length?docs.map(d=>{
-   const o=d.data(),t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
-   return `<div class="order-row"><div class="top"><b>${esc(d.id)} • ${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>
-   <div class="meta">الكمية: ${fmt(o.quantity)} • المبلغ: ${money(o.price)}<br>الحساب: ${esc(o.accountLink)}<br>${o.customerPhone?'موبايل العميل: '+esc(o.customerPhone)+'<br>':''}الوقت: ${t}</div>
-   <div class="acts"><button onclick="setStatus('${d.id}','done')">تم التنفيذ ✅</button><button onclick="setStatus('${d.id}','rejected')">رفض ❌</button><button class="del" onclick="delOrder('${d.id}')">مسح 🗑️</button></div></div>`
-  }).join(''):'<div class="note" style="text-align:center;padding:20px">مفيش طلبات هنا لسه.</div>';
- },err=>{$('ordersList').innerHTML='<div class="note">تعذر تحميل الطلبات: '+esc(err.code||'')+'</div>'});
+$('adminLogoutBtn').onclick=async()=>{await auth.signOut();adminUser=null;if(unsubAdmin)unsubAdmin();$('adminPanel').classList.add('hidden');$('adminLogin').classList.remove('hidden')};
+document.querySelectorAll('#adminPanel .tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#adminPanel .tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');curView=b.dataset.f;startAdmin()});
+function startAdmin(){
+ if(unsubAdmin)unsubAdmin();
+ if(curView==='topups'){
+  unsubAdmin=store.collection('boostTopups').where('status','==','pending').limit(100).onSnapshot(s=>{
+   const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+   $('adminList').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+    return `<div class="row-item"><div class="top"><b>💳 ${esc(d.id)} • ${money(o.amount)}</b><span class="pill pending">مستني</span></div>
+    <div class="meta">العميل: ${esc(o.name)} • ${esc(o.phone)}<br>${t}</div>
+    <div class="acts"><button onclick="approveTopup('${d.id}','${o.uid}',${o.amount})">تأكيد وشحن الرصيد ✅</button><button class="del" onclick="rejectTopup('${d.id}')">رفض ❌</button></div></div>`
+   }).join(''):'<div class="note" style="text-align:center;padding:20px">مفيش شحنات مستنية 🎉</div>';
+  },e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
+ }else{
+  let q=store.collection('boostOrders').limit(100);
+  if(curView==='orders')q=store.collection('boostOrders').where('status','==','new').limit(100);
+  unsubAdmin=q.onSnapshot(s=>{
+   const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+   $('adminList').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+    return `<div class="row-item"><div class="top"><b>${esc(o.service)} • ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>
+    <div class="meta">الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}</div>
+    <div class="acts"><button onclick="setOrderStatus('${d.id}','done')">تم التنفيذ ✅</button><button onclick="setOrderStatus('${d.id}','rejected')">رفض ❌</button><button class="del" onclick="delOrder('${d.id}')">مسح 🗑️</button></div></div>`
+   }).join(''):'<div class="note" style="text-align:center;padding:20px">مفيش طلبات هنا.</div>';
+  },e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
+ }
 }
-async function setStatus(id,st){try{await store.collection('smmOrders').doc(id).update({status:st})}catch(e){alert('تعذر التحديث: '+(e.code||e.message))}}
-async function delOrder(id){if(!confirm('متأكد تمسح الطلب '+id+'؟'))return;try{await store.collection('smmOrders').doc(id).delete()}catch(e){alert('تعذر المسح: '+(e.code||e.message))}}
+async function approveTopup(code,uid,amount){
+ if(!confirm('تأكيد شحن '+fmt(amount)+' جنيه للعميل ده؟'))return;
+ try{
+  const tref=store.collection('boostTopups').doc(code),uref=store.collection('boostUsers').doc(uid);
+  await store.runTransaction(async tx=>{
+   const u=await tx.get(uref);const bal=(u.exists?(u.data().balance||0):0);
+   tx.update(uref,{balance:bal+amount});
+   tx.update(tref,{status:'approved'});
+  });
+ }catch(e){alert('تعذر الشحن: '+(e.code||e.message))}
+}
+async function rejectTopup(code){if(!confirm('رفض الشحنة '+code+'؟'))return;try{await store.collection('boostTopups').doc(code).update({status:'rejected'})}catch(e){alert('تعذر: '+(e.code||e.message))}}
+async function setOrderStatus(id,st){try{await store.collection('boostOrders').doc(id).update({status:st})}catch(e){alert('تعذر التحديث: '+(e.code||e.message))}}
+async function delOrder(id){if(!confirm('متأكد تمسح الطلب؟'))return;try{await store.collection('boostOrders').doc(id).delete()}catch(e){alert('تعذر المسح: '+(e.code||e.message))}}
 </script>
 </body>
 </html>
