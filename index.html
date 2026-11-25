@@ -2601,6 +2601,53 @@ document.addEventListener('DOMContentLoaded',()=>{
 })();
 </script>
 <!-- ARENA:END -->
+<!-- STREAK:START daily open streak + bonus -->
+<script>
+(function(){
+function key(d){return localDayKey(d)}
+function yest(){const y=new Date();y.setDate(y.getDate()-1);return key(y)}
+function bonusFor(n){return Math.min(n,7)*2}
+function card(){
+  let c=document.getElementById('stkCard');
+  if(!c){const ref=document.getElementById('arHomeCard')||document.getElementById('dailyGoalCard');if(!ref||!ref.parentNode)return null;
+    c=document.createElement('div');c.className='card';c.id='stkCard';c.style.cssText='border-color:#d9822b;background:linear-gradient(135deg,#2a1a0b,#121715);text-align:center';ref.parentNode.insertBefore(c,ref)}
+  return c;
+}
+function paintStreak(){
+  try{
+    const A=window.arenaGet&&window.arenaGet();if(!A||!A.st)return;
+    const s=A.st,n=s.streak|0,c=card();if(!c)return;
+    const today=key(),live=(s.lastDay===today||s.lastDay===yest())?n:0;
+    let dots='';for(let i=1;i<=7;i++)dots+='<span style="display:inline-block;width:26px;height:26px;line-height:26px;border-radius:50%;margin:0 3px;font-size:13px;'+(i<=Math.min(live,7)?'background:#d9822b;color:#fff':'background:#1a221d;color:#667')+'">'+i+'</span>';
+    c.innerHTML='<div style="font-size:42px;line-height:1">🔥</div><b style="font-size:34px;color:#ffb347;display:block;direction:ltr">'+live+'</b><span class="muted">'+(live?'يوم متتالي بتذاكر فيه':'ابدأ سلسلتك النهارده')+'</span><div style="margin:10px 0">'+dots+'</div><p class="muted" style="margin:0">'+(s.openBonusDay===today?'استلمت بونص النهارده +'+(s.openBonus|0)+' نقطة ✓':'افتح الموقع كل يوم واكسب بونص نقاط')+(s.bestStreak?' • أفضل سلسلة: '+s.bestStreak:'')+'</p>';
+    const el=document.getElementById('arStreak');if(el)el.textContent=live;
+  }catch(e){console.warn('streak paint',e)}
+}
+let done=false;
+async function run(){
+  if(done)return;
+  try{
+    if(!window.arenaLoad||!window.arenaGet||!studentAuth||!studentAuth.currentUser||!cloud||!cloud.ready)return;
+    done=true;
+    await window.arenaLoad();
+    const A=window.arenaGet(),s=A.st;if(!s)return;
+    const today=key();
+    if(s.lastDay!==today){s.streak=(s.lastDay===yest())?(s.streak||0)+1:1;s.lastDay=today}
+    s.bestStreak=Math.max(s.bestStreak|0,s.streak|0);
+    if(s.openBonusDay!==today){
+      const add=bonusFor(s.streak|0);s.openBonusDay=today;s.openBonus=add;
+      await window.arenaBonus(add);
+      if(typeof toast==='function')toast('🔥 سلسلة '+s.streak+' يوم! +'+add+' نقطة');
+    }else if(window.arenaBonus){await window.arenaBonus(0)}
+    paintStreak();
+  }catch(e){done=false;console.warn('streak',e)}
+}
+const _go=go;go=function(id){_go(id);if(id==='home'||id==='arena')setTimeout(paintStreak,300)};
+window.streakRun=run;window.streakPaint=paintStreak;
+setInterval(function(){if(!done)run();else if(!document.getElementById('stkCard'))paintStreak()},3000);
+})();
+</script>
+<!-- STREAK:END -->
 
 <script>
 /* MISTAKE-REVIEW:START (اختبرني في أخطائي) */
