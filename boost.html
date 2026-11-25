@@ -92,8 +92,11 @@ a{color:var(--green);text-decoration:none}
 <div class="badges"><span class="badge">👤 حساب ومحفظة خاصة بيك</span><span class="badge">⚡ تنفيذ سريع</span><span class="badge">🛡️ كود دفع لكل شحنة</span></div>
 </section>
 
+<div id="pubSec" class="hidden">
 <h3 class="sec">🛒 الخدمات والأسعار</h3>
+<input id="svcSearch" type="text" placeholder="🔍 ابحث عن خدمة... مثال: تيك توك" style="margin-bottom:12px">
 <div class="grid" id="servicesGrid"></div>
+</div>
 
 <div id="authSec">
 <h3 class="sec">👤 حسابك</h3>
@@ -106,7 +109,7 @@ a{color:var(--green);text-decoration:none}
 <input id="fPass" type="password" placeholder="6 أحرف أو أكثر" style="direction:ltr;text-align:right">
 <button class="btn" id="authBtn">دخول</button>
 <div class="status-err" id="authErr"></div>
-<div class="note">بالتسجيل هتقدر تشحن محفظتك وتطلب وتتابع كل حاجة من مكان واحد.</div>
+<div class="note">🔒 المنصة للأعضاء فقط - سجل دخولك أو اعمل حساب عشان تشوف الخدمات والأسعار وتطلب.</div>
 </div>
 </div>
 
@@ -147,6 +150,9 @@ a{color:var(--green);text-decoration:none}
 
 <h3 class="sec">📦 طلباتي</h3>
 <div class="panel"><div id="myOrders"><div class="note">لسه مفيش طلبات.</div></div></div>
+
+<h3 class="sec">🧾 سجل المحفظة</h3>
+<div class="panel"><div id="myTx"><div class="note">لسه مفيش حركات.</div></div></div>
 </div>
 
 <h3 class="sec">🔐 لوحة الأدمن</h3>
@@ -197,7 +203,8 @@ const STATUS_AR={new:'🕐 جديد',done:'✅ تم التنفيذ',rejected:'�
 function showErr(id,m){const e=$(id);e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',6000)}
 document.querySelectorAll('.copy[data-c]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.c);b.textContent='اتنسخ ✅';setTimeout(()=>b.textContent='نسخ الرقم',1800)});
 
-$('servicesGrid').innerHTML=SERVICES.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span><h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${money(s.price)} <small>/ ${fmt(s.per)}</small></div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join('');
+function renderServices(q){q=(q||'').trim();const list=q?SERVICES.filter(s=>(s.name+s.platName+s.desc).includes(q)):SERVICES;$('servicesGrid').innerHTML=list.length?list.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span><h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${money(s.price)} <small>/ ${fmt(s.per)}</small></div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join(''):'<div class="note">مفيش خدمة بالاسم ده.</div>'}
+renderServices();$('svcSearch').oninput=e=>renderServices(e.target.value);
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
 function renderQty(){$('fQty').innerHTML=QTYS.map(q=>`<option value="${q}">${fmt(q)}</option>`).join('');calc()}
 function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(q/s.per*s.price)}
@@ -231,19 +238,34 @@ $('logoutBtn').onclick=()=>auth.signOut();
 auth.onAuthStateChanged(user=>{
  if(user&&ADMIN_UIDS.indexOf(user.uid)<0){ME=user;startDash()}else{ME=null;PROFILE=null;stopDash();if(user){/* admin handled separately */}}
 });
-function stopDash(){[unsubProfile,unsubOrders,unsubTopups].forEach(u=>{try{u&&u()}catch(_){}});unsubProfile=unsubOrders=unsubTopups=null;$('dashSec').classList.add('hidden');$('authSec').classList.remove('hidden')}
+function stopDash(){[unsubProfile,unsubOrders,unsubTopups].forEach(u=>{try{u&&u()}catch(_){}});unsubProfile=unsubOrders=unsubTopups=null;$('dashSec').classList.add('hidden');$('pubSec').classList.add('hidden');$('authSec').classList.remove('hidden')}
+let lastOrders=[],lastTopups=[],lastOrderData={};
+function reorder(id){const o=lastOrderData[id];if(!o)return;$('fService').value=o.serviceId;renderQty();$('fQty').value=String(o.quantity);$('fLink').value=o.accountLink||'';calc();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
+function renderTx(){
+ if(!$('myTx'))return;
+ const items=[];
+ lastTopups.forEach(d=>{const o=d.data();const dt=(o.createdAt&&o.createdAt.toDate)?o.createdAt.toDate().toLocaleString('ar-EG'):'';const lbl='شحنة '+esc(d.id);
+  items.push({t:o.createdAt?.seconds||0,html:o.status==='approved'?`<div class="row-item"><div class="top"><b>➕ ${money(o.amount)}</b><span class="pill approved">${lbl}</span></div><div class="meta">اتشنت لمحفظتك • ${dt}</div></div>`:o.status==='rejected'?`<div class="row-item"><div class="top"><b>❌ ${money(o.amount)}</b><span class="pill rejected">${lbl}</span></div><div class="meta">اترفضت • ${dt}</div></div>`:`<div class="row-item"><div class="top"><b>🕐 ${money(o.amount)}</b><span class="pill pending">${lbl}</span></div><div class="meta">مستنية التأكيد • ${dt}</div></div>`})});
+ lastOrders.forEach(d=>{const o=d.data();const dt=(o.createdAt&&o.createdAt.toDate)?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+  items.push({t:o.createdAt?.seconds||0,html:`<div class="row-item"><div class="top"><b>➖ ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div><div class="meta">${esc(o.service)} • الكمية: ${fmt(o.quantity)} • ${dt}</div></div>`})});
+ items.sort((a,b)=>b.t-a.t);
+ $('myTx').innerHTML=items.length?items.slice(0,30).map(i=>i.html).join(''):'<div class="note">لسه مفيش حركات.</div>';
+}
 function startDash(){
- $('authSec').classList.add('hidden');$('dashSec').classList.remove('hidden');
+ $('authSec').classList.add('hidden');$('dashSec').classList.remove('hidden');$('pubSec').classList.remove('hidden');
  unsubProfile=store.collection('boostUsers').doc(ME.uid).onSnapshot(d=>{
   if(!d.exists)return;PROFILE=d.data();$('uName').textContent=PROFILE.name||'';$('uBal').textContent=fmt(PROFILE.balance);
  },e=>console.warn(e));
  unsubOrders=store.collection('boostOrders').where('uid','==',ME.uid).limit(50).onSnapshot(s=>{
   const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+  lastOrders=docs;lastOrderData={};docs.forEach(d=>lastOrderData[d.id]=d.data());
   $('myOrders').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
-   return `<div class="row-item"><div class="top"><b>${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div><div class="meta">الكمية: ${fmt(o.quantity)} • السعر: ${money(o.price)}<br>${t}</div></div>`}).join(''):'<div class="note">لسه مفيش طلبات.</div>';
+   return `<div class="row-item"><div class="top"><b>${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div><div class="meta">الكمية: ${fmt(o.quantity)} • السعر: ${money(o.price)}<br>${t}</div><button class="copy" onclick="reorder('${d.id}')" style="margin-top:6px">🔁 اطلب تاني</button></div>`}).join(''):'<div class="note">لسه مفيش طلبات.</div>';
+  renderTx();
  },e=>{$('myOrders').innerHTML='<div class="note">تعذر تحميل الطلبات</div>'});
  unsubTopups=store.collection('boostTopups').where('uid','==',ME.uid).limit(20).onSnapshot(s=>{
   const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+  lastTopups=docs;renderTx();
   $('myTopups').innerHTML=docs.length?('<label style="margin-top:18px">شحناتي السابقة</label>'+docs.map(d=>{const o=d.data();
    return `<div class="row-item"><div class="top"><b>${money(o.amount)} • ${esc(d.id)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div></div>`}).join('')):'';
  },e=>console.warn(e));
