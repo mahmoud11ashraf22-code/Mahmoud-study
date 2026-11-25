@@ -2438,7 +2438,7 @@ function paint(){
   try{paintDaily();paintWeekly()}catch(e){console.warn(e)}
   const b=document.getElementById('arBoard');if(!b)return;
   const me=AR.uid;let list=AR.top.slice();
-  if(AR.lbOk&&me&&!list.some(x=>x.uid===me)&&s.points>0)list.push({uid:me,name:(db.profile&&db.profile.name)||'أنت',points:s.points});
+  if(AR.lbOk&&me&&!list.some(x=>x.uid===me))list.push({uid:me,name:(db.profile&&db.profile.name)||'أنت',points:s.points});
   if(!AR.lbOk){
     set('arRankLine','ترتيبك هيظهر أول ما لوحة المتصدرين تتفعّل');
     b.innerHTML='<div class="ar-row me"><span class="ar-rank">—</span><span class="ar-name">أنت</span><span class="ar-pts">'+s.points+'</span></div><p class="muted">لوحة المتصدرين العامة لسه مش مفعّلة. نقاطك محفوظة.</p>';return;
@@ -2448,7 +2448,7 @@ function paint(){
   set('arRankLine',idx>=0?'ترتيبك: '+(idx+1)+' من '+list.length:'—');
   b.innerHTML=list.length?list.map((x,i)=>'<div class="ar-row'+(x.uid===me?' me':'')+'"><span class="ar-rank">'+(i<3?['🥇','🥈','🥉'][i]:i+1)+'</span><span class="ar-name">'+esc(String(x.name||'طالب'))+(x.uid===me?' (أنت)':'')+'</span><span class="ar-pts">'+(x.points|0)+'</span></div>').join(''):'<p class="muted">لسه مفيش نتائج. كن أول واحد!</p>';
 }
-async function open(){await load();paint();if(AR.st&&AR.st.points>0)await pushScore();await loadBoard();paint()}
+async function open(){await load();paint();if(AR.st&&AR.uid)await pushScore();await loadBoard();paint()}
 /* ARENA-WEEKLY:START weekly challenge */
 const WG={exams:3,points:60,bonus:50};
 function weekRoll(){const s=AR.st,wk=wkKey();if(s.week.key!==wk)s.week={key:wk,exams:0,points:0,claimed:false}}
