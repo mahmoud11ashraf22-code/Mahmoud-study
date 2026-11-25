@@ -792,6 +792,15 @@ body.auth-locked .wa-fab{display:none}
  <div class="card"><h2>متابعة نتائج الامتحانات</h2><p class="smallnote">تظهر درجات الاختياري وإجابات المقالي المحفوظة للمراجعة.</p><div id="gradingQueue" class="empty">ستظهر هنا نتائج الطلاب بعد تفعيل المزامنة.</div></div>
 </section>
 <div id="wordsList" style="display:none"></div><div class="footer">MAHMOUD STUDY • منصة تعليمية<br><b>Developer: Mahmoud Ashraf</b><br><a class="dev-link" href="https://wa.me/201558288143" target="_blank" rel="noopener" dir="ltr"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#i-wa"/></svg> Contact: 01558288143</a></div>
+<!-- ARENA:START page -->
+<section class="page" id="arena">
+ <h1>🏆 المنافسات</h1><p class="sub">نقاطك وترتيبك بين الطلبة. حلّ امتحانات واكسب نقاط.</p>
+ <div class="ar-hero"><span class="muted">نقاطك</span><b id="arPoints">0</b><span class="muted" id="arRankLine">—</span></div>
+ <div class="grid"><div class="stat"><b id="arExams">0</b><span>امتحانات اتحلّت</span></div><div class="stat"><b id="arStreak">0</b><span>أيام متتالية 🔥</span></div></div>
+ <div class="card"><h2>📊 المتصدرين</h2><div id="arBoard"><p class="muted">جاري التحميل...</p></div></div>
+ <div class="card"><h2>إزاي تكسب نقاط؟</h2><p class="muted">• تسليم امتحان: ١٠ نقاط + بونص حسب درجتك (مرة لكل امتحان في اليوم).</p></div>
+</section>
+<!-- ARENA:END page -->
 </main></div>
 
 <nav class="tabs"><div class="tabsin" style="grid-template-columns:repeat(6,1fr)">
@@ -1027,7 +1036,7 @@ let forumUnsubscribe=null, platformUnsubs=[];
 const firebaseConfig = {apiKey:"AIzaSyBlnCzvRKHFPFTR0KQRKbmEHObCP0fQakM",authDomain:"mahmoud-study.firebaseapp.com",projectId:"mahmoud-study",storageBucket:"mahmoud-study.firebasestorage.app",messagingSenderId:"265167276750",appId:"1:265167276750:web:26c6ad1c8c1c4bf8a75e9f"};
 let adminUnlocked=false,adminPasswordMemory='',authMode='login',studentAuth=null;
 /* ADMIN-AUTH:START constants/helpers - admin = Firebase Auth user whose uid is whitelisted (Firestore rules are the real lock) */
-const ADMIN_UIDS=['82rhSBXtd5YveBr1WO6Bcgyxu8t2','9I683tus04VUo9gmsVFDwaqbnof1'];
+const ADMIN_UIDS=['82rhSBXtd5YveBr1WO6Bcgyxu8t2','9I683tus04VUo9gmsVFDwaqbnof1','9aKVRBoMCmOgklU3sYkroNGOcLg1','pMsFOwdTQOR1qPdJGWO6rMvWB5D2'];
 function isAdminUid(uid){return !!uid&&ADMIN_UIDS.indexOf(uid)>=0}
 function applyAdminUI(on){document.querySelectorAll('[onclick="go(\'admin\')"]').forEach(function(b){const c=b.closest('.card');if(c)c.style.display=on?'':'none'})}
 /* ADMIN-AUTH:END */
@@ -2354,4 +2363,108 @@ document.addEventListener('change',e=>{
 try{renderPlatform()}catch(_){}
 })();
 </script>
+<!-- ARENA:START (gamification package 1: points + leaderboard) -->
+<style>
+#arena .ar-hero{background:linear-gradient(135deg,#0f2a1c,#121715);border:1px solid #1f6b43;border-radius:16px;padding:16px;text-align:center;margin-bottom:12px}
+#arena .ar-hero b{font-size:34px;color:var(--gold);display:block;direction:ltr}
+#arena .ar-row{display:flex;align-items:center;gap:10px;background:#0b0f0c;border:1px solid #29332c;border-radius:12px;padding:10px;margin:6px 0}
+#arena .ar-row.me{border-color:var(--green);background:#0d1a12}
+#arena .ar-rank{min-width:30px;text-align:center;font-weight:800;color:var(--gold)}
+#arena .ar-name{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#arena .ar-pts{font-weight:800;color:var(--green);direction:ltr}
+.ar-entry{cursor:pointer;border-color:#1f6b43!important}
+</style>
+
+<script>
+/* ARENA: client-side + Firestore (users/{uid}/learning/gamify, publicScores/{uid}) */
+(function(){
+const AR={uid:null,st:null,top:[],lbOk:null,loading:false};
+const blankSt=()=>({points:0,exams:0,streak:0,lastDay:'',examLog:{},dailyDone:{},week:{key:'',exams:0,points:0,claimed:false}});
+function wkKey(d=new Date()){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+1)%7));return localDayKey(x)}
+function uid(){try{return studentAuth&&studentAuth.currentUser?studentAuth.currentUser.uid:null}catch(_){return null}}
+function ref(){return cloud.store.collection('users').doc(AR.uid).collection('learning').doc('gamify')}
+function cacheKey(){return 'arena_v1_'+AR.uid}
+function merge(s){const b=blankSt();const o=Object.assign(b,s||{});o.examLog=o.examLog||{};o.dailyDone=o.dailyDone||{};o.week=Object.assign(b.week,o.week||{});return o}
+async function load(){
+  const u=uid();if(!u)return;
+  if(AR.uid!==u){AR.uid=u;AR.st=null}
+  if(AR.st)return;
+  let local=null;try{local=JSON.parse(localStorage.getItem(cacheKey())||'null')}catch(_){}
+  AR.st=merge(local);
+  try{if(cloud&&cloud.ready){const s=await ref().get();if(s.exists){const r=merge(s.data());if((r.points||0)>=(AR.st.points||0))AR.st=r}}}catch(e){console.warn('arena load',e)}
+}
+async function persist(){
+  try{localStorage.setItem(cacheKey(),JSON.stringify(AR.st))}catch(_){}
+  try{if(cloud&&cloud.ready)await ref().set(AR.st)}catch(e){console.warn('arena save',e)}
+  pushScore();
+}
+async function pushScore(){
+  try{
+    if(!cloud||!cloud.ready)return;
+    const s=AR.st,nm=((db.profile&&db.profile.name)||studentAuth.currentUser.displayName||'طالب').slice(0,40)||'طالب';
+    await cloud.store.collection('publicScores').doc(AR.uid).set({uid:AR.uid,name:nm,points:s.points|0,exams:s.exams|0,streak:s.streak|0,weekKey:s.week.key||'',weekPoints:s.week.points|0,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    AR.wOk=true;
+  }catch(e){AR.wOk=false;console.warn('arena score',e&&e.code)}
+}
+async function loadBoard(){
+  try{
+    const snap=await cloud.store.collection('publicScores').orderBy('points','desc').limit(20).get();
+    AR.top=snap.docs.map(d=>d.data());AR.lbOk=true;
+  }catch(e){AR.lbOk=false;AR.top=[];console.warn('arena board',e&&e.code)}
+}
+function award(rec){
+  const s=AR.st,today=localDayKey();
+  const k=rec.examId;
+  if(s.examLog[k]===today)return 0;
+  s.examLog[k]=today;
+  const add=10+Math.floor((rec.percent||0)/10);
+  s.points+=add;s.exams+=1;
+  if(s.lastDay!==today){const y=new Date();y.setDate(y.getDate()-1);s.streak=(s.lastDay===localDayKey(y))?(s.streak||0)+1:1;s.lastDay=today}
+  const wk=wkKey();if(s.week.key!==wk)s.week={key:wk,exams:0,points:0,claimed:false};
+  s.week.exams+=1;s.week.points+=add;
+  const keys=Object.keys(s.examLog);if(keys.length>200)keys.slice(0,keys.length-200).forEach(x=>delete s.examLog[x]);
+  return add;
+}
+function paint(){
+  const s=AR.st||blankSt();
+  const set=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v};
+  set('arPoints',s.points);set('arExams',s.exams);set('arStreak',s.streak);
+  const b=document.getElementById('arBoard');if(!b)return;
+  const me=AR.uid;let list=AR.top.slice();
+  if(AR.lbOk&&me&&!list.some(x=>x.uid===me)&&s.points>0)list.push({uid:me,name:(db.profile&&db.profile.name)||'أنت',points:s.points});
+  if(!AR.lbOk){
+    set('arRankLine','ترتيبك هيظهر أول ما لوحة المتصدرين تتفعّل');
+    b.innerHTML='<div class="ar-row me"><span class="ar-rank">—</span><span class="ar-name">أنت</span><span class="ar-pts">'+s.points+'</span></div><p class="muted">لوحة المتصدرين العامة لسه مش مفعّلة. نقاطك محفوظة.</p>';return;
+  }
+  list.sort((a,c)=>(c.points|0)-(a.points|0));
+  const idx=list.findIndex(x=>x.uid===me);
+  set('arRankLine',idx>=0?'ترتيبك: '+(idx+1)+' من '+list.length:'—');
+  b.innerHTML=list.length?list.map((x,i)=>'<div class="ar-row'+(x.uid===me?' me':'')+'"><span class="ar-rank">'+(i<3?['🥇','🥈','🥉'][i]:i+1)+'</span><span class="ar-name">'+esc(String(x.name||'طالب'))+(x.uid===me?' (أنت)':'')+'</span><span class="ar-pts">'+(x.points|0)+'</span></div>').join(''):'<p class="muted">لسه مفيش نتائج. كن أول واحد!</p>';
+}
+async function open(){await load();paint();await loadBoard();paint()}
+window.arenaOpen=open;
+const _go=go;go=function(id){_go(id);if(id==='arena')open()};
+const _sp=submitPlatformExam;
+submitPlatformExam=async function(id){
+  const before=db.localSubmissions&&db.localSubmissions[0];
+  const r=await _sp.apply(this,arguments);
+  try{
+    const rec=db.localSubmissions&&db.localSubmissions[0];
+    if(rec&&rec!==before&&rec.examId===id&&uid()){
+      await load();const add=award(rec);
+      if(add){await persist();toast('🏆 +'+add+' نقطة! مجموعك '+AR.st.points)}
+    }
+  }catch(e){console.warn('arena hook',e)}
+  return r;
+};
+document.addEventListener('DOMContentLoaded',()=>{
+  const home=document.getElementById('dailyGoalCard');
+  if(home&&!document.getElementById('arHomeCard')){const c=document.createElement('div');c.className='card ar-entry';c.id='arHomeCard';c.innerHTML='<div class="row"><h2>🏆 المنافسات</h2><b class="gold">شوف ترتيبك ›</b></div><p class="muted">اكسب نقاط من الامتحانات وقارن نفسك بزمايلك.</p>';c.onclick=()=>go('arena');home.parentNode.insertBefore(c,home)}
+  const more=document.getElementById('devContactCard');
+  if(more&&!document.getElementById('arMoreCard')){const c=document.createElement('div');c.className='card ar-entry';c.id='arMoreCard';c.innerHTML='<div class="row"><h2>🏆 المنافسات والنقاط</h2><b class="gold">›</b></div>';c.onclick=()=>go('arena');more.parentNode.insertBefore(c,more)}
+});
+})();
+</script>
+<!-- ARENA:END -->
+
 </body></html>
