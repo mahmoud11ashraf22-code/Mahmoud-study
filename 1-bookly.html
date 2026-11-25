@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOOKLY | نظام حجوزات ذكي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--p:#6c5ce7;--p2:#4834d4;--bg:#0f1023;--card:#181a35;--card2:#1f2244;--txt:#f2f3ff;--mut:#9aa0c7;--ok:#2ed573;--bad:#ff6b6b;--warn:#feca57}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:var(--bg);color:var(--txt);min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:16px}
+.logo{text-align:center;padding:28px 0 8px;font-size:34px;font-weight:800;letter-spacing:2px}
+.logo b{background:linear-gradient(135deg,#a29bfe,#6c5ce7);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{text-align:center;color:var(--mut);margin-bottom:20px;font-size:14px}
+.card{background:var(--card);border:1px solid #262a52;border-radius:18px;padding:18px;margin-bottom:14px}
+h2{font-size:18px;margin-bottom:12px}
+h3{font-size:15px;margin:14px 0 8px;color:var(--mut)}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+input,select,textarea{width:100%;background:var(--card2);border:1px solid #2c3060;color:var(--txt);border-radius:12px;padding:11px 12px;font-size:15px;outline:none}
+input:focus,select:focus{border-color:var(--p)}
+.btn{display:block;width:100%;background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;border:none;border-radius:12px;padding:13px;font-size:16px;font-weight:700;cursor:pointer;margin-top:14px}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--card2);border:1px solid #343a70}
+.btn.small{width:auto;padding:7px 14px;font-size:13px;margin:0;border-radius:10px}
+.btn.okb{background:linear-gradient(135deg,#2ed573,#20bf6b)}
+.btn.badb{background:linear-gradient(135deg,#ff6b6b,#ee5253)}
+.row{display:flex;gap:8px;align-items:center}
+.row>*{flex:1}
+.muted{color:var(--mut);font-size:13px}
+.err{color:var(--bad);font-size:13px;margin-top:8px;min-height:18px;text-align:center}
+.okm{color:var(--ok);font-size:13px;margin-top:8px;text-align:center}
+.tabs{display:flex;background:var(--card2);border-radius:12px;padding:4px;margin-bottom:14px}
+.tabs button{flex:1;background:none;border:none;color:var(--mut);padding:9px;border-radius:9px;font-weight:700;font-size:14px;cursor:pointer}
+.tabs button.on{background:var(--p);color:#fff}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:6px}
+.days label{background:var(--card2);border:1px solid #2c3060;border-radius:10px;text-align:center;padding:8px 0;margin:0;font-size:12px;color:var(--mut);cursor:pointer}
+.days input{display:none}
+.days label.on{background:var(--p);color:#fff;border-color:var(--p)}
+.svc{background:var(--card2);border:1px solid #2c3060;border-radius:12px;padding:10px;margin-bottom:8px}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}
+.slot{background:var(--card2);border:1px solid #2c3060;border-radius:10px;padding:9px 0;text-align:center;font-size:13px;cursor:pointer;font-weight:600}
+.slot.on{background:var(--p);border-color:var(--p);color:#fff}
+.slot.off{opacity:.3;pointer-events:none;text-decoration:line-through}
+.bk{background:var(--card2);border:1px solid #2c3060;border-radius:14px;padding:12px;margin-bottom:10px}
+.bk .st{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:700}
+.st.p{background:#4a3f10;color:var(--warn)}.st.c{background:#0f4630;color:var(--ok)}.st.x{background:#4a1717;color:var(--bad)}
+.badge{display:inline-block;background:var(--bad);color:#fff;border-radius:20px;font-size:11px;padding:1px 8px;font-weight:700}
+.linkbox{display:flex;gap:6px;margin-top:8px}
+.linkbox input{font-size:12px;direction:ltr;text-align:left}
+.hide{display:none!important}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.notif{background:var(--card2);border-right:3px solid var(--p);border-radius:10px;padding:9px 12px;margin-bottom:7px;font-size:13px}
+.hero{text-align:center;padding:10px 0 4px}
+.hero .feat{display:flex;gap:8px;margin:14px 0}
+.hero .feat div{flex:1;background:var(--card2);border-radius:14px;padding:12px 6px;font-size:12px;color:var(--mut)}
+.hero .feat div b{display:block;color:var(--txt);font-size:14px;margin-bottom:3px}
+.codebox{font-size:30px;font-weight:800;letter-spacing:4px;text-align:center;background:var(--card2);border:1px dashed var(--p);border-radius:14px;padding:14px;margin:12px 0;direction:ltr}
+.footer{text-align:center;color:#565b8a;font-size:11px;padding:18px 0}
+.chip{display:inline-block;background:var(--card2);border:1px solid #2c3060;border-radius:20px;padding:4px 12px;font-size:12px;margin:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="logo">BOOKLY<b>.</b></div>
+<div class="tag">نظام حجوزات ذكي للعيادات والسناتر والحلاقين</div>
+
+<!-- ============ LANDING / AUTH ============ -->
+<div id="vAuth" class="hide">
+<div class="hero card">
+<div class="feat">
+<div><b>📅 حجز أونلاين</b>عملاؤك يحجزون من لينك خاص بيك</div>
+<div><b>📊 لوحة تحكم</b>أكّد أو ارفض الحجوزات بضغطة</div>
+<div><b>🔔 إشعارات</b>كل حجز جديد يوصلك فورا</div>
+</div>
+</div>
+<div class="card">
+<div class="tabs">
+<button id="tLogin" class="on" onclick="authTab(1)">تسجيل دخول</button>
+<button id="tReg" onclick="authTab(0)">حساب جديد</button>
+</div>
+<div id="fReg" class="hide">
+<label>اسم النشاط</label><input id="rName" placeholder="مثال: عيادة د. أحمد / سنتر النور">
+<label>نوع النشاط</label><select id="rType"><option value="clinic">عيادة</option><option value="tutor">سنتر / دروس</option><option value="barber">حلاقة</option><option value="other">أخرى</option></select>
+</div>
+<label>رقم الموبايل</label><input id="aPhone" inputmode="tel" placeholder="01xxxxxxxxx">
+<label>كلمة السر</label><input id="aPass" type="password" placeholder="6 حروف على الأقل">
+<div class="err" id="aErr"></div>
+<button class="btn" id="aBtn" onclick="doLogin()">دخول</button>
+</div>
+<div class="footer">BOOKLY — من صناعة <b>محمود أشرف</b></div>
+</div>
+
+<!-- ============ OWNER DASHBOARD ============ -->
+<div id="vDash" class="hide">
+<div class="top">
+<div><b id="dBizName">—</b><div class="muted" id="dBizType"></div></div>
+<button class="btn small ghost" onclick="logout()">خروج</button>
+</div>
+<div class="tabs" style="position:sticky;top:8px;z-index:5">
+<button id="tb1" class="on" onclick="dashTab(1)">الحجوزات <span id="pendBadge" class="badge hide">0</span></button>
+<button id="tb2" onclick="dashTab(2)">إشعارات</button>
+<button id="tb3" onclick="dashTab(3)">إعدادات</button>
+</div>
+<div id="dp1">
+<div class="card">
+<label>لينك الحجز بتاعك (ابعته لعملائك)</label>
+<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink()">نسخ</button></div>
+</div>
+<div class="row" style="margin-bottom:10px">
+<input type="date" id="fltDate" onchange="renderBookings()">
+<button class="btn small ghost" style="flex:0 0 auto" onclick="fltDate.value='';renderBookings()">الكل</button>
+</div>
+<div id="bkList"></div>
+</div>
+<div id="dp2" class="hide"><div id="notifList"></div></div>
+<div id="dp3" class="hide">
+<div class="card">
+<h2>الخدمات والأسعار</h2>
+<div id="svcRows"></div>
+<button class="btn small ghost" onclick="addSvcRow()">+ إضافة خدمة</button>
+</div>
+<div class="card">
+<h2>مواعيد العمل</h2>
+<label>الأيام المتاحة</label>
+<div class="days" id="dayPicks"></div>
+<div class="row">
+<div><label>من الساعة</label><input type="time" id="wFrom" value="10:00"></div>
+<div><label>إلى الساعة</label><input type="time" id="wTo" value="22:00"></div>
+</div>
+<label>مدة الكشف / الجلسة (دقيقة)</label><input type="number" id="wStep" value="30" min="10" step="5">
+<div class="err" id="sErr"></div><div class="okm" id="sOk"></div>
+<button class="btn" onclick="saveSettings()">حفظ الإعدادات</button>
+</div>
+</div>
+</div>
+
+<!-- ============ PUBLIC BOOKING ============ -->
+<div id="vBook" class="hide">
+<div class="card" style="text-align:center">
+<div style="font-size:40px" id="pIcon">📅</div>
+<h2 id="pName" style="margin:4px 0">—</h2>
+<div class="muted" id="pType"></div>
+<div id="pSvcs" style="margin-top:8px"></div>
+</div>
+<div class="card" id="stepSvc">
+<h2>1) اختار الخدمة</h2>
+<div id="svcPick"></div>
+</div>
+<div class="card hide" id="stepTime">
+<h2>2) اختار اليوم والمعاد</h2>
+<label>اليوم</label><input type="date" id="bDate" onchange="loadSlots()">
+<div id="slotBox"><div class="muted" style="margin-top:8px">اختار يوم الأول</div></div>
+</div>
+<div class="card hide" id="stepInfo">
+<h2>3) بياناتك</h2>
+<label>الاسم</label><input id="cName" placeholder="اسمك بالكامل">
+<label>رقم الموبايل</label><input id="cPhone" inputmode="tel" placeholder="01xxxxxxxxx">
+<div class="err" id="bErr"></div>
+<button class="btn" onclick="submitBooking()">تأكيد الحجز ✅</button>
+</div>
+</div>
+
+<!-- ============ BOOKING SUCCESS / STATUS ============ -->
+<div id="vDone" class="hide">
+<div class="card" style="text-align:center">
+<div style="font-size:44px">🎉</div>
+<h2>تم استلام حجزك!</h2>
+<p class="muted" id="doneInfo"></p>
+<div class="codebox" id="doneCode"></div>
+<p class="muted">احتفظ بالكود ده عشان تتابع حالة حجزك</p>
+<button class="btn ghost" onclick="checkStatus()">متابعة الحجز</button>
+</div>
+</div>
+<div id="vStatus" class="hide">
+<div class="card" style="text-align:center">
+<h2>حالة الحجز</h2>
+<div id="stBody"></div>
+<button class="btn ghost" onclick="location.href=location.pathname">حجز جديد</button>
+</div>
+</div>
+<div class="card hide" id="vFind">
+<h2>عندك كود حجز؟</h2>
+<div class="row"><input id="findCode" placeholder="مثال: AB12CD34" style="direction:ltr;text-align:left"><button class="btn small" style="flex:0 0 auto" onclick="findBooking()">بحث</button></div>
+<div class="err" id="fErr"></div>
+</div>
+<div class="footer hide" id="pFooter">مدعوم بواسطة <b>BOOKLY</b> — احجز بذكاء</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyBlnCzvRKHFPFTR0KQRKbmEHObCP0fQakM",authDomain:"mahmoud-study.firebaseapp.com",projectId:"mahmoud-study",storageBucket:"mahmoud-study.firebasestorage.app",messagingSenderId:"265167276750",appId:"1:265167276750:web:26c6ad1c8c1c4bf8a75e9f"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.firestore();
+const $=id=>document.getElementById(id);
+const TYPES={clinic:'عيادة 🩺',tutor:'سنتر / دروس 📚',barber:'حلاقة 💈',other:'نشاط آخر ⭐'};
+const ICONS={clinic:'🩺',tutor:'📚',barber:'💈',other:'⭐'};
+const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const qp=new URLSearchParams(location.search);
+const pubBiz=qp.get('b'),pubCode=qp.get('code');
+function show(id){['vAuth','vDash','vBook','vDone','vStatus','vFind','pFooter'].forEach(v=>$(v).classList.add('hide'));if(id)$(id).classList.remove('hide');}
+function normPhone(raw){let d=String(raw||'').replace(/[\s().-]/g,'');if(d.startsWith('00'))d='+'+d.slice(2);if(d.startsWith('01'))d='+20'+d.slice(1);else if(d.startsWith('20'))d='+'+d;else if(/^1[0125]\d{8}$/.test(d))d='+2'+d;return d;}
+const bkEmail=ph=>'bk'+ph.replace(/\D/g,'')+'@mahmoud-study.firebaseapp.com';
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function t12(t){let[h,m]=t.split(':').map(Number);const ap=h>=12?'م':'ص';h=h%12||12;return h+':'+String(m).padStart(2,'0')+' '+ap;}
+function genCode(){const c='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<8;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+
+/* ---------- AUTH ---------- */
+let regMode=false;
+function authTab(login){regMode=!login;$('tLogin').classList.toggle('on',login);$('tReg').classList.toggle('on',!login);$('fReg').classList.toggle('hide',login);$('aBtn').textContent=login?'دخول':'إنشاء الحساب';$('aErr').textContent='';}
+async function doLogin(){
+const ph=normPhone($('aPhone').value),pw=$('aPass').value;
+if(!ph||ph.length<10){$('aErr').textContent='اكتب رقم موبايل صحيح';return;}
+if(pw.length<6){$('aErr').textContent='كلمة السر 6 حروف على الأقل';return;}
+$('aErr').textContent='...';
+try{
+if(regMode){
+const name=$('rName').value.trim();if(!name){$('aErr').textContent='اكتب اسم النشاط';return;}
+const cr=await auth.createUserWithEmailAndPassword(bkEmail(ph),pw);
+await db.collection('bookly_businesses').add({ownerUid:cr.user.uid,name:name,type:$('rType').value,phone:ph,createdAt:firebase.firestore.FieldValue.serverTimestamp(),services:[],schedule:{days:[1,2,3,4,6],from:'10:00',to:'22:00',step:30}});
+}else{await auth.signInWithEmailAndPassword(bkEmail(ph),pw);}
+}catch(e){$('aErr').textContent=e.code==='auth/email-already-in-use'?'الرقم ده مسجل قبل كده، ادخل بيه':e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'كلمة السر غلط':e.code==='auth/user-not-found'?'مفيش حساب بالرقم ده، اعمل حساب جديد':'حصل خطأ: '+e.code;}
+}
+async function logout(){await auth.signOut();location.href=location.pathname;}
+
+/* ---------- DASHBOARD ---------- */
+let myBiz=null,myBizId=null,bkCache=[],seenPend=new Set(JSON.parse(localStorage.getItem('bk_seen')||'[]'));
+auth.onAuthStateChanged(async u=>{
+if(pubBiz)return; // public page handles itself
+if(!u){show('vAuth');return;}
+const q=await db.collection('bookly_businesses').where('ownerUid','==',u.uid).limit(1).get();
+if(q.empty){await auth.signOut();show('vAuth');$('aErr').textContent='مفيش نشاط مرتبط بالحساب ده';return;}
+myBiz={id:q.docs[0].id,...q.docs[0].data()};myBizId=q.docs[0].id;
+enterDash();
+});
+function enterDash(){
+$('dBizName').textContent=myBiz.name;$('dBizType').textContent=TYPES[myBiz.type]||myBiz.type;
+$('myLink').value=location.origin+location.pathname+'?b='+myBizId;
+if(!myBiz.services||!myBiz.services.length){myBiz.services=[{name:'كشف',dur:30,price:''}];dashTab(3);}else dashTab(1);
+renderSvcRows();renderDays();$('wFrom').value=myBiz.schedule?.from||'10:00';$('wTo').value=myBiz.schedule?.to||'22:00';$('wStep').value=myBiz.schedule?.step||30;
+show('vDash');listenBookings();
+}
+function dashTab(n){[1,2,3].forEach(i=>{$('tb'+i).classList.toggle('on',i===n);$('dp'+i).classList.toggle('hide',i!==n);});}
+function copyLink(){$('myLink').select();document.execCommand('copy');navigator.clipboard?.writeText($('myLink').value);event.target.textContent='تم ✅';setTimeout(()=>event.target.textContent='نسخ',1500);}
+function listenBookings(){
+db.collection('bookly_businesses').doc(myBizId).collection('bookings').orderBy('date','desc').limit(100).onSnapshot(s=>{
+bkCache=s.docs.map(d=>({id:d.id,...d.data()}));
+const pend=bkCache.filter(b=>b.status==='pending');
+const fresh=pend.filter(b=>!seenPend.has(b.id));
+if(fresh.length){fresh.forEach(b=>seenPend.add(b.id));localStorage.setItem('bk_seen',JSON.stringify([...seenPend].slice(-200)));renderNotifs(fresh,true);}
+else renderNotifs(pend,false);
+$('pendBadge').textContent=pend.length;$('pendBadge').classList.toggle('hide',!pend.length);
+document.title=(pend.length?`(${pend.length}) `:'')+'BOOKLY | لوحة التحكم';
+renderBookings();
+});
+}
+function renderBookings(){
+const f=$('fltDate').value;
+let list=bkCache.filter(b=>!f||b.date===f);
+list.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+if(!list.length){$('bkList').innerHTML='<div class="card muted" style="text-align:center">مفيش حجوزات '+(f?'في اليوم ده':'لحد دلوقتي')+'</div>';return;}
+$('bkList').innerHTML=list.map(b=>`
+<div class="bk"><div class="top" style="margin:0 0 6px">
+<div><b>${esc(b.name)}</b> <span class="muted" style="font-size:12px">${esc(b.phone)}</span></div>
+<span class="st ${b.status==='pending'?'p':b.status==='confirmed'?'c':'x'}">${b.status==='pending'?'جديد':b.status==='confirmed'?'مؤكد':'ملغي'}</span></div>
+<div class="muted" style="font-size:13px">${esc(b.service)} — ${b.date} الساعة ${t12(b.time)}</div>
+${b.status!=='cancelled'?`<div class="row" style="margin-top:8px">
+<button class="btn small okb" onclick="setStatus('${b.id}','confirmed')">تأكيد ✅</button>
+<button class="btn small badb" onclick="setStatus('${b.id}','cancelled')">إلغاء ❌</button></div>`:''}
+</div>`).join('');
+}
+async function setStatus(id,st){
+const b=bkCache.find(x=>x.id===id);
+await db.collection('bookly_businesses').doc(myBizId).collection('bookings').doc(id).update({status:st});
+if(st==='cancelled'&&b){try{await db.collection('bookly_businesses').doc(myBizId).collection('slots').doc(b.date+'_'+b.time).delete();}catch(e){}}
+}
+function renderNotifs(fresh,isNew){
+const pend=bkCache.filter(b=>b.status==='pending').slice(0,20);
+$('notifList').innerHTML=(pend.length?pend.map(b=>`<div class="notif">🔔 حجز جديد: <b>${esc(b.name)}</b> — ${esc(b.service)} يوم ${b.date} الساعة ${t12(b.time)}</div>`).join(''):'<div class="card muted" style="text-align:center">مفيش إشعارات جديدة</div>');
+}
+/* settings */
+function renderSvcRows(){
+$('svcRows').innerHTML=myBiz.services.map((s,i)=>`
+<div class="svc"><div class="row">
+<input placeholder="اسم الخدمة" value="${esc(s.name)}" onchange="myBiz.services[${i}].name=this.value">
+<input type="number" placeholder="المدة" value="${s.dur}" style="flex:0 0 70px" onchange="myBiz.services[${i}].dur=+this.value">
+<input type="number" placeholder="السعر" value="${s.price||''}" style="flex:0 0 80px" onchange="myBiz.services[${i}].price=this.value">
+<button class="btn small badb" style="flex:0 0 auto" onclick="myBiz.services.splice(${i},1);renderSvcRows()">🗑</button>
+</div></div>`).join('');
+}
+function addSvcRow(){myBiz.services.push({name:'',dur:30,price:''});renderSvcRows();}
+function renderDays(){
+const on=myBiz.schedule?.days||[];
+$('dayPicks').innerHTML=DAYS.map((d,i)=>`<label class="${on.includes(i)?'on':''}" data-d="${i}">${d}<input type="checkbox" ${on.includes(i)?'checked':''}></label>`).join('');
+$('dayPicks').querySelectorAll('label').forEach(l=>l.onclick=()=>{const c=l.querySelector('input');c.checked=!c.checked;l.classList.toggle('on',c.checked);});
+}
+async function saveSettings(){
+const days=[...$('dayPicks').querySelectorAll('input')].map((c,i)=>c.checked?i:null).filter(x=>x!==null);
+if(!days.length){$('sErr').textContent='اختار يوم واحد على الأقل';return;}
+myBiz.services=myBiz.services.filter(s=>s.name.trim());
+if(!myBiz.services.length){$('sErr').textContent='ضيف خدمة واحدة على الأقل';return;}
+myBiz.schedule={days:days,from:$('wFrom').value,to:$('wTo').value,step:Math.max(10,+$('wStep').value||30)};
+await db.collection('bookly_businesses').doc(myBizId).update({services:myBiz.services,schedule:myBiz.schedule});
+$('sErr').textContent='';$('sOk').textContent='تم الحفظ ✅';setTimeout(()=>$('sOk').textContent='',2000);dashTab(1);
+}
+function esc(s){return String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
+
+/* ---------- PUBLIC BOOKING ---------- */
+let PB=null,PBID=null,selSvc=null,selSlot=null;
+async function bootPublic(){
+PBID=pubBiz;
+const d=await db.collection('bookly_businesses').doc(PBID).get();
+if(!d.exists){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>اللينك ده مش شغال ❌</h2><p class="muted">اتأكد من اللينك مع صاحب النشاط</p></div>';return;}
+PB=d.data();
+$('pIcon').textContent=ICONS[PB.type]||'📅';$('pName').textContent=PB.name;$('pType').textContent=TYPES[PB.type]||'';
+$('pSvcs').innerHTML=(PB.services||[]).map(s=>`<span class="chip">${esc(s.name)}${s.price?' · '+esc(s.price)+'ج':''}</span>`).join('');
+$('svcPick').innerHTML=(PB.services||[]).map((s,i)=>`<div class="svc" style="cursor:pointer" onclick="pickSvc(${i},this)"><div class="row"><b>${esc(s.name)}</b><span class="muted" style="flex:0 0 auto;font-size:12px">${s.dur} دقيقة${s.price?' · '+esc(s.price)+' جنيه':''}</span></div></div>`).join('')||'<div class="muted">النشاط لسه مضافش خدمات</div>';
+const t=new Date();$('bDate').min=fmtDate(t);const mx=new Date();mx.setDate(mx.getDate()+14);$('bDate').max=fmtDate(mx);
+show('vBook');$('vFind').classList.remove('hide');$('pFooter').classList.remove('hide');
+if(pubCode){findBooking(pubCode);}
+}
+function pickSvc(i,el){selSvc=PB.services[i];document.querySelectorAll('#svcPick .svc').forEach(x=>x.style.borderColor='');el.style.borderColor='var(--p)';$('stepTime').classList.remove('hide');$('stepInfo').classList.remove('hide');loadSlots();}
+async function loadSlots(){
+selSlot=null;
+const ds=$('bDate').value;if(!ds||!selSvc)return;
+const wd=new Date(ds+'T12:00:00').getDay();
+const sch=PB.schedule||{days:[0,1,2,3,4,5,6],from:'10:00',to:'22:00',step:30};
+if(!sch.days.includes(wd)){$('slotBox').innerHTML='<div class="muted" style="margin-top:8px">اليوم ده مش من أيام العمل، اختار يوم تاني</div>';return;}
+$('slotBox').innerHTML='<div class="muted" style="margin-top:8px">بنجيب المواعيد...</div>';
+const taken=new Set();
+try{const s=await db.collection('bookly_businesses').doc(PBID).collection('slots').where('date','==',ds).get();s.docs.forEach(d=>taken.add(d.data().time));}catch(e){}
+const dur=selSvc.dur||sch.step||30;
+const [fh,fm]=sch.from.split(':').map(Number),[th,tm]=sch.to.split(':').map(Number);
+const now=new Date(),isToday=ds===fmtDate(now);
+let out=[];
+for(let t=fh*60+fm;t+dur<=th*60+tm;t+=sch.step||30){
+const tt=String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+const past=isToday&&(t<=now.getHours()*60+now.getMinutes());
+out.push(`<div class="slot ${taken.has(tt)||past?'off':''}" data-t="${tt}" onclick="pickSlot(this)">${t12(tt)}</div>`);
+}
+$('slotBox').innerHTML=out.length?`<div class="slots">${out.join('')}</div>`:'<div class="muted" style="margin-top:8px">مفيش مواعيد فاضية في اليوم ده</div>';
+}
+function pickSlot(el){document.querySelectorAll('.slot').forEach(x=>x.classList.remove('on'));el.classList.add('on');selSlot=el.dataset.t;}
+async function submitBooking(){
+const name=$('cName').value.trim(),ph=normPhone($('cPhone').value),ds=$('bDate').value;
+if(!selSvc){$('bErr').textContent='اختار الخدمة الأول';return;}
+if(!selSlot){$('bErr').textContent='اختار المعاد';return;}
+if(!name){$('bErr').textContent='اكتب اسمك';return;}
+if(!ph||ph.length<10){$('bErr').textContent='اكتب رقم موبايل صحيح';return;}
+$('bErr').textContent='...';
+const code=genCode(),slotId=ds+'_'+selSlot;
+const slotRef=db.collection('bookly_businesses').doc(PBID).collection('slots').doc(slotId);
+const bkRef=db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code);
+try{
+await db.runTransaction(async tx=>{
+const sl=await tx.get(slotRef);
+if(sl.exists)throw'taken';
+tx.set(slotRef,{date:ds,time:selSlot});
+tx.set(bkRef,{code:code,name:name,phone:ph,service:selSvc.name,date:ds,time:selSlot,status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+});
+}catch(e){
+if(e==='taken'){$('bErr').textContent='المعاد ده اتحجز للأسف، اختار معاد تاني';loadSlots();return;}
+$('bErr').textContent='حصل خطأ، حاول تاني';return;
+}
+$('doneInfo').textContent=`${selSvc.name} — يوم ${ds} الساعة ${t12(selSlot)}`;
+$('doneCode').textContent=code;
+history.replaceState(null,'',location.pathname+'?b='+PBID+'&code='+code);
+show('vDone');
+}
+async function findBooking(c){
+const code=(c||$('findCode').value||'').trim().toUpperCase();
+if(!code)return;
+try{
+const d=await db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code).get();
+if(!d.exists){if($('fErr'))$('fErr').textContent='الكود ده مش موجود';return;}
+const b=d.data();
+$('stBody').innerHTML=`<div style="font-size:34px;margin:8px 0">${b.status==='confirmed'?'✅':b.status==='cancelled'?'❌':'⏳'}</div>
+<p><b>${b.status==='confirmed'?'حجزك مؤكد!':b.status==='cancelled'?'حجزك اتلغى':'حجزك قيد المراجعة'}</b></p>
+<p class="muted" style="margin-top:6px">${esc(b.name)} — ${esc(b.service)}<br>${b.date} الساعة ${t12(b.time)}</p>
+${PB.phone?`<a class="btn okb" style="text-decoration:none;margin-top:14px" href="https://wa.me/${PB.phone.replace('+','')}?text=${encodeURIComponent('أهلا، معايا حجز كود '+b.code)}">تواصل واتساب 💬</a>`:''}`;
+show('vStatus');$('pFooter').classList.remove('hide');
+}catch(e){if($('fErr'))$('fErr').textContent='حصل خطأ، حاول تاني';}
+}
+function checkStatus(){const c=$('doneCode').textContent.trim();if(c)findBooking(c);}
+
+/* ---------- BOOT ---------- */
+if(pubBiz){bootPublic().catch(e=>{document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>حصل خطأ في التحميل</h2></div>';});}
+else{show('vAuth');}
+</script>
+</body>
+</html>
