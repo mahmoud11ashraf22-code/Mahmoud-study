@@ -781,6 +781,15 @@ body.auth-locked .wa-fab{display:none}
 <!-- ENGLISH-2027:START -->
  <div class="card" style="border-color:#1f6b43"><div class="row"><h2>🇬🇧 امتحان اللغة الإنجليزية — تانية بكالوريا 2027</h2><span class="tag">بالإجابات</span></div><p class="smallnote">اختياري ومقالي • عداد وقت وتصحيح فوري مع الإجابات النموذجية.</p><a class="btn greenbtn full" href="english-2027.html" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">ابدأ الامتحان ›</a></div>
 <!-- ENGLISH-2027:END -->
+<!-- NETWORKS-2027:START -->
+ <div class="card" style="border-color:#1f6b43"><div class="row"><h2>🌐 امتحان الشبكات وأمن المعلومات</h2><span class="tag">بالإجابات</span></div><p class="smallnote">20 سؤال اختيار من متعدد + أسئلة مقالية • عداد وقت وتصحيح فوري.</p><a class="btn greenbtn full" href="networks-2027.html" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">ابدأ الامتحان ›</a></div>
+<!-- NETWORKS-2027:END -->
+<!-- MATH-2027:START -->
+ <div class="card" style="border-color:#1f6b43"><div class="row"><h2>➗ امتحان المتتابعات الحسابية</h2><span class="tag">بالإجابات</span></div><p class="smallnote">أسئلة مقالية بالإجابات النموذجية • عداد وقت (ساعة) وتصحيح بالكلمات المفتاحية.</p><a class="btn greenbtn full" href="math-2027.html" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">ابدأ الامتحان ›</a></div>
+<!-- MATH-2027:END -->
+<!-- HISTORY-2027:START -->
+ <div class="card" style="border-color:#1f6b43"><div class="row"><h2>🏛️ امتحان التاريخ الشامل — الوحدة الأولى</h2><span class="tag">بالإجابات</span></div><p class="smallnote">اختيار من متعدد + أسئلة مقالية بالتصحيح الذكي • عداد وقت (120 دقيقة).</p><a class="btn greenbtn full" href="history-2027.html" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">ابدأ الامتحان ›</a></div>
+<!-- HISTORY-2027:END -->
  <div class="card" id="uxExamsAdminShortcut" style="display:none"><div class="row"><h2>📤 رفع امتحان من ملف</h2><span class="tag">للإدارة</span></div><p class="smallnote">ارفع ملف TXT أو HTML أو DOCX أو PDF وستتحول أسئلته إلى امتحان جاهز تحدد أنت إجاباته.</p><button class="btn full" onclick="UX.openUpload()">📤 رفع امتحان من ملف</button></div>
  <div class="card"><div class="row"><h2>إنشاء امتحان جديد</h2><span class="tag redtag">منشئ الأسئلة</span></div>
  <label>اسم الامتحان</label><input id="newExamTitle" placeholder="امتحان الوحدة الأولى">
@@ -2466,7 +2475,7 @@ async function pushScore(){
     const tp=Math.min(s.points|0,bp+(old?300:300)),te=Math.max(be,Math.min(s.exams|0,5000));
     const wp=Math.min(s.week.points|0,old?50000:300);
     const _doc={uid:AR.uid,name:nm,points:tp,exams:te,streak:Math.min(s.streak|0,3650),weekKey:s.week.key||'',weekPoints:wp,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
-    /* TEAMS:START push */if(s.team==='boys'||s.team==='girls')_doc.team=s.team;
+    /* TEAMS:START push */if(!s.team&&old&&(old.team==='boys'||old.team==='girls'))s.team=old.team;if(s.team==='boys'||s.team==='girls')_doc.team=s.team;
     try{await pref.set(_doc);if(_doc.team)AR.teamOk=true}catch(_e1){if(_doc.team){AR.teamOk=false;delete _doc.team;await pref.set(_doc)}else throw _e1}/* TEAMS:END push */
     AR.wOk=true;
   }catch(e){AR.wOk=false;console.warn('arena score',e&&e.code)}
