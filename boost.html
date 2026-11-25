@@ -66,6 +66,18 @@ input:focus,select:focus{outline:none;border-color:var(--primary)}
 .row-item .acts{display:flex;gap:8px;margin-top:10px}
 .row-item .acts button{flex:1;padding:8px;border-radius:9px;border:1px solid var(--line);background:#142019;color:var(--green);font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
 .row-item .acts button.del{color:var(--red)}
+.steps{display:flex;align-items:stretch;gap:4px;margin:10px 0 2px}
+.steps .st{flex:1;text-align:center;font-size:11px;color:var(--muted);position:relative;padding-top:16px}
+.steps .st::before{content:'';position:absolute;top:4px;right:50%;transform:translateX(50%);width:10px;height:10px;border-radius:50%;background:#233129}
+.steps .st.on{color:#37d99c;font-weight:700}
+.steps .st.on::before{background:#37d99c;box-shadow:0 0 8px #37d99c66}
+.pill.in-progress{background:#14324a;color:#5db9f5}
+#notifBar{position:sticky;top:8px;z-index:60;background:linear-gradient(115deg,#10ae80,#37d99c);color:#04150e;border-radius:14px;padding:12px 16px;font-weight:800;margin:10px 0;box-shadow:0 8px 24px #10ae8044;animation:slideDown .4s}
+@keyframes slideDown{from{transform:translateY(-16px);opacity:0}to{transform:none;opacity:1}}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.stat{background:#0e1512;border:1px solid var(--line);border-radius:14px;padding:16px 10px;text-align:center}
+.stat b{display:block;font-size:20px;color:#37d99c;margin-bottom:6px}
+.stat span{font-size:12px;color:var(--muted)}
 .tabs{display:flex;gap:8px;justify-content:center;margin:14px 0;flex-wrap:wrap}
 .tabs button{background:#0e1512;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:8px 22px;font-family:'Cairo',sans-serif;font-weight:700;font-size:14px;cursor:pointer}
 .tabs button.active{background:linear-gradient(115deg,#10ae80,#37d99c);color:#04150e;border-color:transparent}
@@ -114,6 +126,7 @@ a{color:var(--green);text-decoration:none}
 </div>
 
 <div id="dashSec" class="hidden">
+<div id="notifBar" class="hidden"></div>
 <div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><button id="logoutBtn">تسجيل خروج</button></div>
 <div class="wallet"><div class="lbl">رصيد محفظتك</div><div class="bal" id="uBal">0</div><div class="lbl">جنيه</div></div>
 
@@ -166,7 +179,7 @@ a{color:var(--green);text-decoration:none}
 <div class="status-err" id="loginErr"></div>
 </div>
 <div class="panel hidden" id="adminPanel">
-<div class="tabs"><button class="active" data-f="topups">شحنات مستنية 🕐</button><button data-f="orders">طلبات جديدة 🛒</button><button data-f="allOrders">كل الطلبات</button></div>
+<div class="tabs"><button class="active" data-f="topups">شحنات مستنية 🕐</button><button data-f="orders">طلبات جديدة 🛒</button><button data-f="allOrders">كل الطلبات</button><button data-f="stats">إحصائيات 📊</button></div>
 <div id="adminList"></div>
 <button class="btn ghost" id="adminLogoutBtn">تسجيل خروج</button>
 </div>
@@ -199,15 +212,16 @@ const fmt=n=>Number(n||0).toLocaleString('ar-EG');
 const money=n=>fmt(Math.round(n))+' جنيه';
 const svc=id=>SERVICES.find(s=>s.id===id);
 const esc=t=>String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const STATUS_AR={new:'🕐 جديد',done:'✅ تم التنفيذ',rejected:'❌ مرفوض',pending:'🕐 مستني التأكيد',approved:'✅ اتشحن'};
+const STATUS_AR={new:'🕐 جديد','in-progress':'⚙️ قيد التنفيذ',done:'✅ تم التنفيذ',rejected:'❌ مرفوض',pending:'🕐 مستني التأكيد',approved:'✅ اتشحن'};
 function showErr(id,m){const e=$(id);e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',6000)}
+store.doc('boostSettings/prices').get().then(d=>{if(d.exists){const p=d.data();SERVICES.forEach(s=>{const k=s.id;if(p['price_'+k]!=null)s.price=p['price_'+k];if(p['per_'+k]!=null)s.per=p['per_'+k]});renderServices();renderQty()}}).catch(()=>{});
 document.querySelectorAll('.copy[data-c]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.c);b.textContent='اتنسخ ✅';setTimeout(()=>b.textContent='نسخ الرقم',1800)});
 
 function renderServices(q){q=(q||'').trim();const list=q?SERVICES.filter(s=>(s.name+s.platName+s.desc).includes(q)):SERVICES;$('servicesGrid').innerHTML=list.length?list.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span><h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${money(s.price)} <small>/ ${fmt(s.per)}</small></div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join(''):'<div class="note">مفيش خدمة بالاسم ده.</div>'}
 renderServices();$('svcSearch').oninput=e=>renderServices(e.target.value);
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
 function renderQty(){$('fQty').innerHTML=QTYS.map(q=>`<option value="${q}">${fmt(q)}</option>`).join('');calc()}
-function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(q/s.per*s.price)}
+function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(Math.ceil(q*s.price/s.per))}
 function pick(id){if(!ME){$('authSec').scrollIntoView({behavior:'smooth'});return}$('fService').value=id;renderQty();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
 $('fService').onchange=renderQty;$('fQty').onchange=calc;renderQty();
 
@@ -241,6 +255,8 @@ auth.onAuthStateChanged(user=>{
 function stopDash(){[unsubProfile,unsubOrders,unsubTopups].forEach(u=>{try{u&&u()}catch(_){}});unsubProfile=unsubOrders=unsubTopups=null;$('dashSec').classList.add('hidden');$('pubSec').classList.add('hidden');$('authSec').classList.remove('hidden')}
 let lastOrders=[],lastTopups=[],lastOrderData={};
 function reorder(id){const o=lastOrderData[id];if(!o)return;$('fService').value=o.serviceId;renderQty();$('fQty').value=String(o.quantity);$('fLink').value=o.accountLink||'';calc();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
+function notify(msg){const b=$('notifBar');if(!b)return;b.innerHTML=msg;b.classList.remove('hidden');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.add('hidden'),12000)}
+function stepsHtml(st){if(st==='rejected')return `<div class="steps"><div class="st on" style="color:#f55d5d">❌ الطلب اترفض • الرصيد رجع لمحفظتك</div></div>`;const i=st==='done'?3:st==='in-progress'?2:1;return `<div class="steps"><div class="st ${i>=1?'on':''}">🕐 قيد الانتظار</div><div class="st ${i>=2?'on':''}">⚙️ قيد التنفيذ</div><div class="st ${i>=3?'on':''}">✅ تم التنفيذ</div></div>`}
 function renderTx(){
  if(!$('myTx'))return;
  const items=[];
@@ -260,12 +276,29 @@ function startDash(){
   const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
   lastOrders=docs;lastOrderData={};docs.forEach(d=>lastOrderData[d.id]=d.data());
   $('myOrders').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
-   return `<div class="row-item"><div class="top"><b>${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div><div class="meta">الكمية: ${fmt(o.quantity)} • السعر: ${money(o.price)}<br>${t}</div><button class="copy" onclick="reorder('${d.id}')" style="margin-top:6px">🔁 اطلب تاني</button></div>`}).join(''):'<div class="note">لسه مفيش طلبات.</div>';
+   return `<div class="row-item"><div class="top"><b>${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>${stepsHtml(o.status)}<div class="meta">الكمية: ${fmt(o.quantity)} • السعر: ${money(o.price)}<br>${t}</div><button class="copy" onclick="reorder('${d.id}')" style="margin-top:6px">🔁 اطلب تاني</button></div>`}).join(''):'<div class="note">لسه مفيش طلبات.</div>';
+  let seen={};try{seen=JSON.parse(localStorage.getItem('bso_'+ME.uid)||'{}')}catch(_){}
+  docs.forEach(d=>{const o=d.data();const prev=seen[d.id];
+   if(prev&&prev!==o.status){
+    if(o.status==='in-progress')notify('⚙️ طلبك "'+esc(o.service)+'" بدأ التنفيذ!');
+    else if(o.status==='done')notify('✅ طلبك "'+esc(o.service)+'" اتنفذ بنجاح!');
+    else if(o.status==='rejected')notify('❌ للأسف طلبك "'+esc(o.service)+'" اترفض • الرصيد رجع لمحفظتك');
+   }
+   seen[d.id]=o.status});
+  try{localStorage.setItem('bso_'+ME.uid,JSON.stringify(seen))}catch(_){}
   renderTx();
  },e=>{$('myOrders').innerHTML='<div class="note">تعذر تحميل الطلبات</div>'});
  unsubTopups=store.collection('boostTopups').where('uid','==',ME.uid).limit(20).onSnapshot(s=>{
   const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
-  lastTopups=docs;renderTx();
+  lastTopups=docs;
+  let seenT={};try{seenT=JSON.parse(localStorage.getItem('bst_'+ME.uid)||'{}')}catch(_){}
+  docs.forEach(d=>{const o=d.data();const prev=seenT[d.id];
+   if(prev&&prev!==o.status){
+    if(o.status==='approved')notify('✅ اتشحن رصيدك بـ '+money(o.amount)+' بنجاح!');
+    else if(o.status==='rejected')notify('❌ طلب الشحن '+esc(d.id)+' اترفض • لو عندك استفسار كلمنا واتساب');
+   }
+   seenT[d.id]=o.status});
+  try{localStorage.setItem('bst_'+ME.uid,JSON.stringify(seenT))}catch(_){}renderTx();
   $('myTopups').innerHTML=docs.length?('<label style="margin-top:18px">شحناتي السابقة</label>'+docs.map(d=>{const o=d.data();
    return `<div class="row-item"><div class="top"><b>${money(o.amount)} • ${esc(d.id)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div></div>`}).join('')):'';
  },e=>console.warn(e));
@@ -298,7 +331,7 @@ $('orderBtn').onclick=async()=>{
  if(!PROFILE)return showErr('ordErr','جارٍ تحميل حسابك...');
  const s=svc($('fService').value),q=+$('fQty').value,link=$('fLink').value.trim();
  if(link.length<3)return showErr('ordErr','اكتب رابط الحساب أو البوست الأول.');
- const price=Math.round(q/s.per*s.price);
+ const price=Math.ceil(q*s.price/s.per);
  if((PROFILE.balance||0)<price)return showErr('ordErr','رصيدك مش كفاية (معاك '+money(PROFILE.balance||0)+' والطلب بـ'+money(price)+'). اشحن محفظتك الأول من فوق 👆');
  const btn=$('orderBtn');btn.disabled=true;btn.textContent='جارٍ تنفيذ الطلب...';
  try{
@@ -338,6 +371,24 @@ $('adminLogoutBtn').onclick=async()=>{await auth.signOut();adminUser=null;if(uns
 document.querySelectorAll('#adminPanel .tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#adminPanel .tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');curView=b.dataset.f;startAdmin()});
 function startAdmin(){
  if(unsubAdmin)unsubAdmin();
+ if(curView==='stats'){
+  $('adminList').innerHTML='<div class="note" style="text-align:center;padding:20px">جارٍ حساب الإحصائيات...</div>';
+  Promise.all([store.collection('boostOrders').limit(500).get(),store.collection('boostTopups').where('status','==','approved').limit(500).get()]).then(([os,ts])=>{
+   const nw=new Date();const day0=new Date(nw.getFullYear(),nw.getMonth(),nw.getDate()).getTime()/1000;const week0=day0-6*86400;
+   let today=0,week=0,total=0,cnt={};let charged=0,chargedN=0;
+   os.docs.forEach(d=>{const o=d.data();if(o.status==='rejected')return;const sc=o.createdAt?.seconds||0;total+=o.price||0;if(sc>=day0)today+=o.price||0;if(sc>=week0)week+=o.price||0;cnt[o.service]=(cnt[o.service]||0)+1});
+   ts.docs.forEach(d=>{charged+=d.data().amount||0;chargedN++});
+   const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+   $('adminList').innerHTML=`<div class="stat-grid">
+    <div class="stat"><b>${money(today)}</b><span>💰 مبيعات اليوم</span></div>
+    <div class="stat"><b>${money(week)}</b><span>📅 مبيعات آخر ٧ أيام</span></div>
+    <div class="stat"><b>${money(total)}</b><span>🛒 إجمالي المبيعات (${fmt(os.docs.length)} طلب)</span></div>
+    <div class="stat"><b>${money(charged)}</b><span>💳 إجمالي الشحنات (${fmt(chargedN)} عملية)</span></div>
+   </div>
+   <div class="row-item"><div class="top"><b>🏆 أكتر خدمة متطلبة</b></div><div class="meta">${top?esc(top[0])+' • '+fmt(top[1])+' طلب':'لسه مفيش طلبات'}</div></div>`;
+  }).catch(e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
+  return;
+ }
  if(curView==='topups'){
   unsubAdmin=store.collection('boostTopups').where('status','==','pending').limit(100).onSnapshot(s=>{
    const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
@@ -355,7 +406,7 @@ function startAdmin(){
    $('adminList').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
     return `<div class="row-item"><div class="top"><b>${esc(o.service)} • ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>
     <div class="meta">الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}</div>
-    <div class="acts"><button onclick="setOrderStatus('${d.id}','done')">تم التنفيذ ✅</button><button onclick="setOrderStatus('${d.id}','rejected')">رفض ❌</button><button class="del" onclick="delOrder('${d.id}')">مسح 🗑️</button></div></div>`
+    <div class="acts"><button onclick="setOrderStatus('${d.id}','in-progress')">بدء التنفيذ ⚙️</button><button onclick="setOrderStatus('${d.id}','done')">تم التنفيذ ✅</button><button onclick="setOrderStatus('${d.id}','rejected')">رفض ❌</button><button class="del" onclick="delOrder('${d.id}')">مسح 🗑️</button></div></div>`
    }).join(''):'<div class="note" style="text-align:center;padding:20px">مفيش طلبات هنا.</div>';
   },e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
  }
@@ -372,7 +423,19 @@ async function approveTopup(code,uid,amount){
  }catch(e){alert('تعذر الشحن: '+(e.code||e.message))}
 }
 async function rejectTopup(code){if(!confirm('رفض الشحنة '+code+'؟'))return;try{await store.collection('boostTopups').doc(code).update({status:'rejected'})}catch(e){alert('تعذر: '+(e.code||e.message))}}
-async function setOrderStatus(id,st){try{await store.collection('boostOrders').doc(id).update({status:st})}catch(e){alert('تعذر التحديث: '+(e.code||e.message))}}
+async function setOrderStatus(id,st){
+ if(st==='rejected'){
+  if(!confirm('رفض الطلب وارجاع ثمنه لمحفظة العميل؟'))return;
+  try{const oref=store.collection('boostOrders').doc(id);
+   await store.runTransaction(async tx=>{const od=await tx.get(oref);const o=od.data();if(o.status==='rejected')return;
+    const uref=store.collection('boostUsers').doc(o.uid);const ud=await tx.get(uref);
+    if(ud.exists)tx.update(uref,{balance:(ud.data().balance||0)+(o.price||0)});
+    tx.update(oref,{status:'rejected'})});
+  }catch(e){alert('تعذر الرفض: '+(e.code||e.message))}
+  return;
+ }
+ try{await store.collection('boostOrders').doc(id).update({status:st})}catch(e){alert('تعذر التحديث: '+(e.code||e.message))}
+}
 async function delOrder(id){if(!confirm('متأكد تمسح الطلب؟'))return;try{await store.collection('boostOrders').doc(id).delete()}catch(e){alert('تعذر المسح: '+(e.code||e.message))}}
 </script>
 </body>
