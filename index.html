@@ -718,6 +718,13 @@ body.auth-locked .wa-fab{display:none}
 <section class="page" id="tutor">
  <h1>🧑‍🏫 المدرّس الذكي</h1><p class="sub">بيقرا نتايجك ويقولك تذاكر إيه بعد كده.</p>
  <div class="card" id="stCard" style="border-color:#5d3d75"><div class="row"><h2>توصياتك</h2><span class="tag">على جهازك</span></div><div id="stBody"></div></div>
+<!-- SMART-TUTOR:START chatcard -->
+ <div class="card" id="stChat" style="border-color:#1f6b43"><div class="row"><h2>💬 اسأل المدرّس</h2><span class="tag">من بياناتك</span></div>
+  <div id="stChips"></div>
+  <div id="stChatLog" style="max-height:340px;overflow-y:auto;margin:8px 0"></div>
+  <div class="formgrid"><input id="stInput" placeholder="اكتب سؤالك: مثلاً أذاكر إيه؟"><button class="btn greenbtn" id="stSend">إرسال</button></div>
+ </div>
+<!-- SMART-TUTOR:END chatcard -->
 </section>
 <!-- SMART-TUTOR:END page -->
 <section class="page" id="more">
@@ -2677,9 +2684,95 @@ function paint(){
   h.innerHTML=html;
   var t=document.getElementById('stToggle');if(t)t.onclick=function(){open=!open;paint()};
 }
-var _go=go;go=function(id){_go(id);if(id==='tutor')setTimeout(paint,50)};
+var _go=go;go=function(id){_go(id);if(id==='tutor')setTimeout(function(){paint();chatInit()},50)};
 if(typeof refreshAllStudentViews==='function'){var _r=refreshAllStudentViews;refreshAllStudentViews=function(){var x=_r.apply(this,arguments);try{paint()}catch(_){}return x}}
 setTimeout(paint,1200);
+/* SMART-TUTOR:START chat (شات المدرّس - مطابقة كلمات على الجهاز) */
+var chatLog=[];
+function nz(t){return String(t||'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').replace(/[؟?!.,،]/g,' ').replace(/\s+/g,' ').trim()}
+function has(t,list){return list.some(function(w){return t.indexOf(w)>-1})}
+function backlogs(){return (db.subjects||[]).map(function(x){return{n:x.name,left:Math.max(0,(+x.backlog||0)-(+x.backlogDone||0))}}).filter(function(x){return x.left>0}).sort(function(a,b){return b.left-a.left})}
+function todayItems(){try{return typeof todayPlanItems==='function'?todayPlanItems():[]}catch(_){return[]}}
+function daysLeft(){var d=db.profile&&db.profile.examDate;if(!d)return null;var n=Math.ceil((new Date(d+'T00:00:00')-new Date())/864e5);return n>0?n:null}
+function aStudy(){
+  var bl=backlogs(),s=stats(),wl=wrongList(),out=[];
+  if(bl.length)out.push('📚 أكتر مادة متراكمة عليك: <b>'+esc(bl[0].n)+'</b> ('+bl[0].left+' درس). ابدأ بيها.');
+  if(s.subjects.length)out.push('⚠️ أضعف مادة في نتايجك: <b>'+esc(s.subjects[0].name)+'</b> ('+s.subjects[0].avg+'%).');
+  if(wl.length)out.push('❌ عندك '+wl.length+' غلطة لسه محتاجة مراجعة.');
+  var t=todayItems();if(t.length)out.push('📅 جدول النهارده: '+t.slice(0,4).map(function(i){return esc(i.name||i.title||'مهمة')}).join('، ')+'.');
+  if(!out.length)return 'لسه معنديش بيانات عنك 😅 أضف موادك والدروس المتراكمة في صفحة التراكمات، أو حلّ امتحان، وبعدين اسألني تاني.';
+  return 'من بياناتك، ده ترتيبي ليك:<br>'+out.join('<br>')+'<br>ابدأ بأول نقطة، وبعدها كمّل بالترتيب 💪';
+}
+function aReview(){
+  var wl=wrongList(),s=stats(),out=[];
+  if(wl.length){out.push('عندك <b>'+wl.length+'</b> غلطة محتاجة مراجعة. افتح "اختبرني في أخطائي" في صفحة مراجعتي.');out.push('أول غلطة: '+esc(String(wl[0].q)).slice(0,90)+' ← الإجابة الصح: '+esc(String(wl[0].right||'—')))}
+  if(s.subjects.length)out.push('وراجع مادة <b>'+esc(s.subjects[0].name)+'</b> لأنها أضعف عندك ('+s.subjects[0].avg+'%).');
+  return out.length?out.join('<br>'):'مفيش أخطاء مسجلة عندك دلوقتي 👏 حلّ امتحان جديد وأخطاءك هتظهر هنا.';
+}
+function aWeak(){
+  var s=stats();if(!s.subjects.length)return 'لسه ماحلتش امتحانات، فمقدرش أحدد ضعفك. حلّ امتحان وأنا أقولك 📝';
+  var w=s.subjects.slice(0,3).map(function(x,i){return (i+1)+') <b>'+esc(x.name)+'</b>: '+x.avg+'% في '+x.n+' امتحان'}).join('<br>');
+  return 'أضعف موادك حسب نتايجك:<br>'+w+'<br>🧠 '+tips(s.subjects[0].avg);
+}
+function aPoints(){
+  var p=null,wp=null;try{if(typeof AR!=='undefined'&&AR.st){p=AR.st.points;wp=AR.st.week&&AR.st.week.points}}catch(_){}
+  var st=0;try{st=streakCount()}catch(_){}
+  var pt=0;try{pt=pointsTotal()}catch(_){}
+  var o='⭐ نقاط الإنجاز: <b>'+pt+'</b><br>🔥 الستريك: <b>'+st+'</b> يوم متواصل';
+  if(p!==null)o+='<br>🏆 نقاط المنافسات: <b>'+p+'</b>'+(wp!=null?' (الأسبوع ده: '+wp+')':'');
+  return o+(st?'':'<br>ابدأ جلسة تركيز النهارده عشان تبدأ الستريك!');
+}
+function aSchedule(){
+  var t=todayItems(),h=(db.profile&&db.profile.hours)||null;
+  if(!t.length)return 'مفيش جدول لليوم ده. ادخل صفحة تنظيم المذاكرة واعمل خطة'+(h?' (ساعاتك '+h+' ساعة يومياً).':'.');
+  var mins=t.reduce(function(a,i){return a+(+i.duration||0)},0);
+  return '📅 جدولك النهارده ('+t.length+' مهمة'+(mins?'، حوالي '+(Math.round(mins/6)/10)+' ساعة':'')+'):<br>'+t.map(function(i,k){return (k+1)+') '+esc(i.name||i.title||'مهمة')+(i.duration?' ('+i.duration+' د)':'')}).join('<br>');
+}
+function aRescue(){
+  var bl=backlogs(),left=bl.reduce(function(a,x){return a+x.left},0),d=daysLeft();
+  if(!left)return 'ماعندكش دروس متراكمة مسجلة 🎉 لو عندك تراكم، أضفه في صفحة التراكمات.';
+  var o='عندك <b>'+left+'</b> درس متراكم';
+  if(d){var use=Math.max(1,d-2);o+=' و<b>'+d+'</b> يوم على الامتحان، يعني محتاج حوالي <b>'+(Math.round(left/use*10)/10)+'</b> درس في اليوم (بعد ما نسيب آخر يومين للمراجعة).'}
+  else o+='. حدد تاريخ امتحانك في الإعدادات عشان أحسبلك المعدل.';
+  return o+'<br>🚑 افتح صفحة التراكمات وهتلاقي "خطة الإنقاذ" بالترتيب الكامل وزرار تطبيقها. ابدأ بـ <b>'+esc(bl[0].n)+'</b>.';
+}
+function answer(q){
+  var t=nz(q);if(!t)return null;
+  if(has(t,['الحق','الحقه','الحق ','انقاذ','انقذ'])||(has(t,['تراكم','متراكم'])&&has(t,['ازاي','اعمل','اخلص','خلص','اذاكر','لحق'])))return aRescue();
+  if(has(t,['جدول','قد ايه','كام ساعه','كام ساعة','ساعات','خطه النهارده','خطتي']))return aSchedule();
+  if(has(t,['نقط','نقاط','ستريك','متواصل','مستوي','تقدم','سلسل']))return aPoints();
+  if(has(t,['ضعيف','ضعف','اضعف','وحش','مشكل','اسوا','وحشه']))return aWeak();
+  if(has(t,['راجع','مراجع','اخطا','غلط','غلطات']))return aReview();
+  if(has(t,['اذاكر','ذاكر','مذاكر','ابدا','ابدأ','اعمل ايه','اعمل اي','اعمل ايه','النهارده','النهاردة','اولويه','اولوي']))return aStudy();
+  if(has(t,['تراكم','متراكم']))return aRescue();
+  return null;
+}
+var CHIPS=['أذاكر إيه؟','راجع إيه؟','إيه ضعفي؟','عندي كام نقطة؟','جدولي النهارده','إزاي ألحق التراكم؟'];
+var FALLBACK='مش فاهم سؤالك 😅 أنا بجاوب من بياناتك على أسئلة زي:<br>• أذاكر إيه؟<br>• راجع إيه؟<br>• أنا ضعيف في إيه؟<br>• عندي كام نقطة؟<br>• جدولي النهارده<br>• إزاي ألحق التراكم؟';
+function chatPaint(){
+  var box=document.getElementById('stChatLog');if(!box)return;
+  box.innerHTML=chatLog.length?chatLog.map(function(m){return '<div style="margin:6px 0;text-align:'+(m.me?'left':'right')+'"><span style="display:inline-block;max-width:92%;padding:8px 11px;border-radius:12px;font-size:12px;line-height:1.8;text-align:right;background:'+(m.me?'#1f6b43':'#2a1f3d')+';color:#fff">'+(m.me?esc(m.t):m.t)+'</span></div>'}).join(''):'<p class="smallnote">اسألني أي سؤال عن مذاكرتك، وأنا أرد من بياناتك 👇</p>';
+  box.scrollTop=box.scrollHeight;
+}
+function ask(q){
+  q=String(q||'').trim();if(!q)return;
+  var a=null;try{a=answer(q)}catch(e){a=null}
+  chatLog.push({me:true,t:q});chatLog.push({me:false,t:a||FALLBACK});
+  if(chatLog.length>40)chatLog=chatLog.slice(-40);
+  chatPaint();
+}
+function chatInit(){
+  var c=document.getElementById('stChips'),inp=document.getElementById('stInput'),btn=document.getElementById('stSend');
+  if(!c||c.dataset.ok)return;c.dataset.ok='1';
+  c.innerHTML=CHIPS.map(function(x){return '<button class="btn ghost small" style="margin:3px" data-q="'+x+'">'+x+'</button>'}).join('');
+  c.querySelectorAll('button').forEach(function(b){b.onclick=function(){ask(b.dataset.q)}});
+  btn.onclick=function(){ask(inp.value);inp.value=''};
+  inp.onkeydown=function(e){if(e.key==='Enter'){ask(inp.value);inp.value=''}};
+  chatPaint();
+}
+window.smartTutorAsk=ask;
+/* SMART-TUTOR:END chat */
+
 window.smartTutorPaint=paint;
 })();
 /* SMART-TUTOR:END */
