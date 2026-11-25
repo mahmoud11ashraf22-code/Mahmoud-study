@@ -558,7 +558,7 @@ try{
 await db.runTransaction(async tx=>{
 const sl=await tx.get(slotRef);
 if(sl.exists)throw'taken';
-tx.set(slotRef,{date:ds,time:selSlot});
+tx.set(slotRef,{date:ds,time:selSlot,code:code});
 tx.set(bkRef,data);
 });
 }catch(e){
@@ -593,7 +593,14 @@ show('vStatus');$('pFooter').classList.remove('hide');
 async function clientCancel(code){
 if(!confirm('متأكد إنك عايز تلغي الحجز؟'))return;
 try{
-await db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code).update({status:'cancelled'});
+const ref=db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code);
+const d=await ref.get();
+if(!d.exists){alert('الكود ده مش موجود');return;}
+const b=d.data();
+const batch=db.batch();
+batch.update(ref,{status:'cancelled'});
+batch.delete(db.collection('bookly_businesses').doc(PBID).collection('slots').doc(b.date+'_'+b.time));
+await batch.commit();
 findBooking(code);
 }catch(e){alert('حصل خطأ، حاول تاني');}
 }
