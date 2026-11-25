@@ -2571,6 +2571,7 @@ async function finishDaily(){
 /* ARENA-DAILY:END */
 window.arenaBonus=async function(n){try{await load();if(!AR.st)return;weekRoll();AR.st.points+=n;AR.st.week.points+=n;await persist();paint()}catch(e){console.warn(e)}};
 window.arenaOpen=open;window.arenaGet=function(){return AR};window.arenaLoad=load;
+/* EXAM-BRIDGE:START api */window.arenaAwardExternal=async function(rec){await load();if(!AR.st)return 0;const add=award(rec);if(add){const wb=weekClaim();await persist();paint();toast('🏆 +'+add+' نقطة'+(wb?' + بونص الأسبوع +'+wb+' 🎉':''))}return add};/* EXAM-BRIDGE:END api */
 /* TEAMS:START api */window.arenaSetTeam=async function(t){if(t!=='boys'&&t!=='girls')return;await load();if(!AR.st||AR.st.team)return;AR.st.team=t;await persist();paint()};/* TEAMS:END api */
 const _go=go;go=function(id){_go(id);if(id==='arena')open()};
 const _sp=submitPlatformExam;
@@ -2908,4 +2909,40 @@ setInterval(function(){var h=document.getElementById('home'),a=document.getEleme
 .day-theme .gd{background:#fff;border-color:#d9dced}.day-theme .gdb{color:#44506b}
 /* GUIDE:END css */
 </style>
+<script>
+/* EXAM-BRIDGE:START (ربط صفحات الامتحانات المستقلة بالحساب والنقاط) */
+(function(){
+var busy=false;
+function user(){try{return studentAuth&&studentAuth.currentUser?studentAuth.currentUser:null}catch(_){return null}}
+function sync(){
+  var u=user();if(!u)return;
+  var nm=((db.profile&&db.profile.name)||u.displayName||'').trim();
+  try{var o=JSON.stringify({uid:u.uid,name:nm});if(localStorage.getItem('ms_user')!==o)localStorage.setItem('ms_user',o)}catch(_){}
+}
+async function proc(){
+  if(busy)return;var u=user();if(!u)return;
+  var q=[];try{q=JSON.parse(localStorage.getItem('ms_pending_exams')||'[]')}catch(_){}
+  if(!q.length)return;
+  var mine=q.filter(function(x){return x&&x.uid===u.uid}),rest=q.filter(function(x){return !(x&&x.uid===u.uid)});
+  if(!mine.length)return;
+  busy=true;
+  try{
+    try{localStorage.setItem('ms_pending_exams',JSON.stringify(rest))}catch(_){}
+    if(!Array.isArray(db.localSubmissions))db.localSubmissions=[];
+    for(var i=0;i<mine.length;i++){
+      var x=mine[i];if(db.localSubmissions.some(function(s){return s.id===x.id}))continue;
+      var pct=x.total?Math.round(x.earned/x.total*100):0;
+      var rec={id:x.id,examId:'ext-'+x.page,examTitle:x.title,subject:x.subject||'عام',correct:x.earned,total:x.total,percent:pct,answered:0,essayCount:0,status:'امتحان خارجي',answers:[],studentUid:u.uid,createdAt:x.ts||new Date().toISOString(),external:true};
+      db.localSubmissions.unshift(rec);
+      try{saveDB()}catch(_){}
+      try{if(window.arenaAwardExternal)await window.arenaAwardExternal(rec)}catch(e){console.warn('ext award',e)}
+    }
+    try{refreshAllStudentViews()}catch(_){}
+  }finally{busy=false}
+}
+setInterval(function(){sync();proc()},3000);
+window.addEventListener('focus',proc);document.addEventListener('visibilitychange',proc);
+})();
+/* EXAM-BRIDGE:END */
+</script>
 </body></html>
