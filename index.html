@@ -639,6 +639,9 @@ body.auth-locked .wa-fab{display:none}
   <div class="stat"><b id="tasksStat">0</b><span>مهمة غير مكتملة</span></div>
   <div class="stat"><b id="studyStat">0</b><span>دقيقة تركيز اليوم</span></div>
  </div>
+<!-- SMART-TUTOR:START card -->
+ <div class="card" id="stCard" style="border-color:#5d3d75"><div class="row"><h2>🧑‍🏫 المدرّس الذكي</h2><span class="tag">جديد</span></div><div id="stBody"></div></div>
+<!-- SMART-TUTOR:END card -->
  <div class="card" id="smartAssistantCard">
   <div class="row"><h2>🤖 مساعدك الدراسي الذكي</h2><span class="tag">يعمل على جهازك</span></div>
   <p class="smallnote">اسأله عن أفضل خطوة تذاكرها الآن، أو اكتب وقتك المتاح.</p>
@@ -2618,4 +2621,61 @@ window.rescuePaint=paint;
 /* RESCUE-PLAN:END */
 </script>
 
+<script>
+/* SMART-TUTOR:START (المدرّس الذكي - قواعد على الجهاز، بدون خادم) */
+(function(){
+var open=false;
+function host(){return document.getElementById('stBody')}
+function stats(){
+  var subs=(db.localSubmissions||[]).filter(function(s){return s&&s.total>0}),by={};
+  subs.forEach(function(s){var k=s.subject||'عام';(by[k]=by[k]||{n:0,sum:0,last:[],name:k});by[k].n++;by[k].sum+=+s.percent||0;by[k].last.push(+s.percent||0)});
+  var arr=Object.keys(by).map(function(k){var o=by[k];o.avg=Math.round(o.sum/o.n);return o}).sort(function(a,b){return a.avg-b.avg});
+  return{subs:subs,subjects:arr};
+}
+function wrongList(){
+  var out=[],seen={};
+  (db.localSubmissions||[]).forEach(function(sub){(sub.answers||[]).forEach(function(a){
+    if(a.type!=='mcq'||a.isCorrect!==false)return;
+    var k=sub.examId+'|'+a.question;if(seen[k])return;seen[k]=1;
+    var hint='';try{var e=(platform.exams||[]).find(function(x){return x.id===sub.examId});var q=e&&(e.questions||[]).find(function(x){return x.text===a.question});if(q)hint=q.explanation||q.hint||q.reason||''}catch(_){}
+    out.push({q:a.question,mine:a.studentAnswer,right:a.correctAnswer,hint:hint,subject:sub.subject||'عام'});
+  })});
+  return out;
+}
+function tips(avg){
+  if(avg>=85)return 'مستواك ممتاز 👏 ركّز على الأسئلة الصعبة وحلّ امتحانات بوقت محدد عشان تثبّت السرعة.';
+  if(avg>=65)return 'كويس وفاضلك شوية. راجع أخطاءك الأول وبعدين حلّ امتحان جديد، وحاول تفهم ليه الإجابة الصح صح مش تحفظها.';
+  if(avg>=40)return 'محتاج تقوّي الأساس. ارجع للدروس بتاعة المادة دي، ذاكر بالورقة والقلم، وبعدها حلّ أسئلة قصيرة وراجع كل غلطة.';
+  return 'ابدأ من الصفر بهدوء: درس واحد في اليوم من المادة دي، وبعده 5 أسئلة بس. الثبات أهم من الكمية.';
+}
+function paint(){
+  var h=host();if(!h)return;
+  var s=stats(),wl=wrongList(),bl=(db.subjects||[]).map(function(x){return{n:x.name,left:Math.max(0,(+x.backlog||0)-(+x.backlogDone||0))}}).filter(function(x){return x.left>0}).sort(function(a,b){return b.left-a.left});
+  if(!s.subjects.length){
+    h.innerHTML='<p class="muted">لسه معنديش نتايج عنك. حلّ أول امتحان وأنا هقولك تذاكر إيه بعده.</p>'+(bl.length?'<div class="helpbox">💡 في الوقت ده ابدأ بمادة <b>'+esc(bl[0].n)+'</b>: عندك '+bl[0].left+' درس متراكم فيها.</div>':'')+'<button class="btn greenbtn full" onclick="go(\'exams\')">📝 ابدأ امتحان</button>';
+    return;
+  }
+  var weak=s.subjects[0],best=s.subjects[s.subjects.length-1],all=s.subs,avg=Math.round(all.reduce(function(a,x){return a+(+x.percent||0)},0)/all.length);
+  var trend='';if(all.length>=2){var d=(+all[0].percent||0)-(+all[1].percent||0);trend=d>0?'📈 آخر امتحان أحسن من اللي قبله بـ '+d+'%':d<0?'📉 آخر امتحان أقل من اللي قبله بـ '+(-d)+'%':'⏸ آخر امتحانين بنفس المستوى'}
+  var next='';
+  if(wl.length)next='1) راجع أخطاءك ('+wl.length+') من كارت "اختبرني في أخطائي" في صفحة مراجعتي.';
+  next+=(next?'<br>':'')+(wl.length?'2) ':'1) ')+'ذاكر <b>'+esc(weak.name)+'</b> (متوسطك '+weak.avg+'%) وبعدها حلّ امتحان جديد فيها.';
+  if(bl.length)next+='<br>'+(wl.length?'3) ':'2) ')+'وخلّي في يومك وقت لتراكم <b>'+esc(bl[0].n)+'</b> ('+bl[0].left+' درس).';
+  var html='<div class="grid"><div class="stat"><b>'+avg+'%</b><span>متوسط نتايجك</span></div><div class="stat"><b>'+all.length+'</b><span>امتحان اتحلّ</span></div></div>';
+  if(trend)html+='<p class="smallnote">'+trend+'</p>';
+  html+='<div class="helpbox"><b>الخطوة الجاية ليك:</b><br>'+next+'</div>';
+  html+='<p class="smallnote">💪 أقوى مادة: <b>'+esc(best.name)+'</b> ('+best.avg+'%) • ⚠️ أضعف مادة: <b>'+esc(weak.name)+'</b> ('+weak.avg+'%)</p>';
+  html+='<p class="smallnote">🧠 نصيحة: '+tips(weak.avg)+'</p>';
+  if(wl.length)html+='<button class="btn ghost full" id="stToggle">'+(open?'إخفاء شرح الأخطاء':'🔍 اشرحلي أخطائي')+'</button>';
+  if(open&&wl.length)html+=wl.slice(0,5).map(function(w){return '<div class="helpbox" style="margin-top:8px"><b>'+esc(String(w.q))+'</b><br><span style="color:var(--red)">إجابتك: '+esc(String(w.mine||'—'))+'</span><br><span style="color:var(--green)">الإجابة الصح: '+esc(String(w.right||'—'))+'</span>'+(w.hint?'<br>💡 '+esc(String(w.hint)):'<br>💡 قارن بين اختيارك والإجابة الصح، وحاول تفتكر القاعدة أو الدرس اللي بيربط بينهم.')+'</div>'}).join('')+(wl.length>5?'<p class="smallnote">وفي '+(wl.length-5)+' أخطاء تانية في مراجعتي.</p>':'');
+  h.innerHTML=html;
+  var t=document.getElementById('stToggle');if(t)t.onclick=function(){open=!open;paint()};
+}
+var _go=go;go=function(id){_go(id);if(id==='home')setTimeout(paint,50)};
+if(typeof refreshAllStudentViews==='function'){var _r=refreshAllStudentViews;refreshAllStudentViews=function(){var x=_r.apply(this,arguments);try{paint()}catch(_){}return x}}
+setTimeout(paint,1200);
+window.smartTutorPaint=paint;
+})();
+/* SMART-TUTOR:END */
+</script>
 </body></html>
