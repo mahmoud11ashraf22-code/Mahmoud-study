@@ -797,8 +797,9 @@ body.auth-locked .wa-fab{display:none}
  <h1>🏆 المنافسات</h1><p class="sub">نقاطك وترتيبك بين الطلبة. حلّ امتحانات واكسب نقاط.</p>
  <div class="ar-hero"><span class="muted">نقاطك</span><b id="arPoints">0</b><span class="muted" id="arRankLine">—</span></div>
  <div class="grid"><div class="stat"><b id="arExams">0</b><span>امتحانات اتحلّت</span></div><div class="stat"><b id="arStreak">0</b><span>أيام متتالية 🔥</span></div></div>
+ <div class="card" id="arDailyCard"><h2>⚡ التحدي اليومي</h2><div id="arDaily"></div></div>
  <div class="card"><h2>📊 المتصدرين</h2><div id="arBoard"><p class="muted">جاري التحميل...</p></div></div>
- <div class="card"><h2>إزاي تكسب نقاط؟</h2><p class="muted">• تسليم امتحان: ١٠ نقاط + بونص حسب درجتك (مرة لكل امتحان في اليوم).</p></div>
+ <div class="card"><h2>إزاي تكسب نقاط؟</h2><p class="muted">• تسليم امتحان: ١٠ نقاط + بونص حسب درجتك (مرة لكل امتحان في اليوم).</p><p class="muted">• التحدي اليومي: لحد ٣٥ نقطة + بونص السلسلة.</p></div>
 </section>
 <!-- ARENA:END page -->
 </main></div>
@@ -2405,7 +2406,7 @@ async function pushScore(){
     const pref=cloud.store.collection('publicScores').doc(AR.uid);let old=null;try{const g=await pref.get();if(g.exists)old=g.data()}catch(_){}
     const bp=old?(old.points|0):0,be=old?(old.exams|0):0;
     const tp=Math.min(s.points|0,bp+(old?300:300)),te=Math.max(be,Math.min(s.exams|0,5000));
-    const wp=Math.min(s.week.points|0,tp>300&&!old?300:50000);
+    const wp=Math.min(s.week.points|0,old?50000:300);
     await pref.set({uid:AR.uid,name:nm,points:tp,exams:te,streak:Math.min(s.streak|0,3650),weekKey:s.week.key||'',weekPoints:wp,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
     AR.wOk=true;
   }catch(e){AR.wOk=false;console.warn('arena score',e&&e.code)}
@@ -2433,6 +2434,7 @@ function paint(){
   const s=AR.st||blankSt();
   const set=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v};
   set('arPoints',s.points);set('arExams',s.exams);set('arStreak',s.streak);
+  try{paintDaily()}catch(e){console.warn(e)}
   const b=document.getElementById('arBoard');if(!b)return;
   const me=AR.uid;let list=AR.top.slice();
   if(AR.lbOk&&me&&!list.some(x=>x.uid===me)&&s.points>0)list.push({uid:me,name:(db.profile&&db.profile.name)||'أنت',points:s.points});
@@ -2446,6 +2448,45 @@ function paint(){
   b.innerHTML=list.length?list.map((x,i)=>'<div class="ar-row'+(x.uid===me?' me':'')+'"><span class="ar-rank">'+(i<3?['🥇','🥈','🥉'][i]:i+1)+'</span><span class="ar-name">'+esc(String(x.name||'طالب'))+(x.uid===me?' (أنت)':'')+'</span><span class="ar-pts">'+(x.points|0)+'</span></div>').join(''):'<p class="muted">لسه مفيش نتائج. كن أول واحد!</p>';
 }
 async function open(){await load();paint();if(AR.st&&AR.st.points>0)await pushScore();await loadBoard();paint()}
+/* ARENA-DAILY:START daily challenge */
+const DQ={list:null,i:0,ans:[],day:''};
+function hashStr(t){let h=2166136261;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}
+function pool(){const out=[];try{(platform.exams||[]).forEach(e=>(e.questions||[]).forEach((q,i)=>{if(q&&q.type!=='essay'&&q.text&&Array.isArray(q.choices)&&q.choices.filter(Boolean).length>=2&&q.choices[+q.answer]!=null&&q.choices[+q.answer]!==''){out.push({k:e.id+'#'+i,text:q.text,choices:q.choices,answer:+q.answer})}}))}catch(_){}return out}
+function pickDaily(){const p=pool().sort((a,b)=>a.k<b.k?-1:1);if(p.length<3)return[];const r=rng(hashStr(localDayKey()+'|'+AR.uid));for(let i=p.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[p[i],p[j]]=[p[j],p[i]]}return p.slice(0,5)}
+function dBox(){return document.getElementById('arDaily')}
+function paintDaily(){
+  const b=dBox();if(!b||!AR.st)return;const today=localDayKey();const done=AR.st.dailyDone[today];
+  if(DQ.list&&DQ.day===today){return drawQ()}
+  if(done){b.innerHTML='<p class="green"><b>✓ خلّصت تحدي النهارده: '+done.score+' / '+done.total+'</b></p><p class="muted">ارجع بكرة لتحدي جديد وحافظ على السلسلة 🔥</p>';return}
+  const n=pool().length;
+  b.innerHTML=n<3?'<p class="muted">مفيش أسئلة كفاية لسه. أول ما الامتحانات تتضاف التحدي هيشتغل.</p>':'<p class="muted">٥ أسئلة من الامتحانات. +٥ نقاط لكل إجابة صح، +١٠ بونص لو خلّصتهم، + بونص السلسلة. مرة واحدة في اليوم.</p><button class="btn" id="arDStart">⚡ ابدأ التحدي</button>';
+  const s=document.getElementById('arDStart');if(s)s.onclick=startDaily;
+}
+function startDaily(){DQ.list=pickDaily();DQ.i=0;DQ.ans=[];DQ.day=localDayKey();if(!DQ.list.length){DQ.list=null;return toast('مفيش أسئلة كفاية')}drawQ()}
+function drawQ(){
+  const b=dBox(),q=DQ.list[DQ.i];if(!b||!q)return;
+  b.innerHTML='<div class="row"><b>سؤال '+(DQ.i+1)+' من '+DQ.list.length+'</b></div><p><b>'+esc(String(q.text))+'</b></p>'+q.choices.map((c,i)=>c?'<button class="btn ghost" style="display:block;width:100%;text-align:right;margin:5px 0" data-c="'+i+'">'+esc(String(c))+'</button>':'').join('');
+  b.querySelectorAll('button[data-c]').forEach(x=>x.onclick=()=>answerQ(+x.dataset.c));
+}
+function answerQ(c){
+  const q=DQ.list[DQ.i];DQ.ans.push(c===q.answer);
+  const b=dBox();b.querySelectorAll('button[data-c]').forEach(x=>{x.disabled=true;const i=+x.dataset.c;if(i===q.answer)x.style.borderColor='var(--green)';else if(i===c)x.style.borderColor='var(--red)'});
+  setTimeout(()=>{DQ.i++;if(DQ.i>=DQ.list.length)finishDaily();else drawQ()},900);
+}
+async function finishDaily(){
+  const today=localDayKey(),s=AR.st;const correct=DQ.ans.filter(Boolean).length,total=DQ.list.length;
+  DQ.list=null;
+  if(s.dailyDone[today]){paintDaily();return}
+  if(s.lastDay!==today){const y=new Date();y.setDate(y.getDate()-1);s.streak=(s.lastDay===localDayKey(y))?(s.streak||0)+1:1;s.lastDay=today}
+  const add=correct*5+(correct===total?10:0)+Math.min(s.streak||0,5)*2;
+  s.points+=add;s.dailyDone[today]={score:correct,total};
+  const dk=Object.keys(s.dailyDone).sort();if(dk.length>30)dk.slice(0,dk.length-30).forEach(x=>delete s.dailyDone[x]);
+  const wk=wkKey();if(s.week.key!==wk)s.week={key:wk,exams:0,points:0,claimed:false};s.week.points+=add;
+  await persist();paint();
+  toast('⚡ خلّصت التحدي: '+correct+'/'+total+' • +'+add+' نقطة');
+}
+/* ARENA-DAILY:END */
 window.arenaOpen=open;
 const _go=go;go=function(id){_go(id);if(id==='arena')open()};
 const _sp=submitPlatformExam;
