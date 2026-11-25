@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>امتحان الشبكات وأمن المعلومات - MAHMOUD STUDY</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: #ffffff;
+  color: #003366;
+  line-height: 1.6;
+  padding: 20px;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 2px solid #007bff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(0,123,255,0.1);
+}
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #007bff;
+}
+.logo {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 6px solid #007bff;
+  object-fit: cover;
+  margin-bottom: 15px;
+  background: #ffffff;
+}
+h1 {
+  color: #0056b3;
+  font-size: 28px;
+  margin: 10px 0;
+}
+.student-info {
+  margin: 20px 0;
+  text-align: center;
+}
+.student-info label {
+  font-weight: bold;
+  font-size: 18px;
+  color: #003366;
+}
+.student-info input {
+  margin-right: 10px;
+  padding: 10px 15px;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 300px;
+  max-width: 90%;
+  direction: rtl;
+}
+.timer {
+  text-align: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #0056b3;
+  background: #e6f2ff;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  border: 2px solid #007bff;
+}
+.timer.warning { color: #ff6600; }
+.timer.danger { color: #cc0000; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.5; } }
+.question {
+  background: #f8fbff;
+  border: 1px solid #cce5ff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.question h3 {
+  color: #0056b3;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+.options label {
+  display: block;
+  padding: 8px 12px;
+  margin: 6px 0;
+  background: #ffffff;
+  border: 1px solid #99ccff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.options label:hover {
+  background: #e6f2ff;
+  border-color: #007bff;
+}
+.options input {
+  margin-left: 10px;
+}
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  font-size: 16px;
+  font-family: inherit;
+  direction: rtl;
+  resize: vertical;
+}
+.submit-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 30px auto;
+  padding: 15px 30px;
+  background: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.submit-btn:hover {
+  background: #0056b3;
+}
+.results {
+  margin-top: 40px;
+  padding: 25px;
+  background: #f0f8ff;
+  border: 2px solid #007bff;
+  border-radius: 10px;
+}
+.result-item {
+  margin: 15px 0;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 6px;
+  border-right: 5px solid #007bff;
+}
+.correct { border-right-color: #28a745; }
+.incorrect { border-right-color: #dc3545; }
+.partial { border-right-color: #ffc107; }
+.score {
+  font-weight: bold;
+  color: #0056b3;
+}
+.model-answer {
+  background: #e6f2ff;
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 8px;
+  font-style: italic;
+}
+.total-score {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #0056b3;
+  margin: 20px 0;
+  padding: 20px;
+  background: #ffffff;
+  border: 3px solid #007bff;
+  border-radius: 10px;
+}
+footer {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+  border-top: 2px solid #007bff;
+  color: #003366;
+}
+footer a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+footer a:hover { text-decoration: underline; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img class="logo" src="icon-192.png" alt="MAHMOUD STUDY">
+    <h1>امتحان الشبكات وأمن المعلومات</h1>
+    <p>MAHMOUD STUDY | نظّم وقتك، ذاكر بذكاء</p>
+  </div>
+
+  <div class="student-info">
+    <label for="studentName">اسم الطالب:</label>
+    <input type="text" id="studentName" placeholder="أدخل اسمك هنا" required>
+  </div>
+
+  <div class="timer" id="timer">60:00</div>
+
+  <form id="examForm">
+    <div id="questionsContainer"></div>
+    <button type="button" class="submit-btn" id="submitBtn" onclick="submitExam()">عرض النتيجة</button>
+  </form>
+
+  <div id="results" class="results hidden"></div>
+
+  <footer>
+    <p>© MAHMOUD STUDY</p>
+  </footer>
+</div>
+
+<script>
+const questions = [
+  // MCQs 1-20
+  {
+    type: 'mcq',
+    q: 'أي مما يلي يعد مثالاً على «الأجهزة الطرفية» في شبكة المؤسسة؟',
+    options: ['أ) جدار الحماية عند مدخل الشبكة', 'ب) الحاسب المحمول الذي يستخدمه الموظف', 'ج) النفق المشفر للشبكة الافتراضية الخاصة', 'د) المنطقة المعزولة (DMZ) في الشبكة'],
+    correct: 1,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'كم عدد مراحل الاستجابة للحوادث كما وردت في الكتاب؟',
+    options: ['أ) أربع مراحل', 'ب) ثلاث مراحل', 'ج) ست مراحل', 'د) ثماني مراحل'],
+    correct: 2,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'إرجاع الملفات من نسخة احتياطية سليمة وإعادة تشغيل الخدمة بأمان يمثل مرحلة:',
+    options: ['أ) الاكتشاف', 'ب) الدروس المستفادة والتحسين', 'ج) التحضير', 'د) الاستعادة'],
+    correct: 3,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'ما اسم الإجراء الذي يتم به إنشاء الاتصال الآمن في HTTPS؟',
+    options: ['أ) مصافحة TLS', 'ب) التوقيع الرقمي', 'ج) المصادقة الثنائية', 'د) التشفير المتماثل للبيانات'],
+    correct: 0,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'تحليل سبب الحادث وتوثيق ما حدث وتحسين الضوابط حتى لا يتكرر يمثل مرحلة:',
+    options: ['أ) الاكتشاف', 'ب) الاستعادة', 'ج) التحضير', 'د) الدروس المستفادة والتحسين'],
+    correct: 3,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'شركة يجب أن يصل عملاؤها إلى خادم الويب الخاص بها من الإنترنت. أي قاعدة في جدار الحماية تحمي قاعدة البيانات الداخلية؟',
+    options: ['أ) السماح لأي جهاز على الإنترنت بالاتصال بقاعدة البيانات مباشرة', 'ب) منع الوصول الخارجي المباشر إلى قاعدة البيانات', 'ج) فتح كل المنافذ لتسريع الاتصال بالخادم', 'د) إيقاف جدار الحماية أثناء ساعات العمل فقط'],
+    correct: 1,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'كتابة إجراءات الاستجابة وتحديد أدوار الفريق قبل وقوع أي حادث تمثل مرحلة:',
+    options: ['أ) الاستعادة', 'ب) الدروس المستفادة والتحسين', 'ج) التحضير', 'د) الاكتشاف'],
+    correct: 2,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'في اتصال HTTPS، أي مما يلي يحتفظ به الخادم وحده ولا يرسله أبداً إلى المتصفح؟',
+    options: ['أ) المفتاح العام الذي يرسله مع الشهادة', 'ب) البيانات المشفرة بالمفتاح المشترك', 'ج) الشهادة الرقمية التي يرسلها للمتصفح', 'د) المفتاح الخاص'],
+    correct: 3,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'أي مما يلي يصف مصافحة TLS بدقة؟',
+    options: ['أ) إجراء يتحقق فيه المتصفح من الخادم ويتفق معه على مفتاح قبل تبادل البيانات', 'ب) إرسال كلمة المرور دون تشفير', 'ج) إرسال الشهادة الرقمية بعد انتهاء الجلسة لإغلاق الاتصال بين الطرفين بأمان', 'د) توقيع كل رسالة بصمة إصبع المستخدم قبل إرسالها إلى الخادم'],
+    correct: 0,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'نظام يوضع عند نقطة دخول الشبكة وخروجها ويسمح بالاتصال أو يمنعه وفق قواعد محددة مسبقاً، هو:',
+    options: ['أ) جدار الحماية (Firewall)', 'ب) برنامج مكافحة الفيروسات', 'ج) الشبكة الافتراضية الخاصة', 'د) المنطقة المعزولة'],
+    correct: 0,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'أي ترتيب صحيح لهذه المراحل من الاستجابة للحوادث؟',
+    options: ['أ) الاستعادة ← إزالة التهديد ← الاحتواء', 'ب) الاستعادة ← الاحتواء ← إزالة التهديد', 'ج) إزالة التهديد ← الاستعادة ← الاحتواء', 'د) الاحتواء ← إزالة التهديد ← الاستعادة'],
+    correct: 3,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'لماذا تحدد المؤسسة أولويات لمعالجة المخاطر؟',
+    options: ['أ) لأن القانون يمنع معالجة أكثر من خطر واحد في العام', 'ب) لأنه يصعب معالجة كل المخاطر في الوقت نفسه', 'ج) لأن المخاطر المنخفضة تختفي من تلقاء نفسها دون أي إجراء', 'د) لأن كل المخاطر متساوية في الخطورة دائماً'],
+    correct: 1,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'تسجيل الدخول إلى حساب على وسائل التواصل الاجتماعي بكلمة مرور ثم رمز يصل في رسالة قصيرة (SMS) هو مثال على:',
+    options: ['أ) شهادة رقمية يصدرها موقع التواصل', 'ب) مصادقة بعاملين من فئتين مختلفتين', 'ج) مصادقة بعامل واحد هو المعرفة فقط', 'د) توقيع رقمي على رسالة تسجيل الدخول'],
+    correct: 1,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'في المرحلة الأولى (الاتصال) من HTTPS، ماذا يرسل خادم الويب إلى المتصفح؟',
+    options: ['أ) التوقيع الرقمي فقط', 'ب) المفتاح الخاص للخادم وكلمة مرور المدير', 'ج) الشهادة الرقمية والمفتاح العام', 'د) المفتاح المشترك مشفرا بكلمة مرور المستخدم'],
+    correct: 2,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'ملاحظة نشاط غير معتاد في سجلات الخادم والتأكد من وقوع اختراق فعلاً تمثل مرحلة:',
+    options: ['أ) الاستعادة', 'ب) الدروس المستفادة والتحسين', 'ج) الاكتشاف', 'د) التحضير'],
+    correct: 2,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'ما المرحلة التي تأتي مباشرة بعد «الاكتشاف» في الاستجابة للحوادث؟',
+    options: ['أ) الاحتواء', 'ب) الدروس المستفادة والتحسين', 'ج) التحضير', 'د) الاستعادة'],
+    correct: 0,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'تقنية تنشئ خطا خاصا افتراضيا مشفرا (نفقا) عبر الإنترنت للاتصال بأمان من مكان بعيد، هي:',
+    options: ['أ) الشبكة الافتراضية الخاصة (VPN)', 'ب) جدار الحماية (Firewall)', 'ج) المنطقة المعزولة (DMZ)', 'د) نهج انعدام الثقة (Zero Trust)'],
+    correct: 0,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'تثبيت برنامج مكافحة الفيروسات والحفاظ على تحديث نظام التشغيل يحمي أي جزء من الشبكة؟',
+    options: ['أ) أماكن وضع الخوادم', 'ب) مدخل الشبكة', 'ج) الأجهزة الطرفية', 'د) مسار الاتصال'],
+    correct: 2,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'موظف يتصل بشبكة Wi-Fi عامة في مقهى، ما الخطر الذي يقل أساسا عند استخدامه الشبكة الافتراضية الخاصة (VPN)؟',
+    options: ['أ) حماية الاتصال عند استخدام شبكة Wi-Fi عامة', 'ب) ربط مكاتب المؤسسة في أماكن مختلفة بأمان', 'ج) الاتصال بأمان بششبكة المؤسسة من المنزل', 'د) تسريع تحميل الملفات والصور من الإنترنت'],
+    correct: 0,
+    points: 1
+  },
+  {
+    type: 'mcq',
+    q: 'أي مما يلي ليس من الاستخدامات الأساسية للشبكة الافتراضية الخاصة (VPN)؟',
+    options: ['أ) بطء الإنترنت في المقهى', 'ب) التنصت على محتوى الاتصال وقراءته', 'ج) ظهور الإعلانات في المتصفح', 'د) نفاد شحن بطارية الجهاز بسرعة'],
+    correct: 1,
+    points: 1
+  },
+  // Essays 21-40
+  {
+    type: 'essay',
+    q: 'كيف يُحدد حجم المخاطرة؟',
+    model: 'درجة الخطر = درجة التأثير × درجة الاحتمالية؛ التأثير: حجم الضرر إذا وقع الحدث، والاحتمالية: مدى احتمال وقوع الحدث.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'قارن بإيجاز بين الأمان التقليدي ونهج «انعدام الثقة».',
+    model: 'الأمان التقليدي يحمي المحيط ويفترض أن داخل الشبكة آمن، أما انعدام الثقة فلا يثق تلقائيا في أي اتصال حتى من داخل الشبكة ويتحقق دائما من كل وصول.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'قارن بإيجاز بين مرحلتي «الاحتواء» و«إزالة التهديد».',
+    model: 'الاحتواء: الحد من نطاق التأثير حتى لا ينتشر الضرر (مثل عزل الجهاز المصاب)، أما إزالة التهديد فهي إزالة سبب الحادث (مثل حذف البرمجيات الخبيثة).',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'علل: لم تعد حماية «المحيط الأمني» وحدها كافية حاليا.',
+    model: 'لأن انتشار الخدمات السحابية والعمل عن بعد جعل الحدود بين داخل شبكة المؤسسة وخارجها غير واضحة.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'علل: يجمع HTTPS بين التشفير بالمفتاح العام والتشفير المتماثل.',
+    model: 'لان التشفير بالمفتاح العام يشارك المفتاح بأمان، فيستخدم للمصادقة والاتفاق الآمن على مفاتيح الجلسة، ثم يحمي التشفير المتماثل بيانات الجلسة بسرعة، فتجمع بين الأمان والسرعة.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'أي المخاطر يجب معالجتها أولاً وفق تقييم المخاطر؟',
+    model: 'المخاطر ذات التأثير المرتفع والاحتمالية المرتفعة معا.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'ما المقصود بمفهوم «الدفاع في العمق»؟',
+    model: 'استخدام طبقات متعددة من الإجراءات الأمنية بحيث لو اختُرق إجراء يظل الإجراء التالي قادرا على حماية النظام.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'علل: تقل فرصة اختراق الحساب المحمي بالمصادقة الثنائية حتى لو سرقت كلمة المرور.',
+    model: 'لأن المهاجم يحتاج أيضا العامل الثاني (مثل الهاتف الذي يصله الرمز)، فلا يستطيع الدخول بكلمة المرور وحدها.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'اذكر مثالين لحوادث أمنية.',
+    model: 'منه: تسريب المعلومات الشخصية أو السرية للخارج - التلاعب بالبيانات دون تصريح - انقطاع الخدمة بسبب هجمات على الخادم.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'ما المقصود بـ «المخاطرة»؟',
+    model: 'احتمال أن يقع حدث بسبب ضرر، مع مراعاة احتمال وقوعه وحجم أثره.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'ما وظيفة «الشهادة الرقمية»؟',
+    model: 'تساعد المتصفح على التحقق من هوية الخادم وارتباط الشهادة باسم النطاق الذي يتصل به، أي أن الموقع حقيقي وليس مزيفا.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'ما المقصود بـ «عدم التنصل»؟',
+    model: 'ألا يستطيع المرسل إنكار أنه أرسل البيانات أو الرسالة (عدم الإنكار) ويدعمه التوقيع الرقمي.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'علل: لا تكفي تقنية أمان واحدة لحماية الخدمات عبر الإنترنت.',
+    model: 'لأن التهديدات السيبرانية متطورة ومتنوعة، واستخدام طبقات متعددة (الدفاع في العمق) يضمن أنه إذا تم تجاوز حاجز أمني، توجد حواجز أخرى تحمي النظام.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'ما المقصود بـ «الحادث الأمني»؟',
+    model: 'هو حدث غير متوقع يهدد أمن المعلومات أو الأنظمة أو يخرق سياسات الأمان في المؤسسة.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'ما المقصود بـ «HTTPS»؟',
+    model: 'برتوكول نقل النص الفائق الآمن، وهو نسخة مشفرة ومؤمنة من بروتوكول HTTP تُستخدم لتأمين الاتصال وتبادل البيانات بين المتصفح وخادم الويب.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'قارن بإيجاز بين المصادقة الثنائية (2FA) والمصادقة متعددة العوامل (MFA).',
+    model: 'المصادقة الثنائية تعتمد تحديدا على عاملين اثنين فقط للتحقق من الهوية، بينما المصادقة متعددة العوامل قد تستخدم عاملين أو أكثر من فئات مختلفة.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'علل: يجب إزالة سبب الحادث قبل استعادة الأنظمة.',
+    model: 'حتى لا يتكرر الاختراق أو يعود المهاجم لاستغلال نفس الثغرة فور إعادة تشغيل الأنظمة.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'علل: توضع الخوادم المعرضة للشبكة الخارجية مثل خادم الويب في المنطقة المعزولة (DMZ).',
+    model: 'لحماية الشبكة الداخلية الحساسة؛ فإذا تعرض خادم الويب للاختراق، يبقى محجوزا في المنطقة المعزولة ولا يمنح المهاجم وصولاً مباشراً لباقي أجهزة المؤسسة الداخليّة.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'ما وظيفة «التوقيع الرقمي»؟',
+    model: 'التحقق من هوية المرسل، وضمان سلامة البيانات من التعديل، وتحقيق خاصية عدم التنصل.',
+    points: 2
+  },
+  {
+    type: 'essay',
+    q: 'اذكر فئات عوامل المصادقة الثلاث مع مثال لكل منها.',
+    model: 'فئة المعرفة (شيء تعرفه) مثل: كلمة المرور أو رقم التعريف الشخصي (PIN). فئة المِلكية (شيء تملكه) مثل: الهاتف الذكي أو البطاقة الذكية. فئة السمات الشخصية (شيء أنت عليه) مثل: بصمة الإصبع أو التعرف على الوجه.',
+    points: 2
+  }
+];
+
+let timeLeft = 3600;
+let timerInterval;
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const mins = Math.floor(timeLeft / 60);
+    const secs = timeLeft % 60;
+    const display = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const timerEl = document.getElementById('timer');
+    timerEl.textContent = display;
+    if (timeLeft <= 300) timerEl.classList.add('warning');
+    if (timeLeft <= 60) timerEl.classList.add('danger');
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timerEl.textContent = 'انتهى الوقت!';
+      submitExam();
+    }
+  }, 1000);
+}
+
+function renderQuestions() {
+  const container = document.getElementById('questionsContainer');
+  questions.forEach((q, index) => {
+    const div = document.createElement('div');
+    div.className = 'question';
+    div.innerHTML = `<h3>السؤال ${index + 1}: ${q.q}</h3>`;
+    if (q.type === 'mcq') {
+      const optionsDiv = document.createElement('div');
+      optionsDiv.className = 'options';
+      q.options.forEach((opt, i) => {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="radio" name="q${index}" value="${i}"> ${opt}`;
+        optionsDiv.appendChild(label);
+      });
+      div.appendChild(optionsDiv);
+    } else {
+      const textarea = document.createElement('textarea');
+      textarea.name = `q${index}`;
+      textarea.placeholder = 'اكتب إجابتك هنا...';
+      div.appendChild(textarea);
+    }
+    container.appendChild(div);
+  });
+}
+
+function normalizeText(text) {
+  return text.toLowerCase()
+    .replace(/[^؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿a-z0-9\s]/gi, '')
+    .split(/\s+/)
+    .filter(w => w.length > 1);
+}
+
+function calculateSimilarity(student, model) {
+  if (!student.trim()) return 0;
+  const sWords = new Set(normalizeText(student));
+  const mWords = new Set(normalizeText(model));
+  if (mWords.size === 0) return 0;
+  let intersection = 0;
+  for (let w of sWords) {
+    if (mWords.has(w)) intersection++;
+  }
+  const union = sWords.size + mWords.size - intersection;
+  const jaccard = union > 0 ? intersection / union : 0;
+  const coverage = intersection / mWords.size;
+  return Math.max(jaccard, coverage * 0.7);
+}
+
+function submitExam() {
+  clearInterval(timerInterval);
+  const studentName = document.getElementById('studentName').value.trim() || 'طالب';
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.classList.remove('hidden');
+  resultsDiv.innerHTML = `<h2 style="text-align:center; color:#0056b3;">نتائج الامتحان - ${studentName}</h2>`;
+  
+  let totalScore = 0;
+  let maxScore = 0;
+
+  questions.forEach((q, index) => {
+    maxScore += q.points;
+    const resultItem = document.createElement('div');
+    resultItem.className = 'result-item';
+    let score = 0;
+    let feedback = '';
+
+    if (q.type === 'mcq') {
+      const selected = document.querySelector(`input[name="q${index}"]:checked`);
+      const selectedIndex = selected ? parseInt(selected.value) : -1;
+      const isCorrect = selectedIndex === q.correct;
+      score = isCorrect ? q.points : 0;
+      resultItem.classList.add(isCorrect ? 'correct' : 'incorrect');
+      feedback = `
+        <p><strong>إجابتك:</strong> ${selected ? q.options[selectedIndex] : 'لم تجب'}</p>
+        <p><strong>الإجابة الصحيحة:</strong> ${q.options[q.correct]}</p>
+        <p class="score">الدرجة: ${score} / ${q.points}</p>
+      `;
+    } else {
+      const answer = document.querySelector(`textarea[name="q${index}"]`).value;
+      const sim = calculateSimilarity(answer, q.model);
+      if (sim >= 0.65) score = q.points;
+      else if (sim >= 0.35) score = Math.round(q.points * sim);
+      else if (sim > 0.1) score = Math.round(q.points * 0.3);
+      else score = 0;
+      const cls = score === q.points ? 'correct' : score > 0 ? 'partial' : 'incorrect';
+      resultItem.classList.add(cls);
+      feedback = `
+        <p><strong>إجابتك:</strong> ${answer || 'لم تجب'}</p>
+        <div class="model-answer"><strong>الإجابة النموذجية:</strong> ${q.model}</div>
+        <p class="score">درجة التشابه: ${(sim * 100).toFixed(0)}% | الدرجة: ${score} / ${q.points}</p>
+      `;
+    }
+    totalScore += score;
+    resultItem.innerHTML = `<h4>السؤال ${index + 1}</h4>${feedback}`;
+    resultsDiv.appendChild(resultItem);
+  });
+
+  const totalDiv = document.createElement('div');
+  totalDiv.className = 'total-score';
+  totalDiv.innerHTML = `الدرجة الكلية: ${totalScore} / ${maxScore} (${((totalScore/maxScore)*100).toFixed(1)}%)`;
+  resultsDiv.appendChild(totalDiv);
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('submitBtn').textContent = 'تم التصحيح';
+  resultsDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderQuestions();
+  startTimer();
+});
+</script>
+</body>
+</html>
