@@ -1111,7 +1111,7 @@ let forumUnsubscribe=null, platformUnsubs=[];
 const firebaseConfig = {apiKey:"AIzaSyBlnCzvRKHFPFTR0KQRKbmEHObCP0fQakM",authDomain:"mahmoud-study.firebaseapp.com",projectId:"mahmoud-study",storageBucket:"mahmoud-study.firebasestorage.app",messagingSenderId:"265167276750",appId:"1:265167276750:web:26c6ad1c8c1c4bf8a75e9f"};
 let adminUnlocked=false,adminPasswordMemory='',authMode='login',studentAuth=null;
 /* ADMIN-AUTH:START constants/helpers - admin = Firebase Auth user whose uid is whitelisted (Firestore rules are the real lock) */
-const ADMIN_UIDS=['82rhSBXtd5YveBr1WO6Bcgyxu8t2','9I683tus04VUo9gmsVFDwaqbnof1','9aKVRBoMCmOgklU3sYkroNGOcLg1','pMsFOwdTQOR1qPdJGWO6rMvWB5D2'];
+const ADMIN_UIDS=['82rhSBXtd5YveBr1WO6Bcgyxu8t2','9I683tus04VUo9gmsVFDwaqbnof1','9aKVRBoMCmOgklU3sYkroNGOcLg1','pMsFOwdTQOR1qPdJGWO6rMvWB5D2','GtMGKbVaH3VRs7gue21VI1DVXHA3','gG2onR88EeY4w9JRhwuh1p21jVV2'];
 function isAdminUid(uid){return !!uid&&ADMIN_UIDS.indexOf(uid)>=0}
 function applyAdminUI(on){document.querySelectorAll('[onclick="go(\'admin\')"]').forEach(function(b){const c=b.closest('.card');if(c)c.style.display=on?'':'none'})}
 /* ADMIN-AUTH:END */
