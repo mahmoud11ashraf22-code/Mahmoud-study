@@ -1,5 +1,5 @@
-const CACHE='mahmoud-study-v3';
-const SHELL=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','v3.css','v3.js','tutor.js','extras.js'];
+const CACHE='ms-v4';
+const SHELL=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','v3.css','v3.js','tutor.js','extras.js','plus.js'];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));
 });
