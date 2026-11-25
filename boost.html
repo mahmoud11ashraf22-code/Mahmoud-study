@@ -182,7 +182,7 @@ $('submitBtn').onclick=async()=>{
   let short='';
   for(let t=0;t<5;t++){
    short='MB-'+Array.from({length:6},()=>'ABCDEFGHJKMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*31)]).join('');
-   try{await store.collection('smmOrders').doc(short).create({service:s.name,serviceId:s.id,platform:s.platName,quantity:q,price:price,accountLink:link,customerPhone:phone,status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});break}catch(ex){if(t===4)throw ex}
+   try{await store.collection('smmOrders').doc(short).set({service:s.name,serviceId:s.id,platform:s.platName,quantity:q,price:price,accountLink:link,customerPhone:phone,status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});break}catch(ex){if(t===4)throw ex}
   }
   lastOrder={id:short,short,s:s.name,q,price,link};
   $('formOk').innerHTML=`✅ طلبك اتسجل! رقم الطلب: <b style="direction:ltr;display:inline-block">${short}</b><br>احفظ الرقم ده عشان تتابع بيه طلبك. دلوقتي ابعت سكرينشوت التحويل على واتساب 👇`;
