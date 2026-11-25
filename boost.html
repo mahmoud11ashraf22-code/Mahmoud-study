@@ -32,6 +32,7 @@ h3.sec{font-size:19px;font-weight:800;margin:28px 0 14px;display:flex;align-item
 .card .plat{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;display:inline-block;margin-bottom:10px}
 .plat.tiktok{background:#ffffff14;color:#fff;border:1px solid #ffffff2e}
 .plat.insta{background:linear-gradient(115deg,#ff603e22,#ff4f9122);color:#ff8fb0;border:1px solid #ff4f9144}
+.plat.game{background:#22c55e22;color:#4ade80;border:1px solid #22c55e44}
 .card h4{font-size:17px;font-weight:800;margin-bottom:4px}
 .card .desc{color:var(--muted);font-size:13px;margin-bottom:12px;line-height:1.7}
 .price{font-size:21px;font-weight:800;color:var(--gold)}
@@ -200,7 +201,10 @@ const SERVICES=[
  {id:'tt-view',plat:'tiktok',platName:'تيك توك',icon:'👀',name:'مشاهدات تيك توك',desc:'مشاهدات سريعة لأي فيديو',per:1000,price:15},
  {id:'ig-fol',plat:'insta',platName:'إنستجرام',icon:'📸',name:'متابعين إنستجرام',desc:'متابعين جودة عالية مع ضمان التعويض',per:1000,price:150},
  {id:'ig-like',plat:'insta',platName:'إنستجرام',icon:'❤️',name:'لايكات إنستجرام',desc:'لايكات على أي بوست',per:1000,price:45},
- {id:'ig-view',plat:'insta',platName:'إنستجرام',icon:'▶️',name:'مشاهدات إنستجرام',desc:'مشاهدات ريلز وفيديوهات',per:1000,price:20}
+ {id:'ig-view',plat:'insta',platName:'إنستجرام',icon:'▶️',name:'مشاهدات إنستجرام',desc:'مشاهدات ريلز وفيديوهات',per:1000,price:20},
+ {id:'pes-coin',plat:'game',platName:'eFootball',icon:'⚽',name:'كوينز eFootball',desc:'شحن كوينز بيس موبايل على الآيدي مباشرة',per:1,price:0.55,qtys:[105,550,1050,2130,5700,10500]},
+ {id:'pubg-uc',plat:'game',platName:'PUBG Mobile',icon:'🔫',name:'شدات ببجي موبايل',desc:'شدات UC تتشحن على الآيدي مباشرة',per:1,price:0.75,qtys:[60,325,660,1800,3850]},
+ {id:'ff-dia',plat:'game',platName:'Free Fire',icon:'💎',name:'جواهر فري فاير',desc:'جواهر فري فاير على الآيدي مباشرة',per:1,price:0.38,qtys:[100,310,520,1080,2200]}
 ];
 const QTYS=[500,1000,2500,5000,10000,25000];
 const firebaseConfig={apiKey:"AIzaSyBlnCzvRKHFPFTR0KQRKbmEHObCP0fQakM",authDomain:"mahmoud-study.firebaseapp.com",projectId:"mahmoud-study",storageBucket:"mahmoud-study.firebasestorage.app",messagingSenderId:"265167276750",appId:"1:265167276750:web:26c6ad1c8c1c4bf8a75e9f"};
@@ -217,10 +221,10 @@ function showErr(id,m){const e=$(id);e.textContent=m;e.style.display='block';set
 store.doc('boostSettings/prices').get().then(d=>{if(d.exists){const p=d.data();SERVICES.forEach(s=>{const k=s.id;if(p['price_'+k]!=null)s.price=p['price_'+k];if(p['per_'+k]!=null)s.per=p['per_'+k]});renderServices();renderQty()}}).catch(()=>{});
 document.querySelectorAll('.copy[data-c]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.c);b.textContent='اتنسخ ✅';setTimeout(()=>b.textContent='نسخ الرقم',1800)});
 
-function renderServices(q){q=(q||'').trim();const list=q?SERVICES.filter(s=>(s.name+s.platName+s.desc).includes(q)):SERVICES;$('servicesGrid').innerHTML=list.length?list.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span><h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${money(s.price)} <small>/ ${fmt(s.per)}</small></div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join(''):'<div class="note">مفيش خدمة بالاسم ده.</div>'}
+function renderServices(q){q=(q||'').trim();const list=q?SERVICES.filter(s=>(s.name+s.platName+s.desc).includes(q)):SERVICES;$('servicesGrid').innerHTML=list.length?list.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span><h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${s.qtys?'يبدأ من '+money(s.price*s.qtys[0]):money(s.price)+' <small>/ '+fmt(s.per)+'</small>'}</div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join(''):'<div class="note">مفيش خدمة بالاسم ده.</div>'}
 renderServices();$('svcSearch').oninput=e=>renderServices(e.target.value);
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
-function renderQty(){$('fQty').innerHTML=QTYS.map(q=>`<option value="${q}">${fmt(q)}</option>`).join('');calc()}
+function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=(s.qtys||QTYS).map(q=>`<option value="${q}">${fmt(q)}</option>`).join('');$('fLink').placeholder=s.plat==='game'?'اكتب ID اللاعب (والسيرفر لو موجود)':'مثال: https://tiktok.com/@username أو @username';calc()}
 function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(Math.ceil(q*s.price/s.per))}
 function pick(id){if(!ME){$('authSec').scrollIntoView({behavior:'smooth'});return}$('fService').value=id;renderQty();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
 $('fService').onchange=renderQty;$('fQty').onchange=calc;renderQty();
@@ -330,7 +334,7 @@ $('orderBtn').onclick=async()=>{
  if(!ME)return showErr('ordErr','سجل دخول الأول.');
  if(!PROFILE)return showErr('ordErr','جارٍ تحميل حسابك...');
  const s=svc($('fService').value),q=+$('fQty').value,link=$('fLink').value.trim();
- if(link.length<3)return showErr('ordErr','اكتب رابط الحساب أو البوست الأول.');
+ if(link.length<3)return showErr('ordErr','اكتب رابط الحساب أو ID اللاعب الأول.');
  const price=Math.ceil(q*s.price/s.per);
  if((PROFILE.balance||0)<price)return showErr('ordErr','رصيدك مش كفاية (معاك '+money(PROFILE.balance||0)+' والطلب بـ'+money(price)+'). اشحن محفظتك الأول من فوق 👆');
  const btn=$('orderBtn');btn.disabled=true;btn.textContent='جارٍ تنفيذ الطلب...';
