@@ -575,12 +575,24 @@ body.auth-locked .wa-fab{display:none}
 @media(prefers-reduced-motion:reduce){.page.active>*,.rv-q,.wa-fab,.hero:before,.hero:after,.hero-art svg,.hero .shine,.tab.active .ico{animation:none!important}.rv-ring .fg{transition:none!important}.confetti{display:none}}
 .auth-gate-card h1{background:linear-gradient(90deg,#fff,#7ff0bf);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .day-theme .auth-gate-card h1{background:linear-gradient(90deg,#0d241a,#0b6b48);-webkit-background-clip:text;background-clip:text}
+/* KIRIO-BANNER-CSS:START (remove with the two KIRIO-BANNER blocks) */
+.kirio-banner{margin:0 0 14px;padding:16px 18px;border-radius:16px;border:1.5px solid #f0c45c;background:linear-gradient(135deg,#3a1210,#1c0f0e);color:#fff;text-align:center;line-height:1.9;box-shadow:0 8px 28px rgba(255,57,50,.25);animation:kirioPulse 2.4s ease-in-out infinite;direction:rtl}
+.kirio-banner h3{margin:0 0 6px;font-size:1.15rem;color:#f0c45c;font-weight:800}
+.kirio-banner p{margin:4px 0;font-size:1rem;font-weight:600}
+.kirio-banner .kb-sign{color:#7ff0bf;font-weight:800}
+#authGate .kirio-banner{margin:0 0 16px}
+@keyframes kirioPulse{0%,100%{box-shadow:0 8px 28px rgba(255,57,50,.25)}50%{box-shadow:0 8px 34px rgba(240,196,92,.45)}}
+@media(prefers-reduced-motion:reduce){.kirio-banner{animation:none}}
+/* KIRIO-BANNER-CSS:END */
 </style>
 </head>
 <body class="auth-locked">
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></symbol></svg>
 <div id="authGate">
  <div class="auth-gate-card">
+<!-- KIRIO-BANNER:START -->
+<div class="kirio-banner" role="alert" dir="rtl"><h3>⚠️ تنبيه مهم لكل طلبة تانية ثانوي</h3><p>بكرة الخميس 26 نوفمبر آخر موعد لتسليم فصول منصة كيريو (٥٤ فصل).</p><p>اللي لسه مخلّصش يخلّص النهارده، مفيش وقت! ⏳</p><p>بالتوفيق يا أبطال 💪</p><p class="kb-sign">مستر محمود</p></div>
+<!-- KIRIO-BANNER:END -->
   <div class="auth-gate-logo"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 7 4 17l20 10 20-10z" fill="#34d995"/><path d="M12 24v9c0 4 5.5 7 12 7s12-3 12-7v-9l-12 6z" fill="#1fa070"/><path d="M42 18v13" stroke="#ff5a52" stroke-width="3" stroke-linecap="round"/><circle cx="42" cy="33" r="2.6" fill="#ff5a52"/></svg></div><h1>MAHMOUD STUDY</h1>
   <p class="gate-sub">منصة التنظيم الدراسي الذكي<br>سجّل برقم هاتفك وكلمة المرور للمتابعة</p>
   <div class="gate-tabs"><button id="authLoginTab" class="btn active" onclick="setAuthMode('login')">تسجيل الدخول</button><button id="authRegisterTab" class="btn ghost" onclick="setAuthMode('register')">إنشاء حساب</button></div>
@@ -598,6 +610,9 @@ body.auth-locked .wa-fab{display:none}
 <div class="app">
 <header><div class="top"><div class="brand"><span class="mark"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 7 4 17l20 10 20-10z" fill="#34d995"/><path d="M12 24v9c0 4 5.5 7 12 7s12-3 12-7v-9l-12 6z" fill="#1fa070"/><path d="M42 18v13" stroke="#ff5a52" stroke-width="3" stroke-linecap="round"/><circle cx="42" cy="33" r="2.6" fill="#ff5a52"/></svg></span><div><b>MAHMOUD <span>STUDY</span></b><small>نظّم وقتك • ذاكر بذكاء • حقق هدفك</small></div></div><div style="display:flex;align-items:center;gap:6px"><button class="modebtn" id="notifBtn" onclick="openNotifications()">🔔 <span id="notifCount">0</span></button><button class="modebtn" id="dayNightToggle" onclick="toggleDayNight()">☀️ نهاري</button><button class="modebtn" id="modeToggle" onclick="toggleMode()">الوضع البسيط</button><div class="status" id="cloudStatus">● جارٍ الاتصال بالسحابة</div></div></div></header>
 <main>
+<!-- KIRIO-BANNER:START -->
+<div class="kirio-banner" role="alert" dir="rtl"><h3>⚠️ تنبيه مهم لكل طلبة تانية ثانوي</h3><p>بكرة الخميس 26 نوفمبر آخر موعد لتسليم فصول منصة كيريو (٥٤ فصل).</p><p>اللي لسه مخلّصش يخلّص النهارده، مفيش وقت! ⏳</p><p>بالتوفيق يا أبطال 💪</p><p class="kb-sign">مستر محمود</p></div>
+<!-- KIRIO-BANNER:END -->
 <section class="page active" id="home">
  <div class="hero"><div class="eyebrow">✦ لوحة التحكم الشخصية</div><h1 id="welcome">أهلاً بيك 👋</h1><p>منصة تعليمية تجمع الامتحانات والفيديوهات والمنتدى وتنظيم المذاكرة في مكان واحد.</p>
   <div class="hero-actions"><button class="hero-chip" onclick="go('exams')">📝 ابدأ امتحان</button><a class="hero-chip wa" href="https://wa.me/201558288143" target="_blank" rel="noopener" aria-label="تواصل مع المطور عبر واتساب"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><use href="#i-wa"/></svg> تواصل مع المطور</a></div>
