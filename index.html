@@ -668,6 +668,9 @@ body.auth-locked .wa-fab{display:none}
 
 <section class="page" id="backlog">
  <h1>🔥 كسر التراكم</h1><div class="sectionhint">لو سجلت التراكم داخل كل مادة، مش محتاج تدخل نفس الأرقام هنا. استخدم الحاسبة دي للتقدير السريع فقط.</div><p class="sub">حوّل التراكم لخطة صغيرة تقدر تلتزم بيها.</p>
+<!-- RESCUE-PLAN:START card -->
+ <div class="card" id="rsCard" style="border-color:#1f6b43"><div class="row"><h2>🚑 خطة الإنقاذ من التراكمات</h2><span class="tag">جديد</span></div><div id="rsBody"></div></div>
+<!-- RESCUE-PLAN:END card -->
  <div class="card"><h2>حاسبة التراكم</h2><label>عدد الدروس المتراكمة</label><input id="backlogInput" type="number" min="0" placeholder="مثلاً 20"><div class="formgrid"><div><label>عايز تخلصهم في كام يوم؟</label><input id="backlogDays" type="number" min="1" value="14"></div><div><label>قدرتك اليومية (دروس)</label><input id="dailyCapacity" type="number" min="1" value="2"></div></div><button class="btn full" onclick="calculateBacklog()">احسب الخطة</button><div id="backlogResult"></div></div>
  <div class="card"><div class="row"><h2>تقدمك</h2><b class="green" id="backlogProgressPct">0%</b></div><div class="progress"><i id="backlogBar" style="width:0%"></i></div><p class="smallnote" id="backlogProgressText">لم تبدأ الخطة بعد.</p><div class="row"><button class="btn greenbtn" onclick="finishBacklogLesson()">أنجزت درساً ✓</button><button class="btn ghost" onclick="openBacklogLesson()">+ تسجيل درس</button></div><div id="backlogLessons"></div></div>
  </section>
@@ -2575,6 +2578,44 @@ const _go=go;go=function(id){_go(id);if(id==='review')setTimeout(paint,50)};
 window.mistakeReviewPaint=paint;
 })();
 /* MISTAKE-REVIEW:END */
+</script>
+
+<script>
+/* RESCUE-PLAN:START (خطة الإنقاذ من التراكمات) */
+(function(){
+const dur=s=>Math.max(30,45+(+(s.difficulty||2)-2)*10);
+function calc(){
+  const p=db.profile||{},subs=(db.subjects||[]).map(s=>({s,left:Math.max(0,(+s.backlog||0)-(+s.backlogDone||0))})).filter(x=>x.left>0);
+  const total=subs.reduce((n,x)=>n+x.left,0),mins=subs.reduce((n,x)=>n+x.left*dur(x.s),0);
+  let days=null;if(p.examDate){days=Math.ceil((new Date(p.examDate+'T00:00:00')-new Date(new Date().toDateString()))/86400000)}
+  return{p,subs,total,mins,days};
+}
+function paint(){
+  const h=document.getElementById('rsBody');if(!h)return;
+  const c=calc(),hrs=+c.p.hours||4;
+  if(!c.total){h.innerHTML='<p class="muted">سجّل الدروس المتراكمة في كل مادة (صفحة المواد) وهبني لك خطة إنقاذ.</p>';return}
+  if(c.days==null){h.innerHTML='<p class="muted">عندك '+c.total+' درس متراكم. حدد تاريخ الامتحان الأساسي في الإعدادات الأول عشان أحسب لك الخطة.</p>';return}
+  if(c.days<=0){h.innerHTML='<p class="red"><b>ميعاد الامتحان جه أو فات.</b> راجع التاريخ في الإعدادات.</p>';return}
+  const usable=c.days>5?c.days-2:c.days,perDay=c.mins/usable,needH=perDay/60;
+  const lessonsDay=Math.ceil(c.total/usable);
+  let tone,msg;
+  if(perDay<=hrs*60*0.85){tone='green';msg='على المسار ✅ بوقتك الحالي هتخلّص قبل الامتحان.'}
+  else if(perDay<=hrs*60*1.3){tone='gold';msg='الوقت ضيق ⚠️ محتاج التزام يومي وما تفوّتش أي يوم.'}
+  else{tone='red';msg='محتاج إنقاذ 🚨 وقتك الحالي مش كفاية، لازم تزود ساعات المذاكرة أو تدّي أولوية.'}
+  const maxH=12,feasible=needH<=maxH,applyH=Math.min(maxH,Math.max(hrs,Math.ceil(needH*2)/2));
+  const order=c.subs.slice().sort((a,b)=>(+(b.s.difficulty||2))-(+(a.s.difficulty||2))||b.left-a.left);
+  h.innerHTML='<div class="grid"><div class="stat"><b>'+c.total+'</b><span>درس متراكم</span></div><div class="stat"><b>'+c.days+'</b><span>يوم للامتحان</span></div><div class="stat"><b>'+lessonsDay+'</b><span>درس في اليوم</span></div><div class="stat"><b>'+needH.toFixed(1)+'</b><span>ساعة يومياً مطلوبة</span></div></div>'
+   +'<p class="'+tone+'"><b>'+msg+'</b></p><p class="muted">بحسب وقتك الحالي ('+hrs+' ساعة يومياً)'+(c.days>5?'، وبحجز آخر يومين للمراجعة النهائية.':'.')+'</p>'
+   +'<div class="muted" style="margin:6px 0">ترتيب الأولوية (الأصعب والأكبر الأول):</div>'
+   +order.map((x,i)=>'<div class="item"><div class="row"><strong>'+(i+1)+'. '+esc(x.s.name)+'</strong><span class="chip">'+x.left+' درس</span></div><p class="smallnote">≈ '+Math.max(1,Math.round(x.left/usable*10)/10)+' درس يومياً • '+Math.round(x.left*dur(x.s)/60*10)/10+' ساعة إجمالاً</p></div>').join('')
+   +(feasible?'':'<p class="red">الحمل أكبر من '+maxH+' ساعة يومياً. ركّز على المواد الأولى في الترتيب وقلّل الباقي.</p>')
+   +'<button class="btn greenbtn full" id="rsApply">🚑 طبّق خطة الإنقاذ'+(applyH>hrs?' ('+applyH+' ساعة يومياً)':'')+'</button>';
+  const b=document.getElementById('rsApply');if(b)b.onclick=()=>{db.profile.hours=applyH;db.plan=[];generatePlan();paint();toast('خطة الإنقاذ اتطبقت: '+applyH+' ساعة يومياً')};
+}
+const _go=go;go=function(id){_go(id);if(id==='backlog')setTimeout(paint,50)};
+window.rescuePaint=paint;
+})();
+/* RESCUE-PLAN:END */
 </script>
 
 </body></html>
