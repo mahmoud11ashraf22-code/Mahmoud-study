@@ -565,6 +565,9 @@ tx.set(bkRef,data);
 if(e==='taken'){$('bErr').textContent='المعاد ده اتحجز للأسف، اختار معاد تاني';loadSlots();return;}
 $('bErr').textContent='حصل خطأ، حاول تاني';return;
 }
+try{
+if(auth.currentUser){await db.collection('bookly_buyers').doc(auth.currentUser.uid).collection('bookings').doc(code).set({bizId:PBID,code:code,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
+}catch(e){}
 $('doneTitle').textContent=needDep?'تم استلام طلبك! بانتظار تأكيد العربون 💰':'تم استلام حجزك!';
 $('doneInfo').textContent=`${selSvc.name} — يوم ${ds} الساعة ${t12(selSlot)}`;
 $('doneCode').textContent=code;
@@ -667,8 +670,10 @@ async function enterBuyer(b){
 $('buyName').textContent=b.name;
 show('vBuyer');
 try{
-const q=await db.collectionGroup('bookings').where('phone','==',b.phone).get();
-const list=q.docs.map(d=>d.data()).sort((a,b2)=>(b2.date+b2.time).localeCompare(a.date+a.time));
+const q=await db.collection('bookly_buyers').doc(auth.currentUser.uid).collection('bookings').get();
+const rows=[];
+for(const p of q.docs){const pd=p.data();try{const live=await db.collection('bookly_businesses').doc(pd.bizId).collection('bookings').doc(pd.code).get();if(live.exists)rows.push(live.data());}catch(e){}}
+const list=rows.sort((a,b2)=>(b2.date+b2.time).localeCompare(a.date+a.time));
 $('buyList').innerHTML=list.length?list.map(x=>`
 <div class="bk"><div class="top" style="margin:0"><div><b>${esc(x.service)}</b> <span class="muted" style="font-size:12px">${x.date} ${t12(x.time)}</span></div>
 <span class="st ${SCLS[x.status]||'p'}">${STXT[x.status]||x.status}</span></div></div>`).join(''):'<div class="muted">لسه مفيش حجوزات برقمك. احجز من لينك أي نشاط بنفس رقمك وهتظهر هنا.</div>';
