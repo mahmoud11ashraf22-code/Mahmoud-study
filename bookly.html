@@ -95,7 +95,7 @@ input:focus,select:focus{border-color:var(--p)}
 </div>
 <div class="feats">
 <div><b>🔗 لينك خاص بيك</b>لينك باسم نشاطك تبعته لعملائك واتساب</div>
-<div><b>💰 عربون الحجز</b>فodafone كاش يأكد الجدية ويلغي الحجوزات الوهمية</div>
+<div><b>💰 عربون الحجز</b>فودافون كاش يأكد الجدية ويلغي الحجوزات الوهمية</div>
 <div><b>📊 لوحة تحكم</b>تأكيد وإلغاء وإحصائيات وإشعارات فورية</div>
 <div><b>⏰ مواعيد ذكية</b>أجازات واستراحات ومواعيدك بس اللي تظهر</div>
 </div>
@@ -111,8 +111,13 @@ input:focus,select:focus{border-color:var(--p)}
 <button id="tReg" onclick="authTab(0)">حساب جديد</button>
 </div>
 <div id="fReg" class="hide">
-<label>اسم النشاط</label><input id="rName" placeholder="مثال: عيادة د. أحمد / سنتر النور">
-<label>نوع النشاط</label><select id="rType"><option value="clinic">عيادة</option><option value="tutor">سنتر / دروس</option><option value="barber">حلاقة</option><option value="other">أخرى</option></select>
+<label>نوع الحساب</label>
+<div class="tabs" style="margin-bottom:6px">
+<button id="rSeller" class="on" onclick="setRole(1)">بائع (صاحب نشاط)</button>
+<button id="rBuyer" onclick="setRole(0)">مشتري (عميل)</button>
+</div>
+<label id="rNameLbl">اسم النشاط</label><input id="rName" placeholder="مثال: عيادة د. أحمد / سنتر النور">
+<label id="rTypeLbl">نوع النشاط</label><select id="rType"><option value="clinic">عيادة</option><option value="tutor">سنتر / دروس</option><option value="barber">حلاقة</option><option value="other">أخرى</option></select>
 </div>
 <label>رقم الموبايل</label><input id="aPhone" inputmode="tel" placeholder="01xxxxxxxxx">
 <label>كلمة السر</label><input id="aPass" type="password" placeholder="6 حروف على الأقل">
@@ -185,13 +190,56 @@ input:focus,select:focus{border-color:var(--p)}
 <div class="row" style="margin-bottom:6px"><h2 style="margin:0;flex:1">عربون الحجز 💰</h2><label class="sw"><input type="checkbox" id="depOn"><i></i></label></div>
 <div id="depBox" class="hide">
 <label>قيمة العربون (جنيه)</label><input type="number" id="depAmt" placeholder="مثال: 50" min="5">
-<label>رقم محفظة فodafone كاش اللي هيوصل عليها</label><input id="depWallet" inputmode="tel" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:left">
+<label>رقم محفظة فودافون كاش اللي هيوصل عليها</label><input id="depWallet" inputmode="tel" placeholder="01xxxxxxxxx" style="direction:ltr;text-align:left">
 <p class="muted" style="margin-top:6px">العميل هيشوف الرقم ده ويبعت العربون ويكتب رقم التحويل، وانت تؤكد الاستلام من لوحتك قبل ما الحجز يتثبت.</p>
 </div>
 <div class="err" id="sErr"></div><div class="okm" id="sOk"></div>
 <button class="btn" onclick="saveSettings()">حفظ الإعدادات</button>
 </div>
 </div>
+</div>
+
+<!-- ============ ACTIVATION ============ -->
+<div id="vActivate" class="hide">
+<div class="logo">BOOKLY<b>.</b></div>
+<div class="card" style="text-align:center">
+<div style="font-size:40px">⏳</div>
+<h2>حسابك مستني التفعيل</h2>
+<p class="muted">عشان تفعل حسابك كبائع، حوّل الاشتراك <b id="actPrice">—</b> جنيه على محفظة فودافون كاش:</p>
+<div class="codebox" id="actWallet" style="font-size:22px;letter-spacing:2px">—</div>
+<div id="actForm">
+<label>رقم التحويل / مرجع العملية</label><input id="actRef" placeholder="من رسالة التحويل" style="direction:ltr;text-align:left">
+<div class="err" id="actErr"></div>
+<button class="btn" onclick="submitActivation()">إرسال طلب التفعيل</button>
+</div>
+<div id="actWait" class="hide"><p class="okm">✅ طلبك اتبعت، وحسابك هيتفعل بعد مراجعة الدفع</p></div>
+<div id="actRej" class="hide"><p class="err">طلبك السابق اترفض، تأكد من التحويل وابعت تاني</p></div>
+<button class="btn ghost" onclick="logout()">خروج</button>
+</div>
+</div>
+
+<!-- ============ SUPER ADMIN ============ -->
+<div id="vAdmin" class="hide">
+<div class="top"><div><b>لوحة أدمن BOOKLY 👑</b><div class="muted">إدارة البائعين والاشتراكات</div></div>
+<button class="btn small ghost" onclick="logout()">خروج</button></div>
+<div class="statsRow" style="grid-template-columns:repeat(3,1fr)">
+<div class="statB"><b id="adSellers">0</b><span>بائعين</span></div>
+<div class="statB"><b id="adActive">0</b><span>مفعلين</span></div>
+<div class="statB"><b id="adPend">0</b><span>طلبات معلقة</span></div>
+</div>
+<div class="card"><h2>طلبات التفعيل 💰</h2><div id="adReqs"><div class="muted">بنجيب الطلبات...</div></div></div>
+<div class="card"><h2>إعدادات الاشتراك</h2>
+<label>سعر الاشتراك (جنيه)</label><input type="number" id="adPrice" min="0">
+<label>محفظة فودافون كاش للاستلام</label><input id="adWallet" inputmode="tel" style="direction:ltr;text-align:left">
+<div class="err" id="adErr"></div><div class="okm" id="adOk"></div>
+<button class="btn" onclick="saveAdminSettings()">حفظ الإعدادات</button></div>
+</div>
+
+<!-- ============ BUYER HOME ============ -->
+<div id="vBuyer" class="hide">
+<div class="top"><div><b id="buyName">—</b><div class="muted">حساب مشتري</div></div>
+<button class="btn small ghost" onclick="logout()">خروج</button></div>
+<div class="card"><h2>حجوزاتي 📅</h2><div id="buyList"><div class="muted">بنجيب حجوزاتك...</div></div></div>
 </div>
 
 <!-- ============ PUBLIC BOOKING ============ -->
@@ -217,7 +265,7 @@ input:focus,select:focus{border-color:var(--p)}
 <label>رقم الموبايل</label><input id="cPhone" inputmode="tel" placeholder="01xxxxxxxxx">
 <div id="depStep" class="dep hide">
 💰 الحجز بعربون <b id="depAmtShow"></b> جنيه
-<p class="muted" style="margin:6px 0">حوّل على محفظة فodafone كاش:</p>
+<p class="muted" style="margin:6px 0">حوّل على محفظة فودافون كاش:</p>
 <span class="num" id="depWalletShow"></span>
 <label>رقم التحويل / مرجع العملية</label><input id="cDepRef" placeholder="آخر 4 أرقام من رسالة التحويل" style="direction:ltr;text-align:left">
 </div>
@@ -266,7 +314,7 @@ const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء',
 const qp=new URLSearchParams(location.search);
 const pubBiz=qp.get('b'),pubSlug=qp.get('s'),pubCode=qp.get('code');
 const isPub=!!(pubBiz||pubSlug);
-function show(id){['vLand','vAuth','vDash','vBook','vDone','vStatus','vFind','pFooter'].forEach(v=>$(v).classList.add('hide'));if(id)$(id).classList.remove('hide');}
+function show(id){['vLand','vAuth','vDash','vActivate','vAdmin','vBuyer','vBook','vDone','vStatus','vFind','pFooter'].forEach(v=>$(v).classList.add('hide'));if(id)$(id).classList.remove('hide');}
 function normPhone(raw){let d=String(raw||'').replace(/[\s().-]/g,'');if(d.startsWith('00'))d='+'+d.slice(2);if(d.startsWith('01'))d='+20'+d.slice(1);else if(d.startsWith('20'))d='+'+d;else if(/^1[0125]\d{8}$/.test(d))d='+2'+d;return d;}
 const bkEmail=ph=>'bk'+ph.replace(/\D/g,'')+'@mahmoud-study.firebaseapp.com';
 function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -287,9 +335,13 @@ if(pw.length<6){$('aErr').textContent='كلمة السر 6 حروف على ال�
 $('aErr').textContent='...';
 try{
 if(regMode){
-const name=$('rName').value.trim();if(!name){$('aErr').textContent='اكتب اسم النشاط';return;}
+const name=$('rName').value.trim();if(!name){$('aErr').textContent=myRole==='seller'?'اكتب اسم النشاط':'اكتب اسمك';return;}
 const cr=await auth.createUserWithEmailAndPassword(bkEmail(ph),pw);
-await db.collection('bookly_businesses').add({ownerUid:cr.user.uid,name:name,type:$('rType').value,phone:ph,createdAt:firebase.firestore.FieldValue.serverTimestamp(),services:[],schedule:{days:[1,2,3,4,6],from:'10:00',to:'22:00',step:30,offDates:[],breakFrom:'',breakTo:''},deposit:{on:false,amount:0,wallet:''}});
+if(myRole==='seller'){
+await db.collection('bookly_businesses').add({ownerUid:cr.user.uid,name:name,type:$('rType').value,phone:ph,active:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),services:[],schedule:{days:[1,2,3,4,6],from:'10:00',to:'22:00',step:30,offDates:[],breakFrom:'',breakTo:''},deposit:{on:false,amount:0,wallet:''}});
+}else{
+await db.collection('bookly_buyers').doc(cr.user.uid).set({name:name,phone:ph,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+}
 }else{await auth.signInWithEmailAndPassword(bkEmail(ph),pw);}
 }catch(e){$('aErr').textContent=e.code==='auth/email-already-in-use'?'الرقم ده مسجل قبل كده، ادخل بيه':e.code==='auth/wrong-password'||e.code==='auth/invalid-credential'?'كلمة السر غلط':e.code==='auth/user-not-found'?'مفيش حساب بالرقم ده، اعمل حساب جديد':'حصل خطأ: '+e.code;}
 }
@@ -297,14 +349,23 @@ async function logout(){await auth.signOut();location.href=location.pathname;}
 
 /* ---------- DASHBOARD ---------- */
 let myBiz=null,myBizId=null,bkCache=[];
+const ADMIN_EMAIL='bk201558288143@mahmoud-study.firebaseapp.com';
 auth.onAuthStateChanged(async u=>{
 if(isPub)return;
 if(!u){show('vLand');return;}
+if(u.email===ADMIN_EMAIL){enterAdmin();return;}
 const q=await db.collection('bookly_businesses').where('ownerUid','==',u.uid).limit(1).get();
-if(q.empty){await auth.signOut();show('vAuth');$('aErr').textContent='مفيش نشاط مرتبط بالحساب ده';return;}
+if(!q.empty){
 myBiz={id:q.docs[0].id,...q.docs[0].data()};myBizId=q.docs[0].id;
-enterDash();
+if(myBiz.active===false){enterActivate();}else{enterDash();}
+return;
+}
+const bd=await db.collection('bookly_buyers').doc(u.uid).get();
+if(bd.exists){enterBuyer(bd.data());return;}
+await auth.signOut();show('vAuth');$('aErr').textContent='مفيش حساب مكتمل بالرقم ده';
 });
+let myRole='seller';
+function setRole(s){myRole=s?'seller':'buyer';$('rSeller').classList.toggle('on',!!s);$('rBuyer').classList.toggle('on',!s);$('rNameLbl').textContent=s?'اسم النشاط':'اسمك';$('rTypeLbl').classList.toggle('hide',!s);$('rType').classList.toggle('hide',!s);$('rName').placeholder=s?'مثال: عيادة د. أحمد / سنتر النور':'اسمك بالكامل';}
 function myLink(){return location.origin+location.pathname+(myBiz.slug?'?s='+myBiz.slug:'?b='+myBizId);}
 function enterDash(){
 $('dBizName').textContent=myBiz.name;$('dBizType').textContent=TYPES[myBiz.type]||myBiz.type;
@@ -441,6 +502,7 @@ PBID=sd.data().bizId;
 const d=await db.collection('bookly_businesses').doc(PBID).get();
 if(!d.exists)return deadLink();
 PB=d.data();
+if(PB.active===false)return pausedLink();
 $('pIcon').textContent=ICONS[PB.type]||'📅';$('pName').textContent=PB.name;$('pType').textContent=TYPES[PB.type]||'';
 $('pSvcs').innerHTML=(PB.services||[]).map(s=>`<span class="chip">${esc(s.name)}${s.price?' · '+esc(s.price)+'ج':''}</span>`).join('');
 $('svcPick').innerHTML=(PB.services||[]).map((s,i)=>`<div class="svc" style="cursor:pointer" onclick="pickSvc(${i},this)"><div class="row"><b>${esc(s.name)}</b><span class="muted" style="flex:0 0 auto;font-size:12px">${s.dur} دقيقة${s.price?' · '+esc(s.price)+' جنيه':''}</span></div></div>`).join('')||'<div class="muted">النشاط لسه مضافش خدمات</div>';
@@ -450,6 +512,7 @@ show('vBook');$('vFind').classList.remove('hide');$('pFooter').classList.remove(
 if(pubCode)findBooking(pubCode);
 }catch(e){deadLink();}
 }
+function pausedLink(){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>النشاط ده مش متاح حاليا ⏸️</h2></div>';}
 function deadLink(){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>اللينك ده مش شغال ❌</h2><p class="muted">اتأكد من اللينك مع صاحب النشاط</p></div>';}
 function pickSvc(i,el){selSvc=PB.services[i];document.querySelectorAll('#svcPick .svc').forEach(x=>x.style.borderColor='');el.style.borderColor='var(--p)';$('stepTime').classList.remove('hide');$('stepInfo').classList.remove('hide');loadSlots();}
 async function loadSlots(){
@@ -532,6 +595,85 @@ findBooking(code);
 }catch(e){alert('حصل خطأ، حاول تاني');}
 }
 function checkStatus(){const c=$('doneCode').textContent.trim();if(c)findBooking(c);}
+
+/* ---------- ACTIVATION ---------- */
+async function getSubSettings(){
+try{const d=await db.collection('bookly_settings').doc('main').get();if(d.exists)return d.data();}catch(e){}
+return {price:50,wallet:'+201558288143'};
+}
+async function enterActivate(){
+const st=await getSubSettings();
+$('actPrice').textContent=st.price;$('actWallet').textContent=st.wallet;
+try{
+const a=await db.collection('bookly_activations').doc(auth.currentUser.uid).get();
+if(a.exists){
+const st2=a.data().status;
+$('actForm').classList.toggle('hide',st2==='pending');
+$('actWait').classList.toggle('hide',st2!=='pending');
+$('actRej').classList.toggle('hide',st2!=='rejected');
+if(st2==='approved'){location.reload();return;}
+}
+}catch(e){}
+show('vActivate');
+}
+async function submitActivation(){
+const ref=$('actRef').value.trim();
+if(ref.length<2){$('actErr').textContent='اكتب رقم التحويل';return;}
+try{
+await db.collection('bookly_activations').doc(auth.currentUser.uid).set({bizId:myBizId,name:myBiz.name,phone:myBiz.phone,ref:ref.slice(0,60),status:'pending',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+$('actForm').classList.add('hide');$('actWait').classList.remove('hide');$('actRej').classList.add('hide');
+}catch(e){$('actErr').textContent='حصل خطأ، حاول تاني';}
+}
+
+/* ---------- SUPER ADMIN ---------- */
+async function enterAdmin(){
+show('vAdmin');
+const st=await getSubSettings();
+$('adPrice').value=st.price;$('adWallet').value=st.wallet;
+db.collection('bookly_activations').where('status','==','pending').onSnapshot(s=>{
+$('adPend').textContent=s.size;
+$('adReqs').innerHTML=s.empty?'<div class="muted">مفيش طلبات معلقة</div>':s.docs.map(d=>{const r=d.data();return `
+<div class="bk"><div class="top" style="margin:0 0 4px"><div><b>${esc(r.name)}</b> <span class="muted" style="font-size:12px">${esc(r.phone)}</span></div></div>
+<div class="muted" style="font-size:12px">مرجع التحويل: <b style="direction:ltr;display:inline-block">${esc(r.ref)}</b></div>
+<div class="row" style="margin-top:8px">
+<button class="btn small okb" onclick="approveSeller('${d.id}','${r.bizId}')">تفعيل ✅</button>
+<button class="btn small badb" onclick="rejectSeller('${d.id}')">رفض ❌</button></div></div>`;}).join('');
+});
+db.collection('bookly_businesses').onSnapshot(s=>{
+$('adSellers').textContent=s.size;
+$('adActive').textContent=s.docs.filter(d=>d.data().active!==false).length;
+});
+}
+async function approveSeller(uid,bizId){
+try{
+await db.collection('bookly_businesses').doc(bizId).update({active:true});
+await db.collection('bookly_activations').doc(uid).update({status:'approved'});
+}catch(e){alert('حصل خطأ: '+e.code);}
+}
+async function rejectSeller(uid){
+try{await db.collection('bookly_activations').doc(uid).update({status:'rejected'});}catch(e){alert('حصل خطأ');}
+}
+async function saveAdminSettings(){
+const price=+$('adPrice').value||0,wallet=normPhone($('adWallet').value);
+if(price<0||!wallet){$('adErr').textContent='راجع السعر ورقم المحفظة';return;}
+try{
+await db.collection('bookly_settings').doc('main').set({price:price,wallet:wallet});
+$('adErr').textContent='';$('adOk').textContent='تم الحفظ ✅';setTimeout(()=>$('adOk').textContent='',2000);
+}catch(e){$('adErr').textContent='حصل خطأ: '+e.code;}
+}
+
+/* ---------- BUYER ---------- */
+async function enterBuyer(b){
+$('buyName').textContent=b.name;
+show('vBuyer');
+try{
+const q=await db.collectionGroup('bookings').where('phone','==',b.phone).get();
+const list=q.docs.map(d=>d.data()).sort((a,b2)=>(b2.date+b2.time).localeCompare(a.date+a.time));
+$('buyList').innerHTML=list.length?list.map(x=>`
+<div class="bk"><div class="top" style="margin:0"><div><b>${esc(x.service)}</b> <span class="muted" style="font-size:12px">${x.date} ${t12(x.time)}</span></div>
+<span class="st ${SCLS[x.status]||'p'}">${STXT[x.status]||x.status}</span></div></div>`).join(''):'<div class="muted">لسه مفيش حجوزات برقمك. احجز من لينك أي نشاط بنفس رقمك وهتظهر هنا.</div>';
+}catch(e){$('buyList').innerHTML='<div class="muted">حصل خطأ في التحميل</div>';}
+}
 
 /* ---------- BOOT ---------- */
 if(isPub){bootPublic();}
