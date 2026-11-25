@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>امتحان المتتابعات الحسابية - MAHMOUD STUDY</title>
+<style>
+:root{--blue:#145da0;--blue2:#2479c8;--pale:#eaf4ff;--line:#c9def3;--ink:#12314d;--white:#fff}
+*{box-sizing:border-box} body{margin:0;background:#f4f9ff;color:var(--ink);font-family:Tahoma,Arial,sans-serif;line-height:1.8}
+header{background:var(--white);border-bottom:3px solid var(--blue);padding:22px 14px;text-align:center}
+.logo{width:142px;height:142px;border-radius:50%;object-fit:cover;border:4px solid var(--blue);padding:3px;background:#fff}
+h1{font-size:25px;margin:8px 0 0;color:var(--blue)} .sub{margin:0;color:#52718e}
+.wrap{max-width:900px;margin:22px auto;padding:0 14px}
+.panel,.question,.result{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 4px 14px #145da00d}
+.topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.timer{font-size:24px;font-weight:bold;color:var(--blue);background:var(--pale);border:1px solid var(--line);padding:6px 18px;border-radius:12px;direction:ltr}
+input[type=text],textarea{width:100%;border:1px solid #a9c9e8;border-radius:10px;padding:12px;font:inherit;color:var(--ink);background:#fff}
+label.name{display:block;font-weight:bold;margin-bottom:7px} .qhead{display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--blue);font-weight:bold;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:10px}
+.points{font-size:13px;background:var(--pale);padding:2px 10px;border-radius:20px;white-space:nowrap}
+.choice{display:block;padding:8px 12px;border:1px solid var(--line);border-radius:10px;margin:8px 0;cursor:pointer}
+.choice:hover{background:var(--pale)} input[type=radio]{accent-color:var(--blue);margin-left:8px}
+.feedback{display:none;margin-top:10px;padding:10px;border-radius:10px;background:var(--pale);border-right:4px solid var(--blue)}
+textarea{min-height:105px;resize:vertical} .model{background:#f5faff;border:1px dashed #8ab7e2;padding:12px;border-radius:10px;margin-top:10px}
+button{border:0;border-radius:12px;background:var(--blue);color:#fff;padding:13px 24px;font: bold 17px Tahoma;cursor:pointer}
+button:hover{background:var(--blue2)}button:disabled{opacity:.6;cursor:not-allowed}
+.actions{text-align:center;margin:24px 0}.result{display:none;border:2px solid var(--blue);text-align:center}.score{font-size:34px;font-weight:bold;color:var(--blue)}
+footer{text-align:center;padding:24px;color:#52718e}footer a{color:var(--blue);font-weight:bold;text-decoration:none}
+.small{font-size:13px;color:#52718e} .locked{opacity:.65;pointer-events:none}
+@media(max-width:560px){h1{font-size:21px}.logo{width:116px;height:116px}.panel,.question{padding:14px}}
+</style></head>
+<body>
+<header><img class="logo" src="icon-192.png" alt="MAHMOUD STUDY"><h1>امتحان المتتابعات الحسابية</h1><p class="sub">MAHMOUD STUDY • نظّم وقتك، ذاكر بذكاء</p></header>
+<main class="wrap">
+<section class="panel">
+<div class="topbar"><div><strong>المدة المحددة: ساعة واحدة</strong><div class="small">يبدأ المؤقت تلقائيًا عند فتح الامتحان.</div></div><div class="timer" id="timer">01:00:00</div></div>
+<div style="margin-top:14px"><label class="name" for="student">اسم الطالب</label><input id="student" type="text" placeholder="اكتب اسمك كاملًا" autocomplete="name"></div>
+</section>
+<div id="exam"></div>
+<div class="actions"><button id="submitBtn" onclick="finishExam(false)">عرض النتيجة</button></div>
+<section class="result" id="result"><h2>نتيجة الامتحان</h2><div id="studentResult"></div><div class="score" id="score"></div><div id="percent"></div><p id="status"></p><button onclick="window.print()">طباعة النتيجة</button></section>
+</main>
+<footer>© MAHMOUD STUDY</footer>
+<script>
+const questions=[{"n": 1, "type": "essay", "q": "أوجد رتبة الحد الذي قيمته ٤٣ في المتتابعة الحسابية: ٣ ، ٧ ، ١١ ، ١٥ ، ...", "model": "المعطيات: أ = ٣ ، د = ٤ ، ح ن = ٤٣. القانون: ح ن = أ + (ن − ١) د. بالتعويض: ٤٣ = ٣ + (ن − ١) × ٤ ⟹ ٤٠ = ٤(ن − ١) ⟹ ن = ١١. رتبة الحد هي الحادي عشر.", "keys": ["٤٣", "٣", "٤", "١١", "رتبة", "الحادي عشر"], "points": 1}, {"n": 2, "type": "essay", "q": "متتابعة حسابية حدها الثالث ١١ وحدها السابع ٢٣. أوجد الحد الأول أ والأساس د.", "model": "ح٣ = أ + ٢د = ١١ ، ح٧ = أ + ٦د = ٢٣. بطرح المعادلتين: ٤د = ١٢ ⟹ د = ٣. بالتعويض: أ + ٦ = ١١ ⟹ أ = ٥. إذن الحد الأول ٥ والأساس ٣.", "keys": ["١١", "٢٣", "٤د", "١٢", "د", "٣", "أ", "٥"], "points": 1}, {"n": 3, "type": "essay", "q": "أوجد الحد العام للمتتابعة الحسابية التي حدها الثالث يساوي ١٥ وحدها الثامن يساوي ٥٥.", "model": "ح٣ = أ + ٢د = ١٥ ، ح٨ = أ + ٧د = ٥٥. بطرح المعادلتين: ٥د = ٤٠ ⟹ د = ٨. بالتعويض: أ + ١٦ = ١٥ ⟹ أ = −١. الحد العام: ح ن = أ + (ن − ١)د = −١ + ٨(ن − ١) = ٨ن − ٩.", "keys": ["١٥", "٥٥", "٥د", "٤٠", "د", "٨", "أ", "−١", "٨ن", "٩"], "points": 1}, {"n": 4, "type": "mcq", "q": "مجموع الحدود السبعة الأولى لمتتابعة حسابية حدها الأول ٩ وحدها الأخير ٢٣ يساوي:", "opts": ["٧٠", "١١٢", "١٤٠", "٢٢٤"], "correct": 2, "points": 1}, {"n": 5, "type": "mcq", "q": "معامل [س⁶ ص] في مفكوك (٣ص − ٢س)⁷ يساوي:", "opts": ["٤٤٨", "١٣٤٤", "−١٣٤٤", "−٢٠١٦"], "correct": 1, "points": 1}, {"n": 6, "type": "mcq", "q": "معامل [أ² ب³ ج³] في مفكوك (٣ج + ب − ٢أ)⁸ يساوي:", "opts": ["−١٣٤٤٠", "١٣٤٤٠", "٤٤٨٠", "−٤٤٨٠"], "correct": 0, "points": 1}, {"n": 7, "type": "essay", "q": "أثبت أن: قⁿ(−٢) = قⁿ(ن) − ٣قⁿ(ن−١) + ٣قⁿ(ن−٢) − قⁿ(ن−٣).", "model": "من مفكوك ذات الحدين: (س + ١)ⁿ = قⁿ₀ + قⁿ₁س + ... + قⁿₙسⁿ. بوضع س = −٣ نحصل على مفكوك الحدود بالتناوب، ومنه تتحقق العلاقة المطلوبة وفق صيغة السؤال.", "keys": ["مفكوك", "ذات الحدين", "س", "−٣", "بالتناوب", "العلاقة", "ق", "ن"], "points": 1}, {"n": 8, "type": "essay", "q": "أوجد ناتج وباقي القسمة عند قسمة كثيرة الحدود الموضحة بالسؤال: ٦ + ٧س − ٣س² + ٣س³ على ٣س − ٢س² + س³.", "model": "الناتج: ٢ − س ، والباقي: صفر.", "keys": ["الناتج", "٢", "س", "الباقي", "صفر"], "points": 1}, {"n": 9, "type": "essay", "q": "بسط المقدار: (س − ٢)/(س − ١) − (س + ٢)/س.", "model": "بتوحيد المقامات والتبسيط يكون الناتج: (٣س − ٢) / [س(س − ١)].", "keys": ["٣س", "٢", "س", "س", "١", "المقام", "التبسيط"], "points": 1}, {"n": 10, "type": "essay", "q": "إذا كان: د + (١ + ج س)² + (١ + ب س)³ + (١ + أ س)⁴ = ٦ + ٣س³، فأوجد أ، ب، ج، د.", "model": "بفك الأقواس ومساواة معاملات القوى المتشابهة: معامل س⁴ يعطي أ = ١، ومعامل س³ يعطي ب = −٣، ومعامل س² يعطي ج = ٣، والحد المطلق يعطي د = ٥. إذن أ = ١ ، ب = −٣ ، ج = ٣ ، د = ٥.", "keys": ["أ", "١", "ب", "−٣", "ج", "٣", "د", "٥"], "points": 1}, {"n": 11, "type": "essay", "q": "أثبت المتطابقة: (صع − سل)² + (صل + سع)² = (ل² + ص²)(ع² + س²).", "model": "بفك الطرف الأيسر: ص²ع² − ٢ص²عل + ص²ل² + ص²ل² + ٢ص²لع + س²ع². يختفي الحدّان المتعاكسان، فيتبقى ص²ع² + ص²ل² + س²ل² + س²ع²، وهو يساوي (ل² + ص²)(ع² + س²). إذن المتطابقة صحيحة.", "keys": ["فك", "الطرف الأيسر", "يتبقى", "ص", "ع", "ل", "س", "الطرف الأيمن", "المتطابقة", "صحيحة"], "points": 1}, {"n": 12, "type": "essay", "q": "إذا كان د + ب + ج + أ = ٠، فأثبت العلاقة الجبرية الواردة في السؤال باستخدام التعويض من المعطى وأخذ مكعب الطرفين.", "model": "بما أن د + ب = −(ج + أ)، نأخذ مكعب الطرفين، ثم نستخدم متطابقة مكعب مجموع حدين ونُعوّض بالعلاقة المعطاة. بعد فك الأقواس وتجميع الحدود المتشابهة ينتج تساوي الطرفين، وهو المطلوب إثباته.", "keys": ["د", "ب", "ج", "أ", "صفر", "−", "مكعب", "مجموع", "حدين", "التعويض", "فك", "الأقواس", "تساوي", "الطرفين"], "points": 1}, {"n": 13, "type": "essay", "q": "إذا كان ٥ : ٣ : ٢ = ع : ص : س، فأوجد قيمة المقدار الكسري الموضح في السؤال.", "model": "نفرض أن ع = ٢ك ، ص = ٣ك ، س = ٥ك (بحسب ترتيب النسبة في السؤال)، ثم نعوّض بهذه القيم في البسط والمقام ونختصر العامل المشترك ك. تُقبل الإجابة الصحيحة المكافئة الناتجة من التعويض.", "keys": ["ك", "ع", "ص", "س", "٢", "٣", "٥", "التعويض", "البسط", "المقام", "نختصر"], "points": 1}];
+const exam=document.getElementById('exam');
+questions.forEach(q=>{
+ const box=document.createElement('section');box.className='question';box.id='q'+q.n;
+ let body='';
+ if(q.type==='mcq'){
+  body=q.opts.map((o,i)=>`<label class="choice"><input type="radio" name="q${q.n}" value="${i}" onchange="checkMCQ(${q.n})"> ${String.fromCharCode(1571+i)}) ${o}</label>`).join('');
+  body+=`<div class="feedback" id="fb${q.n}"></div>`;
+ } else {
+  body=`<textarea id="ans${q.n}" placeholder="اكتب إجابتك هنا..."></textarea><div class="feedback" id="fb${q.n}"></div>`;
+ }
+ box.innerHTML=`<div class="qhead"><span>السؤال ${q.n} (${q.type==='mcq'?'اختياري':'مقالي'})</span><span class="points">${q.points} درجة</span></div><div>${q.q}</div><div style="margin-top:12px">${body}</div>`;
+ exam.appendChild(box);
+});
+let remaining=3600, ended=false, timerId;
+function renderTimer(){
+ const h=String(Math.floor(remaining/3600)).padStart(2,'0');
+ const m=String(Math.floor((remaining%3600)/60)).padStart(2,'0');
+ const s=String(remaining%60).padStart(2,'0');
+ document.getElementById('timer').textContent=`${h}:${m}:${s}`;
+}
+function checkMCQ(n){
+ if(ended)return;
+ const q=questions.find(x=>x.n===n), selected=document.querySelector(`input[name="q${n}"]:checked`);
+ if(!selected)return;
+ const fb=document.getElementById('fb'+n), ok=Number(selected.value)===q.correct;
+ fb.style.display='block';fb.innerHTML=ok?`إجابة صحيحة ✓ — درجتك: ${q.points} / ${q.points}`:`إجابة غير صحيحة ✕ — الدرجة: 0 / ${q.points}<br>الإجابة الصحيحة: ${q.opts[q.correct]}`;
+}
+function normalize(s){
+ return s.toLowerCase().replace(/[أإآ]/g,'ا').replace(/[ىي]/g,'ي').replace(/[ة]/g,'ه')
+ .replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[ًٌٍَُِّْـ]/g,'')
+ .replace(/[^ء-ي0-9\-]/g,' ').replace(/\s+/g,' ').trim();
+}
+function essayScore(q,answer){
+ const a=normalize(answer); if(!a)return 0;
+ const keys=q.keys.map(normalize);
+ let hit=0;
+ keys.forEach(k=>{if(k && a.includes(k))hit++;});
+ const ratio=hit/keys.length;
+ if(ratio>=0.78)return q.points;
+ if(ratio>=0.48)return Math.round(q.points*0.5*100)/100;
+ if(ratio>=0.25)return Math.round(q.points*0.25*100)/100;
+ return 0;
+}
+function finishExam(auto){
+ if(ended)return;
+ if(!auto && !document.getElementById('student').value.trim()){alert('من فضلك اكتب اسم الطالب أولًا.');document.getElementById('student').focus();return;}
+ ended=true;clearInterval(timerId);
+ let total=0, earned=0;
+ questions.forEach(q=>{
+  total+=q.points;
+  const fb=document.getElementById('fb'+q.n);
+  if(q.type==='mcq'){
+   const selected=document.querySelector(`input[name="q${q.n}"]:checked`);
+   const ok=selected && Number(selected.value)===q.correct;
+   if(ok)earned+=q.points;
+   fb.style.display='block';
+   fb.innerHTML=`${ok?'إجابة صحيحة ✓':'الإجابة غير صحيحة ✕'} — الدرجة: ${ok?q.points:0} / ${q.points}<br>الإجابة الصحيحة: ${q.opts[q.correct]}`;
+  } else {
+   const val=document.getElementById('ans'+q.n).value;
+   const pts=essayScore(q,val);earned+=pts;
+   fb.style.display='block';
+   fb.innerHTML=`درجة السؤال: ${pts} / ${q.points}<div class="model"><strong>الإجابة النموذجية:</strong><br>${q.model}</div>`;
+  }
+ });
+ document.querySelectorAll('input,textarea').forEach(el=>el.disabled=true);
+ document.getElementById('submitBtn').disabled=true;
+ document.getElementById('studentResult').textContent='الطالب: '+(document.getElementById('student').value.trim()||'غير مسجل');
+ document.getElementById('score').textContent=`${earned} / ${total}`;
+ document.getElementById('percent').textContent=`النسبة المئوية: ${Math.round(earned/total*100)}٪`;
+ document.getElementById('status').textContent=auto?'انتهى الوقت وتم تسليم إجاباتك تلقائيًا.':'تم تسليم الامتحان بنجاح.';
+ document.getElementById('result').style.display='block';
+ document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+renderTimer();
+timerId=setInterval(()=>{if(ended)return;remaining--;renderTimer();if(remaining<=0)finishExam(true);},1000);
+</script></body></html>
