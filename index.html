@@ -2370,7 +2370,7 @@ try{renderPlatform()}catch(_){}
 #arena .ar-row{display:flex;align-items:center;gap:10px;background:#0b0f0c;border:1px solid #29332c;border-radius:12px;padding:10px;margin:6px 0}
 #arena .ar-row.me{border-color:var(--green);background:#0d1a12}
 #arena .ar-rank{min-width:30px;text-align:center;font-weight:800;color:var(--gold)}
-#arena .ar-name{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#arena .ar-name{flex:1;min-width:0;color:#f4f7f4;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #arena .ar-pts{font-weight:800;color:var(--green);direction:ltr}
 .ar-entry{cursor:pointer;border-color:#1f6b43!important}
 </style>
@@ -2400,9 +2400,13 @@ async function persist(){
 }
 async function pushScore(){
   try{
-    if(!cloud||!cloud.ready)return;
+    if(!cloud||!cloud.ready||!AR.uid)return;
     const s=AR.st,nm=((db.profile&&db.profile.name)||studentAuth.currentUser.displayName||'طالب').slice(0,40)||'طالب';
-    await cloud.store.collection('publicScores').doc(AR.uid).set({uid:AR.uid,name:nm,points:s.points|0,exams:s.exams|0,streak:s.streak|0,weekKey:s.week.key||'',weekPoints:s.week.points|0,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+    const pref=cloud.store.collection('publicScores').doc(AR.uid);let old=null;try{const g=await pref.get();if(g.exists)old=g.data()}catch(_){}
+    const bp=old?(old.points|0):0,be=old?(old.exams|0):0;
+    const tp=Math.min(s.points|0,bp+(old?300:300)),te=Math.max(be,Math.min(s.exams|0,5000));
+    const wp=Math.min(s.week.points|0,tp>300&&!old?300:50000);
+    await pref.set({uid:AR.uid,name:nm,points:tp,exams:te,streak:Math.min(s.streak|0,3650),weekKey:s.week.key||'',weekPoints:wp,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
     AR.wOk=true;
   }catch(e){AR.wOk=false;console.warn('arena score',e&&e.code)}
 }
@@ -2441,7 +2445,7 @@ function paint(){
   set('arRankLine',idx>=0?'ترتيبك: '+(idx+1)+' من '+list.length:'—');
   b.innerHTML=list.length?list.map((x,i)=>'<div class="ar-row'+(x.uid===me?' me':'')+'"><span class="ar-rank">'+(i<3?['🥇','🥈','🥉'][i]:i+1)+'</span><span class="ar-name">'+esc(String(x.name||'طالب'))+(x.uid===me?' (أنت)':'')+'</span><span class="ar-pts">'+(x.points|0)+'</span></div>').join(''):'<p class="muted">لسه مفيش نتائج. كن أول واحد!</p>';
 }
-async function open(){await load();paint();await loadBoard();paint()}
+async function open(){await load();paint();if(AR.st&&AR.st.points>0)await pushScore();await loadBoard();paint()}
 window.arenaOpen=open;
 const _go=go;go=function(id){_go(id);if(id==='arena')open()};
 const _sp=submitPlatformExam;
