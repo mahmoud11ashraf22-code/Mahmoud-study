@@ -91,6 +91,10 @@ input:focus,select:focus{outline:none;border-color:var(--primary)}
 .wallet{background:linear-gradient(110deg,#12261c,#101a15);border:1px solid var(--primary);border-radius:var(--r);padding:22px;text-align:center;margin-bottom:16px}
 .wallet .bal{font-size:40px;font-weight:800;color:var(--gold)}
 .wallet .lbl{color:var(--muted);font-size:13px}
+.ntf{padding:9px 4px;border-bottom:1px solid var(--line);font-size:13.5px;cursor:pointer}
+.ntf:last-child{border-bottom:0}
+.ntf.unseen{font-weight:700;border-inline-start:3px solid var(--green);padding-inline-start:8px}
+.ntf-time{display:block;color:var(--muted);font-size:11px;font-weight:400;margin-top:2px}
 .faq{border-bottom:1px solid var(--line);padding:10px 2px}
 .faq:last-child{border-bottom:0}
 .faq summary{cursor:pointer;font-weight:700;font-size:14.5px}
@@ -138,7 +142,8 @@ a{color:var(--green);text-decoration:none}
 
 <div id="dashSec" class="hidden">
 <div id="notifBar" class="hidden"></div>
-<div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><span style="display:flex;gap:12px;align-items:center"><button id="shareBtn" style="color:var(--green)">📤 شارك المنصة</button><button id="logoutBtn">تسجيل خروج</button></span></div>
+<div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><span style="display:flex;gap:12px;align-items:center"><button id="notifBtn" onclick="toggleNotifPanel()" style="color:var(--gold);position:relative">🔔<span id="notifCount" class="hidden" style="position:absolute;top:-7px;left:-7px;background:var(--red);color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;font-weight:800"></span></button><button id="shareBtn" style="color:var(--green)">📤 شارك المنصة</button><button id="logoutBtn">تسجيل خروج</button></span></div>
+<div id="notifPanel" class="panel hidden"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b>🔔 إشعاراتك</b><button class="copy" onclick="try{localStorage.setItem('bsn_'+ME.uid,'[]')}catch(_){}renderNotifInbox()">مسح الكل 🗑️</button></div><div id="notifInbox"></div></div>
 <div class="wallet"><div class="lbl">رصيد محفظتك</div><div class="bal" id="uBal">0</div><div class="lbl">جنيه</div></div>
 
 <h3 class="sec">💳 شحن المحفظة</h3>
@@ -277,7 +282,16 @@ auth.onAuthStateChanged(user=>{
 function stopDash(){[unsubProfile,unsubOrders,unsubTopups].forEach(u=>{try{u&&u()}catch(_){}});unsubProfile=unsubOrders=unsubTopups=null;$('dashSec').classList.add('hidden');$('pubSec').classList.add('hidden');$('authSec').classList.remove('hidden')}
 let lastOrders=[],lastTopups=[],lastOrderData={};
 function reorder(id){const o=lastOrderData[id];if(!o)return;$('fService').value=o.serviceId;renderQty();$('fQty').value=String(o.quantity);$('fLink').value=o.accountLink||'';calc();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
-function notify(msg){const b=$('notifBar');if(!b)return;b.innerHTML=msg+' <span style="cursor:pointer;font-weight:900;margin-inline-start:8px" onclick="this.parentElement.classList.add(\'hidden\')">✕</span>';b.classList.remove('hidden');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.add('hidden'),12000)}
+function notify(msg){const b=$('notifBar');if(!b)return;b.innerHTML=msg+' <span style="cursor:pointer;font-weight:900;margin-inline-start:8px" onclick="this.parentElement.classList.add(\'hidden\')">✕</span>';b.classList.remove('hidden');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.add('hidden'),12000);
+ try{if(ME){const k='bsn_'+ME.uid;let l=[];try{l=JSON.parse(localStorage.getItem(k)||'[]')}catch(_){}
+ l.unshift({msg,t:Date.now(),seen:false});l=l.slice(0,15);localStorage.setItem(k,JSON.stringify(l));renderNotifInbox()}}catch(_){}}
+function renderNotifInbox(){const box=$('notifInbox');if(!box||!ME)return;let l=[];try{l=JSON.parse(localStorage.getItem('bsn_'+ME.uid)||'[]')}catch(_){}
+ const unseen=l.filter(n=>!n.seen).length;
+ $('notifCount').textContent=unseen?unseen:'';
+ $('notifCount').classList.toggle('hidden',!unseen);
+ box.innerHTML=l.length?l.map((n,i)=>`<div class="ntf ${n.seen?'':'unseen'}" onclick="ntfSeen(${i})">${n.msg}<span class="ntf-time">${new Date(n.t).toLocaleString('ar-EG')}</span></div>`).join(''):'<div class="note">مفيش إشعارات لسه.</div>'}
+function ntfSeen(i){try{const k='bsn_'+ME.uid;let l=JSON.parse(localStorage.getItem(k)||'[]');if(l[i])l[i].seen=true;localStorage.setItem(k,JSON.stringify(l));renderNotifInbox()}catch(_){}}
+function toggleNotifPanel(){const p=$('notifPanel');p.classList.toggle('hidden');if(!p.classList.contains('hidden'))renderNotifInbox()}
 function stepsHtml(st){if(st==='rejected')return `<div class="steps"><div class="st on" style="color:#f55d5d">❌ الطلب اترفض • الرصيد رجع لمحفظتك</div></div>`;const i=st==='done'?3:st==='in-progress'?2:1;return `<div class="steps"><div class="st ${i>=1?'on':''}">🕐 قيد الانتظار</div><div class="st ${i>=2?'on':''}">⚙️ قيد التنفيذ</div><div class="st ${i>=3?'on':''}">✅ تم التنفيذ</div></div>`}
 function renderTx(){
  if(!$('myTx'))return;
@@ -395,19 +409,23 @@ function startAdmin(){
  if(unsubAdmin)unsubAdmin();
  if(curView==='stats'){
   $('adminList').innerHTML='<div class="note" style="text-align:center;padding:20px">جارٍ حساب الإحصائيات...</div>';
-  Promise.all([store.collection('boostOrders').limit(500).get(),store.collection('boostTopups').where('status','==','approved').limit(500).get()]).then(([os,ts])=>{
+  Promise.all([store.collection('boostOrders').limit(500).get(),store.collection('boostTopups').where('status','==','approved').limit(500).get()]).then(async([os,ts])=>{
    const nw=new Date();const day0=new Date(nw.getFullYear(),nw.getMonth(),nw.getDate()).getTime()/1000;const week0=day0-6*86400;
    let today=0,week=0,total=0,cnt={};let charged=0,chargedN=0;
-   os.docs.forEach(d=>{const o=d.data();if(o.status==='rejected')return;const sc=o.createdAt?.seconds||0;total+=o.price||0;if(sc>=day0)today+=o.price||0;if(sc>=week0)week+=o.price||0;cnt[o.service]=(cnt[o.service]||0)+1});
+   const byUser={};
+   os.docs.forEach(d=>{const o=d.data();if(o.status==='rejected')return;const sc=o.createdAt?.seconds||0;total+=o.price||0;if(sc>=day0)today+=o.price||0;if(sc>=week0)week+=o.price||0;cnt[o.service]=(cnt[o.service]||0)+1;byUser[o.uid]=(byUser[o.uid]||0)+(o.price||0)});
    ts.docs.forEach(d=>{charged+=d.data().amount||0;chargedN++});
    const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+   const topUids=Object.entries(byUser).sort((a,b)=>b[1]-a[1]).slice(0,3);
+   const unames={};await Promise.all(topUids.map(async([u])=>{try{const ud=await store.collection('boostUsers').doc(u).get();if(ud.exists)unames[u]=ud.data().name||ud.data().phone||u.slice(0,8)}catch(_){unames[u]=u.slice(0,8)}}));
    $('adminList').innerHTML=`<div class="stat-grid">
     <div class="stat"><b>${money(today)}</b><span>💰 مبيعات اليوم</span></div>
     <div class="stat"><b>${money(week)}</b><span>📅 مبيعات آخر ٧ أيام</span></div>
     <div class="stat"><b>${money(total)}</b><span>🛒 إجمالي المبيعات (${fmt(os.docs.length)} طلب)</span></div>
     <div class="stat"><b>${money(charged)}</b><span>💳 إجمالي الشحنات (${fmt(chargedN)} عملية)</span></div>
    </div>
-   <div class="row-item"><div class="top"><b>🏆 أكتر خدمة متطلبة</b></div><div class="meta">${top?esc(top[0])+' • '+fmt(top[1])+' طلب':'لسه مفيش طلبات'}</div></div>`;
+   <div class="row-item"><div class="top"><b>🏆 أكتر خدمة متطلبة</b></div><div class="meta">${top?esc(top[0])+' • '+fmt(top[1])+' طلب':'لسه مفيش طلبات'}</div></div>
+   <div class="row-item"><div class="top"><b>⭐ أفضل العملاء</b></div><div class="meta">${topUids.length?topUids.map(([u,v],i)=>['🥇','🥈','🥉'][i]+' '+esc(unames[u]||u.slice(0,8))+' • '+money(v)).join('<br>'):'لسه مفيش طلبات'}</div></div>`;
   }).catch(e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
   return;
  }
