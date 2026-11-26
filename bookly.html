@@ -304,7 +304,7 @@ select option{background:#0e2118;color:var(--txt)}
 </div>
 <div id="selSum" class="muted" style="text-align:center;margin:10px 0 2px;min-height:20px;font-weight:700"></div>
 <div class="err" id="bErr"></div>
-<button class="btn" onclick="submitBooking()">تأكيد الحجز ✅</button>
+<button class="btn" id="bSubmit" onclick="submitBooking()">تأكيد الحجز ✅</button>
 </div>
 </div>
 
@@ -419,6 +419,7 @@ show('vDash');listenBookings();
 }
 function dashTab(n){[1,2,3].forEach(i=>{$('tb'+i).classList.toggle('on',i===n);$('dp'+i).classList.toggle('hide',i!==n);});}
 function toast(m,bad){const t=$('toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(t._h);t._h=setTimeout(()=>t.className='',2600);}
+function copyTxt(t,el){navigator.clipboard?.writeText(t);const o=el.textContent;el.textContent='تم ✅';setTimeout(()=>el.textContent=o,1200);}
 function copyCode(el){navigator.clipboard?.writeText($('doneCode').textContent.trim());el.textContent='اتنسخ ✅';setTimeout(()=>el.textContent='انسخ الكود 📋',1500);}
 function shareLink(){const l=$('myLink').value;window.open('https://wa.me/?text='+encodeURIComponent('احجز معادك أونلاين من هنا 👇\n'+l),'_blank');}
 function waActivation(){const ref=$('actRef').value.trim()||'(هكتب المرجع)';const w=($('actWallet').textContent||'').replace(/[^0-9]/g,'');
@@ -479,6 +480,7 @@ $('bkList').innerHTML=list.map(b=>`
 <div><b>${esc(b.name)}</b> <span class="muted" style="font-size:12px">${esc(b.phone)}</span></div>
 <span class="st ${SCLS[b.status]||'p'}">${STXT[b.status]||b.status}</span></div>
 <div class="muted" style="font-size:13px">${esc(b.service)} — ${b.date} الساعة ${t12(b.time)}</div>
+<div class="row" style="margin-top:6px"><a class="btn small ghost" target="_blank" href="https://wa.me/${String(b.phone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent('أهلا '+b.name+'، معاك '+(myBiz.name||'')+' بخصوص حجزك: '+b.service+' يوم '+b.date+' الساعة '+t12(b.time))}">واتساب 💬</a><a class="btn small ghost" href="tel:${esc(b.phone)}">اتصال 📞</a></div>
 ${b.status==='awaiting_deposit'?`<div class="muted" style="font-size:12px;margin-top:4px">💰 مرجع التحويل: <b style="direction:ltr;display:inline-block">${esc(b.depositRef||'—')}</b></div>`:''}
 ${b.status==='awaiting_deposit'?`<div class="row" style="margin-top:8px"><button class="btn small warnb" onclick="setStatus('${b.id}','confirmed')">استلمت العربون — تأكيد 💰✅</button><button class="btn small badb" onclick="setStatus('${b.id}','cancelled')">إلغاء ❌</button></div>`
 :b.status!=='cancelled'?`<div class="row" style="margin-top:8px"><button class="btn small okb" onclick="setStatus('${b.id}','confirmed')">تأكيد ✅</button><button class="btn small badb" onclick="setStatus('${b.id}','cancelled')">إلغاء ❌</button></div>`:''}
@@ -593,11 +595,11 @@ const name=$('cName').value.trim(),ph=normPhone($('cPhone').value),ds=$('bDate')
 if(!selSvc){$('bErr').textContent='اختار الخدمة الأول';return;}
 if(!selSlot){$('bErr').textContent='اختار المعاد';return;}
 if(!name){$('bErr').textContent='اكتب اسمك';return;}
-if(!ph||ph.length<10){$('bErr').textContent='اكتب رقم موبايل صحيح';return;}
+if(!ph||!/^\+201[0125]\d{8}$/.test(ph)){$('bErr').textContent='اكتب رقم موبايل مصري صحيح (11 رقم يبدأ بـ 01)';return;}
 const needDep=PB.deposit&&PB.deposit.on;
 const depRef=needDep?$('cDepRef').value.trim():'';
 if(needDep&&!depRef){$('bErr').textContent='اكتب رقم التحويل عشان نكمل الحجز';return;}
-$('bErr').textContent='...';
+$('bErr').textContent='';const bSub=$('bSubmit');bSub.disabled=true;bSub.textContent='ثواني... ⏳';
 const code=genCode(),slotId=ds+'_'+selSlot;
 const slotRef=db.collection('bookly_businesses').doc(PBID).collection('slots').doc(slotId);
 const bkRef=db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code);
@@ -611,8 +613,8 @@ tx.set(slotRef,{date:ds,time:selSlot,code:code});
 tx.set(bkRef,data);
 });
 }catch(e){
-if(e==='taken'){$('bErr').textContent='المعاد ده اتحجز للأسف، اختار معاد تاني';loadSlots();return;}
-$('bErr').textContent='حصل خطأ، حاول تاني';return;
+if(e==='taken'){$('bErr').textContent='المعاد ده اتحجز للأسف، اختار معاد تاني';bSub.disabled=false;bSub.textContent='تأكيد الحجز ✅';loadSlots();return;}
+$('bErr').textContent='حصل خطأ، حاول تاني';bSub.disabled=false;bSub.textContent='تأكيد الحجز ✅';return;
 }
 try{
 if(auth.currentUser){await db.collection('bookly_buyers').doc(auth.currentUser.uid).collection('bookings').doc(code).set({bizId:PBID,code:code,createdAt:firebase.firestore.FieldValue.serverTimestamp()});}
@@ -734,7 +736,7 @@ x._bizName=bizNames[pd.bizId];rows.push(x);}}catch(e){}}
 const list=rows.sort((a,b2)=>(b2.date+b2.time).localeCompare(a.date+a.time));
 $('buyList').innerHTML=list.length?list.map(x=>`
 <div class="bk"><div class="top" style="margin:0"><div><b>${esc(x.service)}</b>${x._bizName?' <span class="muted" style="font-size:12px">@ '+esc(x._bizName)+'</span>':''} <span class="muted" style="font-size:12px">${x.date} ${t12(x.time)}</span></div>
-<span class="st ${SCLS[x.status]||'p'}">${STXT[x.status]||x.status}</span></div></div>`).join(''):'<div class="muted">لسه مفيش حجوزات برقمك. احجز من لينك أي نشاط بنفس رقمك وهتظهر هنا.</div>';
+<span class="st ${SCLS[x.status]||'p'}">${STXT[x.status]||x.status}</span></div><div class="muted" style="font-size:12px;margin-top:5px">كود الحجز: <b style="direction:ltr;display:inline-block">${esc(x.code)}</b> <a href="#" onclick="copyTxt('${esc(x.code)}',this);return false" style="color:var(--p)">نسخ 📋</a></div></div>`).join(''):'<div class="muted">لسه مفيش حجوزات برقمك. احجز من لينك أي نشاط بنفس رقمك وهتظهر هنا.</div>';
 }catch(e){$('buyList').innerHTML='<div class="muted">حصل خطأ في التحميل</div>';}
 }
 
