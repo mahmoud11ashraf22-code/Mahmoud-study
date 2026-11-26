@@ -167,7 +167,7 @@ details p{color:var(--m);font-size:13px;margin:6px 0 2px;line-height:1.7}
 <label id="rTypeLbl">نوع النشاط</label><select id="rType"><option value="clinic">عيادة</option><option value="tutor">سنتر / دروس</option><option value="barber">حلاقة</option><option value="other">أخرى</option></select>
 </div>
 <label>رقم الموبايل</label><input id="aPhone" inputmode="tel" placeholder="01xxxxxxxxx">
-<label>كلمة السر</label><input id="aPass" type="password" placeholder="6 حروف على الأقل">
+<label>كلمة السر</label><input id="aPass" type="password" placeholder="6 حروف على الأقل" onkeydown="if(event.key==='Enter')doLogin()">
 <div class="err" id="aErr"></div>
 <button class="btn" id="aBtn" onclick="doLogin()">دخول</button>
 <button class="btn ghost" onclick="show('vLand')">رجوع</button>
@@ -337,6 +337,7 @@ details p{color:var(--m);font-size:13px;margin:6px 0 2px;line-height:1.7}
 <button class="btn okb" onclick="copyCode(this)">انسخ الكود 📋</button>
 <button class="btn warnb" onclick="shareDone()">شارك الحجز واتساب 📤</button>
 <button class="btn ghost" onclick="checkStatus()">متابعة الحجز</button>
+<button class="btn ghost" onclick="location.href=location.pathname+(location.search.replace(/[?&]code=[^&]*/,'')||'')">احجز معاد تاني 🔁</button>
 </div>
 </div>
 <div id="vStatus" class="hide">
@@ -349,10 +350,10 @@ details p{color:var(--m);font-size:13px;margin:6px 0 2px;line-height:1.7}
 </div>
 <div class="card hide" id="vFind">
 <h2>عندك كود حجز؟</h2>
-<div class="row"><input id="findCode" placeholder="مثال: AB12CD34" style="direction:ltr;text-align:left"><button class="btn small" style="flex:0 0 auto" onclick="findBooking()">بحث</button></div>
+<div class="row"><input id="findCode" placeholder="مثال: AB12CD34" style="direction:ltr;text-align:left" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')findBooking()"><button class="btn small" style="flex:0 0 auto" onclick="findBooking()">بحث</button></div>
 <div class="err" id="fErr"></div>
 </div>
-<div class="footer hide" id="pFooter">مدعوم بواسطة <b>BOOKLY</b> — احجز بذكاء</div>
+<div class="footer hide" id="pFooter">مدعوم بواسطة <a href="?" style="color:var(--p);text-decoration:none;font-weight:700">BOOKLY</a> — احجز بذكاء</div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -614,7 +615,8 @@ const inBreak=bk&&(t < bk.t[0]*60+bk.t[1])&&(t+dur > bk.f[0]*60+bk.f[1]);
 const past=isToday&&(t<=now.getHours()*60+now.getMinutes());
 out.push(`<div class="slot ${taken.has(tt)||past||inBreak?'off':''}" data-t="${tt}" onclick="pickSlot(this)">${t12(tt)}</div>`);
 }
-$('slotBox').innerHTML=out.length?`<div class="slots">${out.join('')}</div>`:'<div class="muted" style="margin-top:8px">مفيش مواعيد فاضية في اليوم ده</div>';
+const free=out.filter(x=>!x.includes('off')).length;
+$('slotBox').innerHTML=out.length?(free?`<div class="muted" style="margin:6px 0 2px;font-size:12px">${free} معاد فاضي ✨</div>`:'')+`<div class="slots">${out.join('')}</div>`:'<div class="muted" style="margin-top:8px">مفيش مواعيد فاضية في اليوم ده</div>';
 }
 function pickSlot(el){document.querySelectorAll('.slot').forEach(x=>x.classList.remove('on'));el.classList.add('on');selSlot=el.dataset.t;updSum();}
 function updSum(){const el=$('selSum');if(!el)return;const ds=$('bDate').value;el.textContent=selSvc?('📌 '+selSvc.name+(ds?' — '+ds:'')+(selSlot?' — '+t12(selSlot):'')):'';el.style.color=selSlot?'#8ff0c6':'';}
