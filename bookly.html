@@ -98,6 +98,10 @@ select option{background:#0e2118;color:var(--txt)}
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(10,25,18,.92);backdrop-filter:blur(10px);border:1px solid rgba(37,211,102,.4);color:var(--txt);padding:11px 20px;border-radius:14px;font-size:14px;font-weight:700;z-index:99;transition:transform .3s,opacity .3s;opacity:0;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:90vw;text-align:center}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 #toast.bad{border-color:rgba(255,90,82,.5)}
+.step{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)}
+.step:last-child{border-bottom:none}
+.step b{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1fc07f,#25d366);color:#04220f;display:flex;align-items:center;justify-content:center;font-size:15px}
+.step div{font-size:14px;color:var(--mut)}
 </style>
 </head>
 <body>
@@ -118,6 +122,12 @@ select option{background:#0e2118;color:var(--txt)}
 <div><b>💰 عربون الحجز</b>فودافون كاش يأكد الجدية ويلغي الحجوزات الوهمية</div>
 <div><b>📊 لوحة تحكم</b>تأكيد وإلغاء وإحصائيات وإشعارات فورية</div>
 <div><b>⏰ مواعيد ذكية</b>أجازات واستراحات ومواعيدك بس اللي تظهر</div>
+</div>
+<div class="card">
+<h2>إزاي بيشتغل؟ 🤔</h2>
+<div class="step"><b>1</b><div>سجّل نشاطك وحدد خدماتك ومواعيدك في دقيقتين</div></div>
+<div class="step"><b>2</b><div>ابعت لينك الحجز لعملائك على واتساب</div></div>
+<div class="step"><b>3</b><div>استقبل حجوزات مؤكدة بعربون، وأكدها بضغطة من لوحتك</div></div>
 </div>
 <div class="footer">BOOKLY — من صناعة <b>محمود أشرف</b></div>
 </div>
@@ -232,6 +242,7 @@ select option{background:#0e2118;color:var(--txt)}
 <label>رقم التحويل / مرجع العملية</label><input id="actRef" placeholder="من رسالة التحويل" style="direction:ltr;text-align:left">
 <div class="err" id="actErr"></div>
 <button class="btn" onclick="submitActivation()">إرسال طلب التفعيل</button>
+<button class="btn okb" onclick="waActivation()">ابعت المرجع واتساب 💬</button>
 </div>
 <div id="actWait" class="hide"><p class="okm">✅ طلبك اتبعت، وحسابك هيتفعل بعد مراجعة الدفع</p></div>
 <div id="actRej" class="hide"><p class="err">طلبك السابق اترفض، تأكد من التحويل وابعت تاني</p></div>
@@ -306,6 +317,7 @@ select option{background:#0e2118;color:var(--txt)}
 <div class="codebox" id="doneCode"></div>
 <p class="muted">احتفظ بالكود ده عشان تتابع حالة حجزك</p>
 <button class="btn okb" onclick="copyCode(this)">انسخ الكود 📋</button>
+<button class="btn warnb" onclick="shareDone()">شارك الحجز واتساب 📤</button>
 <button class="btn ghost" onclick="checkStatus()">متابعة الحجز</button>
 </div>
 </div>
@@ -409,6 +421,11 @@ function dashTab(n){[1,2,3].forEach(i=>{$('tb'+i).classList.toggle('on',i===n);$
 function toast(m,bad){const t=$('toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(t._h);t._h=setTimeout(()=>t.className='',2600);}
 function copyCode(el){navigator.clipboard?.writeText($('doneCode').textContent.trim());el.textContent='اتنسخ ✅';setTimeout(()=>el.textContent='انسخ الكود 📋',1500);}
 function shareLink(){const l=$('myLink').value;window.open('https://wa.me/?text='+encodeURIComponent('احجز معادك أونلاين من هنا 👇\n'+l),'_blank');}
+function waActivation(){const ref=$('actRef').value.trim()||'(هكتب المرجع)';const w=($('actWallet').textContent||'').replace(/[^0-9]/g,'');
+const msg='أهلا، أنا صاحب نشاط على BOOKLY وحوّلت الاشتراك.\nاسم النشاط: '+((typeof myBiz!=='undefined'&&myBiz&&myBiz.name)||'')+'\nمرجع التحويل: '+ref;
+window.open('https://wa.me/'+w+'?text='+encodeURIComponent(msg),'_blank');}
+function shareDone(){const code=$('doneCode').textContent.trim();const info=$('doneInfo').textContent;
+window.open('https://wa.me/?text='+encodeURIComponent('حجزي ✅ '+info+'\nكود الحجز: '+code),'_blank');}
 function goLink(){let v=$('buyLink').value.trim();if(!v)return toast('الصق اللينك الأول',1);
 if(v.includes('?')){location.href=location.pathname+'?'+v.split('?')[1];return;}
 location.href=location.pathname+'?s='+encodeURIComponent(v.replace(/^\?s=/,''));}
