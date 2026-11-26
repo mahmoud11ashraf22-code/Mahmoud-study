@@ -86,6 +86,13 @@ footer a{color:var(--blue);font-weight:bold;text-decoration:none}
   <a href="https://t.me/ZAKERSA7_bot" target="_blank" rel="noopener">https://t.me/ZAKERSA7_bot</a>
 </footer>
 
+<script>/* MAHMOUD STUDY: exam clock keeps true time when tab/app is in background (catch-up per elapsed second) */
+(function(){var rs=window.setInterval,rc=window.clearInterval,alive={};
+window.setInterval=function(f,d){if(d!==1000||typeof f!=='function')return rs.apply(window,arguments);
+var last=Date.now(),id;function w(){var n=Math.round((Date.now()-last)/1000);if(n<1)n=1;last+=n*1000;if(n>7300)n=7300;for(var i=0;i<n&&alive[id];i++)f();}
+id=rs(w,1000);alive[id]=1;return id;};
+window.clearInterval=function(id){alive[id]=0;return rc(id);};})();
+</script>
 <script>
 const questions = [
  {q:"We have arranged ................................................................to Alex in the summer holiday.",o:["travel","to travel","travelling","travelled"],a:1},
