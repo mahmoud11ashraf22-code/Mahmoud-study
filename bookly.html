@@ -194,7 +194,8 @@ details p{color:var(--m);font-size:13px;margin:6px 0 2px;line-height:1.7}
 <div id="dp1">
 <div class="card">
 <label>لينك الحجز بتاعك (ابعته لعملائك)</label>
-<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink(this)">نسخ</button><button class="btn small warnb" onclick="shareLink()">واتساب 📤</button><button class="btn small ghost" onclick="window.open($('myLink').value,'_blank')">معاينة 👁</button></div>
+<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink(this)">نسخ</button><button class="btn small warnb" onclick="shareLink()">واتساب 📤</button><button class="btn small ghost" onclick="window.open($('myLink').value,'_blank')">معاينة 👁</button><button class="btn small ghost" onclick="togQR()">QR 📱</button></div>
+<div id="qrBox" class="hide" style="text-align:center;margin-top:10px"><img id="qrImg" style="width:200px;height:200px;border-radius:14px;background:#fff;padding:8px" alt="QR"><div class="muted" style="margin-top:6px;font-size:12px">اطبعه أو صوّره وخليه عندك في المكان — العميل يمسحه ويحجز على طول</div></div>
 </div>
 <div class="row" style="margin-bottom:10px">
 <input type="date" id="fltDate" onchange="renderBookings()">
@@ -450,6 +451,7 @@ function goLink(){let v=$('buyLink').value.trim();if(!v)return toast('الصق �
 if(v.includes('?')){location.href=location.pathname+'?'+v.split('?')[1];return;}
 location.href=location.pathname+'?s='+encodeURIComponent(v.replace(/^\?s=/,''));}
 function copyLink(el){navigator.clipboard?.writeText($('myLink').value);el.textContent='تم ✅';setTimeout(()=>el.textContent='نسخ',1500);}
+function togQR(){const b=$('qrBox');b.classList.toggle('hide');if(!b.classList.contains('hide'))$('qrImg').src='https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=1&data='+encodeURIComponent($('myLink').value);}
 async function saveSlug(){
 const s=$('slugIn').value.trim().toLowerCase();
 $('slugErr').textContent='';$('slugOk').textContent='';
