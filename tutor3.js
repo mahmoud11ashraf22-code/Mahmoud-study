@@ -235,8 +235,184 @@
     return rep;
   }
 
+  /* ---------- جدول المذاكرة الشخصي (محادثة موجّهة) ---------- */
+  var SCHED_RE = /(اعمل(ي|لي)? (لي )?(جدول|خطه)|عايز (جدول|خطه)|عاوز (جدول|خطه)|نظم(لي)? (لي )?(مذاكرتي|وقتي)|جدول مذاكره|خطه مذاكره|جدول للمذاكره|ساعدني اذاكر)/;
+  var REPLAN_RE = /(متاخر|اتاخرت|ضيعت|مذاكرتش|معرفتش اذاكر|فاتني|اعاده ترتيب|اعد ترتيب|عدل الجدول|غير الجدول|اعمل الجدول تاني)/;
+  var flow = null;
+  function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { } }
+  function parseDate(t) {
+    var n = norm(t), m;
+    if ((m = n.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/))) return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
+    if ((m = n.match(/(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})/))) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+    if ((m = n.match(/بعد (\d+) (يوم|ايام)/))) { var d = new Date(); d.setDate(d.getDate() + parseInt(m[1], 10)); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+    if ((m = n.match(/بعد (\d+) (اسبوع|اسابيع)/))) { var d2 = new Date(); d2.setDate(d2.getDate() + 7 * parseInt(m[1], 10)); return d2.getFullYear() + '-' + ('0' + (d2.getMonth() + 1)).slice(-2) + '-' + ('0' + d2.getDate()).slice(-2); }
+    return '';
+  }
+  function parseSubjects(t) {
+    var parts = String(t).replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 1632); }).split(/[،,؛;\n]+|\s+و\s+/);
+    var out = [];
+    parts.forEach(function (x) {
+      x = x.trim(); if (!x) return;
+      var m = x.match(/^(.*?)[\s:=\-]*(\d{1,2})?\s*(?:دروس|درس)?$/);
+      var name = (m && m[1] ? m[1] : x).trim(), cnt = m && m[2] ? parseInt(m[2], 10) : 2;
+      name = name.replace(/\s+\d+$/, '').trim();
+      if (name && name.length <= 30) out.push({ name: name, n: cnt });
+    });
+    return out;
+  }
+  function fu(list) { return '<div class="t2-fu">' + list.map(function (t) { return '<button data-q="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>'; }
+  function startFlow() {
+    flow = { step: 'year', d: {} };
+    return '<b>تمام، هعملك جدول مذاكرة على مقاسك 📅</b><br>هسألك 5 أسئلة سريعة وبعدها الجدول يتحفظ لوحده في مخطط المنصة.<br><br><b>1/5</b> إنت في سنة كام؟' + fu(['أولى ثانوي', 'تانية ثانوي', 'تالتة ثانوي', 'إعدادي', 'جامعة', 'إلغاء']);
+  }
+  function currentSubjectsStr() {
+    var d = DB(); var a = (d.subjects || []).map(function (x) { return x.name + ' ' + Math.max(1, num(x.backlog) - num(x.backlogDone)); });
+    return a.join('، ');
+  }
+  function buildSchedule() {
+    var d = flow.d, g = function (i) { return $(i); };
+    var subs = d.subjects.slice();
+    subs.sort(function (a, b) { var wa = d.weak.indexOf(a.name) > -1 ? 0 : 1, wb = d.weak.indexOf(b.name) > -1 ? 0 : 1; return wa - wb; });
+    var str = subs.map(function (x) { return x.name + ' ' + x.n; }).join('، ');
+    var hrs = [1, 2, 3, 4, 5, 6, 8].filter(function (h) { return h <= d.hours; }).pop() || 2;
+    try {
+      if (g('examDate') && g('studyHours')) { if (d.exam) g('examDate').value = d.exam; g('studyHours').value = String(d.hours); if (typeof saveSettings === 'function') saveSettings(); }
+    } catch (e) { }
+    g('quickMultiInput').value = str; g('quickMultiHours').value = String(hrs);
+    makeMultiPlan();
+    try { generatePlan(); } catch (e) { }
+    ls('t3_prof', JSON.stringify({ year: d.year, hours: d.hours, exam: d.exam, weak: d.weak, at: today() }));
+    var s = snapshot(), rows = (s.plan || []).slice(0, 7).map(function (p) {
+      var names = []; (p.items || []).forEach(function (it) { if (it.subject && names.indexOf(it.subject) === -1) names.push(it.subject); });
+      return '• <b>' + esc(p.day) + ':</b> ' + esc(names.join('، ') || 'مراجعة') + ' (' + (p.items ? p.items.length : 0) + ' جلسات، ' + Math.round(num(p.minutes) / 6) / 10 + ' ساعة)';
+    }).join('<br>');
+    var tip = d.year.indexOf('تالتة') > -1 ? 'في تالتة ثانوي: حل نماذج امتحانات سابقة بوقت حقيقي كل أسبوع.' : 'ثبّت وقت ثابت يومياً للمذاكرة، الاستمرارية أهم من الكمية.';
+    var txt = '✅ <b>جدولك اتعمل واتحفظ في مخطط المنصة!</b><br>' + (rows || 'الجدول جاهز في صفحة تنظيم المذاكرة.') + '<br><br>⏱ ' + d.hours + ' ساعات يومياً' + (d.weak.length ? ' • بدأت بالمواد الضعيفة: ' + esc(d.weak.join('، ')) : '') + (s.daysToExam !== null && s.daysToExam >= 0 ? ' • فاضل ' + s.daysToExam + ' يوم على الامتحان' : '') + '<br>💡 ' + tip + '<br>هسألك كل يوم «ذاكرت إيه؟»، ولو اتأخرت هعيد ترتيب الجدول لوحدي.';
+    flow = null; ls('t3_ci', today());
+    return txt + '<br><button class="t2-act" data-go="planner">📅 افتح الجدول</button>' + fu(['خلصت مهام النهاردة', 'متأخر، أعد ترتيب الجدول', 'أذاكر إيه']);
+  }
+  function replan() {
+    var ok = true;
+    try { reschedulePlan(); } catch (e) { ok = false; }
+    try { generatePlan(); } catch (e) { }
+    try { go('tutor'); } catch (e) { }
+    var s = snapshot();
+    return (ok ? '🔄 <b>أعدت ترتيب خطتك</b> وخلّيتها تبدأ من النهاردة بالدروس المتأخرة الأول.' : 'جدولك اتحدّث.') + (s.backlogLeft ? '<br>متبقي ' + s.backlogLeft + ' درس، ابدأ بأول جلسة النهاردة 25 دقيقة بس.' : '') + '<br><button class="t2-act" data-go="planner">📅 افتح الجدول</button>' + fu(['أذاكر إيه', 'بومودورو']);
+  }
+  function checkin(q) {
+    var n = norm(q), s = snapshot(), miss = parseInt(ls('t3_miss') || '0', 10);
+    flow = null;
+    if (/(خلصت كل|كله|كل المهام|خلصت مهام|خلصت)/.test(n) && !/جزء|شويه/.test(n)) {
+      ls('t3_miss', '0'); ls('t3_ci', today());
+      return '👏 <b>برافو!</b> يوم ممتاز.' + (s.streak ? '<br>🔥 سلسلتك ' + s.streak + ' يوم' : '') + (s.points ? ' • ⭐ ' + s.points + ' نقطة' : '') + '<br>اقفل اليوم بتحدي سريع عشان تحافظ على السلسلة وتكسب نقاط.' + fu(['كلمة تشجيع', 'أذاكر إيه']);
+    }
+    if (/(جزء|شويه|نص|حاجه بسيطه)/.test(n)) {
+      ls('t3_miss', '0'); ls('t3_ci', today());
+      return '👍 كويس إنك ذاكرت جزء. الأهم الاستمرارية. كمّل جلسة 25 دقيقة دلوقتي لو تقدر، والباقي هيتوزّع على الأيام الجاية.' + fu(['بومودورو', 'أذاكر إيه']);
+    }
+    ls('t3_miss', String(miss + 1)); ls('t3_ci', today());
+    return (miss >= 1 ? 'ده تاني يوم ورا بعض، ولا يهمك، هنظبط الدنيا دلوقتي. ' : 'ولا يهمك، بكرة يوم جديد. ') + '<br>' + replan();
+  }
+  function flowHandle(q) {
+    var n = norm(q);
+    if (/^(الغاء|إلغاء|الغي|خلاص|لا شكرا)$/.test(n) || n === 'الغاء') { flow = null; return 'تمام، لغيت الجدول. اسألني في أي وقت 👍' + fu(['اعملي جدول مذاكرة', 'أذاكر إيه']); }
+    var d = flow.d;
+    if (flow.step === 'year') {
+      d.year = q.trim().slice(0, 30); flow.step = 'subjects';
+      var cur = currentSubjectsStr();
+      return '<b>2/5</b> اكتب موادك وعدد الدروس المتراكمة في كل مادة.<br>مثال: <b>فيزياء 3، كيمياء 2، إنجليزي 1</b><br>(لو مفيش تراكم اكتب 1)' + fu((cur ? ['استخدم موادي الحالية'] : []).concat(['إلغاء']));
+    }
+    if (flow.step === 'subjects') {
+      var list = /استخدم موادي/.test(n) ? parseSubjects(currentSubjectsStr()) : parseSubjects(q);
+      if (!list.length) return 'مقدرتش أقرا المواد. اكتبها كده: <b>فيزياء 3، كيمياء 2</b>';
+      d.subjects = list.slice(0, 10); flow.step = 'weak';
+      return '<b>3/5</b> أنهي مواد حاسس إنك ضعيف فيها؟ (هبدأ بيها الأول)' + fu(d.subjects.map(function (x) { return x.name; }).slice(0, 5).concat(['مفيش ضعيف', 'كلها']));
+    }
+    if (flow.step === 'weak') {
+      d.weak = [];
+      if (!/مفيش|لا /.test(n + ' ')) { if (/كلها/.test(n)) d.weak = d.subjects.map(function (x) { return x.name; }); else d.subjects.forEach(function (x) { if (norm(q).indexOf(norm(x.name)) > -1) d.weak.push(x.name); }); }
+      flow.step = 'hours';
+      return '<b>4/5</b> عندك كام ساعة فاضية للمذاكرة يومياً؟' + fu(['1 ساعة', '2 ساعة', '3 ساعات', '4 ساعات', '5 ساعات', '6 ساعات']);
+    }
+    if (flow.step === 'hours') {
+      var m = n.match(/(\d+(?:\.\d+)?)/); var h = m ? parseFloat(m[1]) : /ساعتين|ساعتان/.test(n) ? 2 : /ساعه/.test(n) ? 1 : 0;
+      if (!h || h < 0.5 || h > 14) return 'اكتب عدد الساعات كرقم، مثلاً <b>3</b>';
+      d.hours = Math.round(h); flow.step = 'exam';
+      return '<b>5/5</b> امتى أقرب امتحان؟ اكتب التاريخ مثل <b>2026-12-20</b> أو <b>بعد 20 يوم</b>.' + fu(['بعد 14 يوم', 'بعد 30 يوم', 'لسه مش محدد']);
+    }
+    if (flow.step === 'exam') {
+      d.exam = parseDate(q);
+      if (!d.exam && !/(لسه|مش محدد|معرفش|مفيش)/.test(n)) return 'مفهمتش التاريخ. اكتبه كده <b>2026-12-20</b> أو <b>بعد 20 يوم</b>، أو اختار «لسه مش محدد».';
+      try { return buildSchedule(); } catch (e) { flow = null; return 'حصلت مشكلة وأنا بحفظ الجدول. جرّب «خطة سريعة» من صفحة تنظيم المذاكرة.'; }
+    }
+    flow = null; return null;
+  }
+  function pendingCheckin() { return flow && flow.step === 'checkin'; }
+  /* يرجع نص الرد لو الرسالة تخص الجدول، أو null */
+  function scheduleRoute(q) {
+    var n = norm(q);
+    if (flow && flow.step === 'checkin') { if (/(خلصت|ذاكرت|جزء|معرفتش|مذاكرتش|ما ذاكرتش|لسه)/.test(n)) return checkin(q); flow = null; }
+    if (flow) return flowHandle(q);
+    if (SCHED_RE.test(n) || n === 'اعملي جدول مذاكره') return startFlow();
+    if (REPLAN_RE.test(n)) return replan();
+    if (/^(خلصت مهام النهارده|ذاكرت|خلصت كل)/.test(n)) return checkin(q);
+    return null;
+  }
+  function addRow(html, me) {
+    var lg = $('t2log'); if (!lg) return;
+    var r = document.createElement('div'); r.className = 't2-row' + (me ? ' me' : '');
+    var b = document.createElement('span'); b.className = 't2-b';
+    if (me) b.textContent = html; else b.innerHTML = html;
+    r.appendChild(b); lg.appendChild(r); lg.scrollTop = lg.scrollHeight; return r;
+  }
+  function handleSched(q) {
+    q = String(q || '').trim(); if (!q) return false;
+    var r = scheduleRoute(q); if (r == null) return false;
+    addRow(q, true);
+    setTimeout(function () { addRow(r, false); }, 350);
+    return true;
+  }
+  function textOf(el) { return (el.getAttribute('data-q') || el.textContent || '').trim(); }
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest ? e.target.closest('#t2chips button,.t2-fu button,#t2send,#t3big') : null;
+    if (!t) return;
+    var q;
+    if (t.id === 't3big') q = 'اعملي جدول مذاكرة';
+    else if (t.id === 't2send') { var i = $('t2inp'); q = i ? i.value : ''; }
+    else q = textOf(t);
+    if (!q) return;
+    var would = flow || SCHED_RE.test(norm(q)) || REPLAN_RE.test(norm(q)) || /^(خلصت مهام النهارده|اعملي جدول مذاكره)/.test(norm(q));
+    if (!would) return;
+    e.stopImmediatePropagation(); e.preventDefault();
+    if (t.id === 't2send') { var inp = $('t2inp'); if (inp) inp.value = ''; }
+    handleSched(q);
+  }, true);
+  document.addEventListener('keydown', function (e) {
+    if (!e.target || e.target.id !== 't2inp' || (e.key !== 'Enter' && e.keyCode !== 13)) return;
+    var q = e.target.value; if (!q.trim()) return;
+    var would = flow || SCHED_RE.test(norm(q)) || REPLAN_RE.test(norm(q));
+    if (!would) return;
+    e.stopImmediatePropagation(); e.preventDefault(); e.target.value = ''; handleSched(q);
+  }, true);
+  function bigButton() {
+    var card = $('t2'); if (!card || $('t3big')) return;
+    var b = document.createElement('button'); b.id = 't3big'; b.type = 'button'; b.textContent = '📅 اعملي جدول مذاكرة';
+    b.style.cssText = 'display:block;width:calc(100% - 24px);margin:10px 12px 4px;padding:14px;border:0;border-radius:14px;font:inherit;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#1fa070,#0b6b48);cursor:pointer;box-shadow:0 6px 18px rgba(31,160,112,.35)';
+    var head = card.querySelector('.t2-head');
+    if (head && head.nextSibling) card.insertBefore(b, head.nextSibling); else card.appendChild(b);
+  }
+  function dailyCheckin() {
+    if (ls('t3_ci') === today()) return;
+    var s = snapshot(); if (!s.subjects.length && !s.plan.length) return;
+    if (ls('t3_ci_shown') === today()) return;
+    ls('t3_ci_shown', today());
+    flow = { step: 'checkin' };
+    addRow('🌙 <b>متابعة اليوم:</b> ذاكرت إيه النهارده؟' + (s.streak ? '<br>🔥 سلسلتك ' + s.streak + ' يوم، خلّيها مكمّلة.' : '') + fu(['خلصت مهام النهاردة', 'ذاكرت جزء منها', 'معرفتش أذاكر النهاردة']), false);
+  }
+
   /* ---------- ربط بالمدرّس الحالي (#t2): fallback أذكى + تبويب "أكتر" ---------- */
-  var EXTRA_CHIPS = ['مستواي', 'كام يوم على الامتحان', 'فيزياء', 'كيمياء', 'رياضيات', 'أحياء', 'جملة شرط', 'Passive Voice', 'كتابة Essay', 'النحو', 'تاريخ وجغرافيا', 'بومودورو', 'ملخص ذكي', 'كلمة تشجيع', 'نصيحة'];
+  var EXTRA_CHIPS = ['اعملي جدول مذاكرة', 'مستواي', 'كام يوم على الامتحان', 'فيزياء', 'كيمياء', 'رياضيات', 'أحياء', 'جملة شرط', 'Passive Voice', 'كتابة Essay', 'النحو', 'تاريخ وجغرافيا', 'بومودورو', 'ملخص ذكي', 'كلمة تشجيع', 'نصيحة'];
   var ACT_LABEL = { planner: '📅 افتح الخطة', backlog: '📚 افتح التراكم', review: '🔁 افتح المراجعة', settings: '⚙️ الإعدادات' };
   function lastQuestion(row) {
     var p = row.previousElementSibling;
@@ -282,7 +458,7 @@
   }
   function init() {
     var lg = $('t2log'); if (!lg) return false;
-    addMoreTab();
+    addMoreTab(); bigButton(); setTimeout(dailyCheckin, 1500);
     new MutationObserver(function () { setTimeout(scan, 30); }).observe(lg, { childList: true, subtree: true, characterData: true });
     var inp = $('t2inp'); if (inp && !inp.getAttribute('data-t3')) { inp.setAttribute('data-t3', '1'); }
     return true;
