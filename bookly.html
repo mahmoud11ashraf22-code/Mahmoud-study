@@ -200,6 +200,7 @@ details p{color:var(--m);font-size:13px;margin:6px 0 2px;line-height:1.7}
 <input type="date" id="fltDate" onchange="renderBookings()">
 <button class="btn small ghost" style="flex:0 0 auto" onclick="fltDate.value=fmtDate(new Date());renderBookings()">النهارده</button>
 <button class="btn small ghost" style="flex:0 0 auto" onclick="fltDate.value='';renderBookings()">الكل</button>
+<button class="btn small ghost" style="flex:0 0 auto" onclick="copyDay(this)">انسخ الجدول 📋</button>
 </div>
 <div id="bkList"></div>
 </div>
@@ -502,6 +503,16 @@ ${b.status==='awaiting_deposit'?`<div class="muted" style="font-size:12px;margin
 ${b.status==='awaiting_deposit'?`<div class="row" style="margin-top:8px"><button class="btn small warnb" onclick="setStatus('${b.id}','confirmed')">استلمت العربون — تأكيد 💰✅</button><button class="btn small badb" onclick="setStatus('${b.id}','cancelled')">إلغاء ❌</button></div>`
 :b.status!=='cancelled'?`<div class="row" style="margin-top:8px"><button class="btn small okb" onclick="setStatus('${b.id}','confirmed')">تأكيد ✅</button><button class="btn small badb" onclick="setStatus('${b.id}','cancelled')">إلغاء ❌</button></div>`:''}
 </div>`).join('');
+}
+function copyDay(el){
+const f=$('fltDate').value;
+let list=bkCache.filter(b=>(!f||b.date===f)&&b.status!=='cancelled');
+list.sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+if(!list.length){toast('مفيش حجوزات تتنسخ',1);return;}
+const lines=list.map(b=>'• '+t12(b.time)+' — '+b.name+' ('+b.service+') '+(b.status==='confirmed'?'✅':b.status==='awaiting_deposit'?'💰':'⏳'));
+const txt='📅 حجوزات '+(myBiz.name||'')+(f?' يوم '+f:'')+'\n'+lines.join('\n');
+navigator.clipboard?.writeText(txt);
+const o=el.textContent;el.textContent='اتنسخ ✅';setTimeout(()=>el.textContent=o,1500);
 }
 async function setStatus(id,st){
 const b=bkCache.find(x=>x.id===id);
