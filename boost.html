@@ -33,6 +33,12 @@ h3.sec{font-size:19px;font-weight:800;margin:28px 0 14px;display:flex;align-item
 .plat.tiktok{background:#ffffff14;color:#fff;border:1px solid #ffffff2e}
 .plat.insta{background:linear-gradient(115deg,#ff603e22,#ff4f9122);color:#ff8fb0;border:1px solid #ff4f9144}
 .plat.game{background:#22c55e22;color:#4ade80;border:1px solid #22c55e44}
+.newbadge{background:#f59e0b22;color:#fbbf24;border:1px solid #f59e0b44;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-inline-start:6px}
+@keyframes fadeUp{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+.grid .card{animation:fadeUp .4s var(--ease) backwards}
+.grid .card:nth-child(2){animation-delay:.05s}.grid .card:nth-child(3){animation-delay:.1s}.grid .card:nth-child(4){animation-delay:.15s}.grid .card:nth-child(5){animation-delay:.2s}.grid .card:nth-child(6){animation-delay:.25s}.grid .card:nth-child(7){animation-delay:.3s}.grid .card:nth-child(8){animation-delay:.35s}.grid .card:nth-child(9){animation-delay:.4s}
+@keyframes pulseDot{0%,100%{box-shadow:0 0 8px #37d99c66}50%{box-shadow:0 0 14px #37d99ccc}}
+.steps .st.on:last-child::before{animation:pulseDot 1.6s infinite}
 .card h4{font-size:17px;font-weight:800;margin-bottom:4px}
 .card .desc{color:var(--muted);font-size:13px;margin-bottom:12px;line-height:1.7}
 .price{font-size:21px;font-weight:800;color:var(--gold)}
@@ -202,9 +208,9 @@ const SERVICES=[
  {id:'ig-fol',plat:'insta',platName:'إنستجرام',icon:'📸',name:'متابعين إنستجرام',desc:'متابعين جودة عالية مع ضمان التعويض',per:1000,price:150},
  {id:'ig-like',plat:'insta',platName:'إنستجرام',icon:'❤️',name:'لايكات إنستجرام',desc:'لايكات على أي بوست',per:1000,price:45},
  {id:'ig-view',plat:'insta',platName:'إنستجرام',icon:'▶️',name:'مشاهدات إنستجرام',desc:'مشاهدات ريلز وفيديوهات',per:1000,price:20},
- {id:'pes-coin',plat:'game',platName:'eFootball',icon:'⚽',name:'كوينز eFootball',desc:'شحن كوينز بيس موبايل على الآيدي مباشرة',per:1,price:0.55,qtys:[105,550,1050,2130,5700,10500]},
- {id:'pubg-uc',plat:'game',platName:'PUBG Mobile',icon:'🔫',name:'شدات ببجي موبايل',desc:'شدات UC تتشحن على الآيدي مباشرة',per:1,price:0.75,qtys:[60,325,660,1800,3850]},
- {id:'ff-dia',plat:'game',platName:'Free Fire',icon:'💎',name:'جواهر فري فاير',desc:'جواهر فري فاير على الآيدي مباشرة',per:1,price:0.38,qtys:[100,310,520,1080,2200]}
+ {id:'pes-coin',plat:'game',platName:'eFootball',icon:'⚽',name:'كوينز eFootball',desc:'شحن كوينز بيس موبايل على الآيدي مباشرة',per:1,price:0.55,unit:'كوينز',qtys:[105,550,1050,2130,5700,10500]},
+ {id:'pubg-uc',plat:'game',platName:'PUBG Mobile',icon:'🔫',name:'شدات ببجي موبايل',desc:'شدات UC تتشحن على الآيدي مباشرة',per:1,price:0.75,unit:'شدة',qtys:[60,325,660,1800,3850]},
+ {id:'ff-dia',plat:'game',platName:'Free Fire',icon:'💎',name:'جواهر فري فاير',desc:'جواهر فري فاير على الآيدي مباشرة',per:1,price:0.38,unit:'جوهرة',qtys:[100,310,520,1080,2200]}
 ];
 const QTYS=[500,1000,2500,5000,10000,25000];
 const firebaseConfig={apiKey:"AIzaSyBlnCzvRKHFPFTR0KQRKbmEHObCP0fQakM",authDomain:"mahmoud-study.firebaseapp.com",projectId:"mahmoud-study",storageBucket:"mahmoud-study.firebasestorage.app",messagingSenderId:"265167276750",appId:"1:265167276750:web:26c6ad1c8c1c4bf8a75e9f"};
@@ -221,10 +227,10 @@ function showErr(id,m){const e=$(id);e.textContent=m;e.style.display='block';set
 store.doc('boostSettings/prices').get().then(d=>{if(d.exists){const p=d.data();SERVICES.forEach(s=>{const k=s.id;if(p['price_'+k]!=null)s.price=p['price_'+k];if(p['per_'+k]!=null)s.per=p['per_'+k]});renderServices();renderQty()}}).catch(()=>{});
 document.querySelectorAll('.copy[data-c]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.c);b.textContent='اتنسخ ✅';setTimeout(()=>b.textContent='نسخ الرقم',1800)});
 
-function renderServices(q){q=(q||'').trim();const list=q?SERVICES.filter(s=>(s.name+s.platName+s.desc).includes(q)):SERVICES;$('servicesGrid').innerHTML=list.length?list.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span><h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${s.qtys?'يبدأ من '+money(s.price*s.qtys[0]):money(s.price)+' <small>/ '+fmt(s.per)+'</small>'}</div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join(''):'<div class="note">مفيش خدمة بالاسم ده.</div>'}
+function renderServices(q){q=(q||'').trim();const list=q?SERVICES.filter(s=>(s.name+s.platName+s.desc).includes(q)):SERVICES;$('servicesGrid').innerHTML=list.length?list.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span>${s.plat==='game'?'<span class="newbadge">جديد 🔥</span>':''}<h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${s.qtys?'يبدأ من '+money(s.price*s.qtys[0]):money(s.price)+' <small>/ '+fmt(s.per)+'</small>'}</div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join(''):'<div class="note">مفيش خدمة بالاسم ده.</div>'}
 renderServices();$('svcSearch').oninput=e=>renderServices(e.target.value);
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
-function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=(s.qtys||QTYS).map(q=>`<option value="${q}">${fmt(q)}</option>`).join('');$('fLink').placeholder=s.plat==='game'?'اكتب ID اللاعب (والسيرفر لو موجود)':'مثال: https://tiktok.com/@username أو @username';calc()}
+function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=(s.qtys||QTYS).map(q=>`<option value="${q}">${fmt(q)}${s.unit?' '+s.unit:''} • ${money(Math.ceil(q*s.price/s.per))}</option>`).join('');$('fLink').placeholder=s.plat==='game'?'اكتب ID اللاعب (والسيرفر لو موجود)':'مثال: https://tiktok.com/@username أو @username';calc()}
 function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(Math.ceil(q*s.price/s.per))}
 function pick(id){if(!ME){$('authSec').scrollIntoView({behavior:'smooth'});return}$('fService').value=id;renderQty();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
 $('fService').onchange=renderQty;$('fQty').onchange=calc;renderQty();
@@ -259,7 +265,7 @@ auth.onAuthStateChanged(user=>{
 function stopDash(){[unsubProfile,unsubOrders,unsubTopups].forEach(u=>{try{u&&u()}catch(_){}});unsubProfile=unsubOrders=unsubTopups=null;$('dashSec').classList.add('hidden');$('pubSec').classList.add('hidden');$('authSec').classList.remove('hidden')}
 let lastOrders=[],lastTopups=[],lastOrderData={};
 function reorder(id){const o=lastOrderData[id];if(!o)return;$('fService').value=o.serviceId;renderQty();$('fQty').value=String(o.quantity);$('fLink').value=o.accountLink||'';calc();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
-function notify(msg){const b=$('notifBar');if(!b)return;b.innerHTML=msg;b.classList.remove('hidden');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.add('hidden'),12000)}
+function notify(msg){const b=$('notifBar');if(!b)return;b.innerHTML=msg+' <span style="cursor:pointer;font-weight:900;margin-inline-start:8px" onclick="this.parentElement.classList.add(\'hidden\')">✕</span>';b.classList.remove('hidden');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.add('hidden'),12000)}
 function stepsHtml(st){if(st==='rejected')return `<div class="steps"><div class="st on" style="color:#f55d5d">❌ الطلب اترفض • الرصيد رجع لمحفظتك</div></div>`;const i=st==='done'?3:st==='in-progress'?2:1;return `<div class="steps"><div class="st ${i>=1?'on':''}">🕐 قيد الانتظار</div><div class="st ${i>=2?'on':''}">⚙️ قيد التنفيذ</div><div class="st ${i>=3?'on':''}">✅ تم التنفيذ</div></div>`}
 function renderTx(){
  if(!$('myTx'))return;
@@ -280,7 +286,7 @@ function startDash(){
   const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
   lastOrders=docs;lastOrderData={};docs.forEach(d=>lastOrderData[d.id]=d.data());
   $('myOrders').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
-   return `<div class="row-item"><div class="top"><b>${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>${stepsHtml(o.status)}<div class="meta">الكمية: ${fmt(o.quantity)} • السعر: ${money(o.price)}<br>${t}</div><button class="copy" onclick="reorder('${d.id}')" style="margin-top:6px">🔁 اطلب تاني</button></div>`}).join(''):'<div class="note">لسه مفيش طلبات.</div>';
+   return `<div class="row-item"><div class="top"><b>${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>${stepsHtml(o.status)}<div class="meta">الكمية: ${fmt(o.quantity)} • السعر: ${money(o.price)}<br>رقم الطلب: <span style="font-family:monospace;font-size:11px">${d.id}</span> <button class="copy" onclick="event.stopPropagation();navigator.clipboard.writeText('${d.id}');this.textContent='اتنسخ ✅';setTimeout(()=>this.textContent='📋 نسخ',1500)">📋 نسخ</button><br>${t}</div><button class="copy" onclick="reorder('${d.id}')" style="margin-top:6px">🔁 اطلب تاني</button></div>`}).join(''):'<div class="note">لسه مفيش طلبات.</div>';
   let seen={};try{seen=JSON.parse(localStorage.getItem('bso_'+ME.uid)||'{}')}catch(_){}
   docs.forEach(d=>{const o=d.data();const prev=seen[d.id];
    if(prev&&prev!==o.status){
