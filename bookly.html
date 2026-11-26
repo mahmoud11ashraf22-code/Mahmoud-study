@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BOOKLY | نظام حجوزات ذكي</title>
+<meta name="description" content="BOOKLY — نظام حجوزات ذكي للعيادات والسناتر والحلاقين: لينك خاص بيك، حجوزات مؤكدة بعربون، ولوحة تحكم كاملة.">
+<meta property="og:title" content="BOOKLY | خلّي عملاءك يحجزوا أونلاين">
+<meta property="og:description" content="نظام حجوزات ذكي بالعربي: لينك خاص بنشاطك، حجوزات مؤكدة بعربون، ولوحة تحكم فورية.">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -98,6 +102,12 @@ select option{background:#0e2118;color:var(--txt)}
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(10,25,18,.92);backdrop-filter:blur(10px);border:1px solid rgba(37,211,102,.4);color:var(--txt);padding:11px 20px;border-radius:14px;font-size:14px;font-weight:700;z-index:99;transition:transform .3s,opacity .3s;opacity:0;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:90vw;text-align:center}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 #toast.bad{border-color:rgba(255,90,82,.5)}
+details{border-top:1px solid rgba(255,255,255,.08);padding:10px 2px}
+details:first-of-type{border-top:none}
+summary{cursor:pointer;font-weight:700;font-size:14px;list-style:none}
+summary::before{content:'＋ ';color:var(--p)}
+details[open] summary::before{content:'－ '}
+details p{color:var(--m);font-size:13px;margin:6px 0 2px;line-height:1.7}
 .step{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)}
 .step:last-child{border-bottom:none}
 .step b{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1fc07f,#25d366);color:#04220f;display:flex;align-items:center;justify-content:center;font-size:15px}
@@ -128,6 +138,13 @@ select option{background:#0e2118;color:var(--txt)}
 <div class="step"><b>1</b><div>سجّل نشاطك وحدد خدماتك ومواعيدك في دقيقتين</div></div>
 <div class="step"><b>2</b><div>ابعت لينك الحجز لعملائك على واتساب</div></div>
 <div class="step"><b>3</b><div>استقبل حجوزات مؤكدة بعربون، وأكدها بضغطة من لوحتك</div></div>
+</div>
+<div class="card">
+<h2>أسئلة شائعة ❓</h2>
+<details><summary>الخدمة مجانية؟</summary><p>إنشاء الحساب واللينك مجاني. تفعيل النشاط باشتراك رمزي (القيمة بتظهرلك في صفحة التفعيل) بيحصل مرة واحدة عن طريق تحويل محفظة.</p></details>
+<details><summary>إزاي عملائي بيحجزوا؟</summary><p>بتبعتلهم لينك خاص بيك، العميل يختار الخدمة والمعاد ويكتب اسمه ورقمه — من غير ما يعمل حساب.</p></details>
+<details><summary>العربون بيحصل فيه إيه؟</summary><p>لو فعّلت العربون، العميل بيحوّل على محفظتك ويكتب مرجع التحويل، وإنت بتأكد الاستلام بضغطة من لوحتك قبل ما المعاد يتثبت.</p></details>
+<details><summary>أقدر أوقف الحجوزات مؤقتًا؟</summary><p>أيوه، من إعدادات لوحتك تقدر توقف اللينك أو تحدد أيام إجازة، والمواعيد المحجوزة بتفضل محفوظة.</p></details>
 </div>
 <div class="footer">BOOKLY — من صناعة <b>محمود أشرف</b></div>
 </div>
@@ -557,7 +574,7 @@ $('pIcon').textContent=ICONS[PB.type]||'📅';$('pName').textContent=PB.name;$('
 $('pSvcs').innerHTML=(PB.services||[]).map(s=>`<span class="chip">${esc(s.name)}${s.price?' · '+esc(s.price)+'ج':''}</span>`).join('');
 $('svcPick').innerHTML=(PB.services||[]).map((s,i)=>`<div class="svc" style="cursor:pointer" onclick="pickSvc(${i},this)"><div class="row"><b>${esc(s.name)}</b><span class="muted" style="flex:0 0 auto;font-size:12px">${s.dur} دقيقة${s.price?' · '+esc(s.price)+' جنيه':''}</span></div></div>`).join('')||'<div class="muted">النشاط لسه مضافش خدمات</div>';
 if(PB.deposit&&PB.deposit.on){$('depStep').classList.remove('hide');$('depAmtShow').textContent=PB.deposit.amount;$('depWalletShow').textContent=PB.deposit.wallet;}
-const t=new Date();$('bDate').min=fmtDate(t);const mx=new Date();mx.setDate(mx.getDate()+14);$('bDate').max=fmtDate(mx);
+const t=new Date();$('bDate').min=fmtDate(t);if(!$('bDate').value)$('bDate').value=fmtDate(t);const mx=new Date();mx.setDate(mx.getDate()+14);$('bDate').max=fmtDate(mx);
 show('vBook');$('vFind').classList.remove('hide');$('pFooter').classList.remove('hide');
 if(pubCode)findBooking(pubCode);
 }catch(e){deadLink();}
