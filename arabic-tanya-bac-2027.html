@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>امتحان اللغة العربية - تانية بكالوريا 2027</title>
+<style>
+:root{--blue:#1769aa;--dark:#123b60;--pale:#eaf4fc;--line:#c9dff1;--ink:#203040}
+*{box-sizing:border-box}body{margin:0;background:#f3f8fc;color:var(--ink);font-family:Tahoma,Arial,sans-serif;line-height:1.8}
+.wrap{max-width:900px;margin:20px auto;padding:16px}
+.sheet{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 8px 28px #123b6012}
+header{padding:24px 20px;text-align:center;background:linear-gradient(135deg,#fff,#eaf4fc);border-bottom:3px solid var(--blue)}
+.logo{width:76px;height:76px;margin:0 auto 10px;border:3px solid var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--blue);font-weight:bold;font-size:13px;background:white;line-height:1.2}
+h1{color:var(--dark);font-size:25px;margin:4px 0}header p{margin:3px;color:#45657f}
+.info{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:15px}
+.info input{padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;min-width:210px}
+.timer{font-weight:bold;color:#b34235;background:#fff1ef;border-radius:10px;padding:7px 14px;display:inline-block;margin-top:12px}
+.content{padding:20px}.notice{background:#f0f7fd;border-right:4px solid var(--blue);padding:10px 14px;border-radius:8px;margin-bottom:18px}
+.section{margin:24px 0 12px;color:var(--dark);font-size:20px;border-bottom:2px solid var(--line);padding-bottom:6px}
+.q{border:1px solid #dce9f4;border-radius:12px;padding:14px;margin:12px 0;background:#fff}
+.q h3{font-size:16px;margin:0 0 10px;color:#203f5b}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #e1ebf3;border-radius:8px;cursor:pointer}
+.opt:hover{background:#f3f9fe}.opt input{accent-color:var(--blue)}
+.feedback{font-size:14px;margin-top:8px;font-weight:bold}.correct{color:#16804a}.wrong{color:#bb3d36}
+textarea{width:100%;min-height:90px;padding:10px;border:1px solid var(--line);border-radius:9px;font:inherit;resize:vertical}
+.actions{text-align:center;margin:24px 0}.btn{border:0;border-radius:10px;padding:12px 28px;font:inherit;font-weight:bold;cursor:pointer;margin:5px}
+.primary{background:var(--blue);color:white}.secondary{background:#eaf2f9;color:var(--dark)}
+#result{display:none;background:#f0f7fd;border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:20px}
+.score{font-size:25px;color:var(--dark);font-weight:bold}
+.model{display:none;margin-top:8px;padding:9px;background:#f7fbff;border-radius:8px;color:#37536b;font-size:14px}
+footer{text-align:center;padding:16px;color:#668096;border-top:1px solid var(--line);font-size:13px}
+@media(max-width:600px){.options{grid-template-columns:1fr}.wrap{padding:8px}.content{padding:13px}h1{font-size:21px}}
+</style>
+</head>
+<body><div class="wrap"><div class="sheet">
+<header>
+<div class="logo">ZAKER<br>SA7</div>
+<h1>امتحان اللغة العربية</h1>
+<p>تانية بكالوريا 2027 | المنهج الجديد</p>
+<p>اختبار تدريبي شامل – مستوى متوسط ومتدرج</p>
+<div class="info"><input id="student" placeholder="اسم الطالب"><span class="timer">الوقت المتبقي: <span id="time">60:00</span></span></div>
+</header>
+<div class="content">
+<div class="notice">اقرأ السؤال جيدًا قبل الإجابة. يتكون الامتحان من 20 سؤالًا اختياريًا و10 أسئلة مقالية. الدرجة النهائية 60 درجة.</div>
+<h2 class="section">أولًا: اختر الإجابة الصحيحة (30 درجة)</h2>
+<div id="mcqs"></div>
+<h2 class="section">ثانيًا: الأسئلة المقالية (30 درجة)</h2>
+<div id="essays"></div>
+<div class="actions"><button class="btn primary" onclick="showResult()">عرض النتيجة</button><button class="btn secondary" onclick="window.print()">طباعة الامتحان</button></div>
+<div id="result"></div>
+</div>
+<footer>بالتوفيق والنجاح 🌟 | ZAKER SA7</footer>
+</div></div>
+<script>
+const questions=[
+["في جملة «إن أباك صاحبُ خُلُقٍ كريم»، إعراب «أباك»:","اسم إن منصوب بالألف لأنه من الأسماء الخمسة","خبر إن مرفوع بالواو","مفعول به منصوب بالفتحة","فاعل مرفوع بالضمة",0],
+["أي الكلمات الآتية ممنوعة من الصرف؟","كتاب","مساجد","قلم","مدرسة",1],
+["تُجرّ الأسماء الخمسة بالياء إذا كانت:","مفردة ومضافة لغير ياء المتكلم","مثناة","جمع مؤنث سالم","غير مضافة",0],
+["العَلَم في جملة «قابلتُ خالدًا في المكتبة» هو:","قابلت","خالدًا","المكتبة","في",1],
+["«عاد المسافرُ مسرورًا» كلمة «مسرورًا» تعرب:","تمييزًا","حالًا","مفعولًا لأجله","نعتًا",1],
+["«قرأتُ رغبةً في المعرفة» كلمة «رغبةً» مفعول:","مطلق","به","لأجله","فيه",2],
+["في «من يجتهدْ ينجحْ» أداة الشرط هي:","يجتهد","ينجح","من","لا توجد",2],
+["أي الجمل الآتية تشتمل على نعت؟","عاد الطالب مبتسمًا","قرأت كتابًا مفيدًا","سافرت طلبًا للعلم","وقف المعلم أمام الفصل",1],
+["«العلم نور» الصورة البيانية الأقرب هي:","تشبيه بليغ","كناية","مجاز مرسل","طباق",0],
+["في «يضحك النهار ويبكي الليل» المحسن البديعي هو:","جناس","طباق","سجع","تصريع",1],
+["التعبير «فلان نظيف اليد» يُعد:","تشبيهًا","كناية عن الأمانة","استعارة تصريحية","مبالغة",1],
+["الغرض الأساسي من الاستفهام في «أليس العلم أساس التقدم؟» هو:","التعجب فقط","التقرير","النداء","التمني",1],
+["الفكرة الرئيسة للنص القرائي تُحدَّد من خلال:","كلمة واحدة فقط","عنوان النص وتماسك أفكاره","آخر جملة فقط","عدد فقراته",1],
+["عند استنتاج معنى كلمة من السياق نعتمد على:","حروفها فقط","الجملة وما يحيط بها من أفكار","عدد مقاطعها","شكلها الطباعي",1],
+["من سمات الفقرة الحجاجية الجيدة:","عرض الرأي دون دليل","تقديم رأي وأدلة وشواهد","تكرار الفكرة","إهمال وجهة النظر الأخرى",1],
+["الغرض من الاستشهاد في الفقرة الحجاجية هو:","إطالة الموضوع","دعم الفكرة وتقوية الإقناع","تغيير الموضوع","تكرار المقدمة",1],
+["من عناصر بناء العمل القصصي:","الشخصيات والأحداث والزمان والمكان","القافية والروي فقط","الأوزان الشعرية","المحسنات وحدها",0],
+["عند تحليل شخصية في قصة نركز على:","اسمها فقط","أقوالها وأفعالها ودوافعها","عدد حروف اسمها","مكان كتابة القصة",1],
+["النص «الخلق جوهر الفضيلة» يوجه القارئ أساسًا إلى قيمة:","التفاخر بالمظاهر","التمسك بالأخلاق","إهمال الآخرين","طلب الشهرة",1],
+["من خصائص المقال النقدي:","إصدار حكم بلا تعليل","تحليل العمل وإبداء الرأي مع التعليل","سرد أحداث بلا تقييم","الاعتماد على العاطفة وحدها",1]
+];
+const essays=[
+["نحو: أعرب ما تحته خط: «إن **أخاك** صاحبُ مروءةٍ، ولن يهملَ واجبه».","أخاك: اسم إن منصوب بالألف لأنه من الأسماء الخمسة، والكاف ضمير مضاف إليه. يهمل: فعل مضارع منصوب بلن وعلامة نصبه الفتحة."],
+["نحو: استخرج الممنوع من الصرف واذكر سبب منعه: «زرتُ مساجدَ كثيرةً في القاهرة».","مساجد: ممنوعة من الصرف لأنها صيغة منتهى الجموع."],
+["نحو: اكتب جملة من إنشائك تشتمل على حال، ثم حدد الحال وصاحبها.","مثال: عاد الطالب مسرورًا. مسرورًا: حال منصوب، وصاحب الحال الطالب."],
+["بلاغة: وضّح الصورة البيانية في «ابتسم الصباح» وبيّن أثرها.","استعارة مكنية؛ صوّر الصباح بإنسان يبتسم، وتوحي بالإشراق والتفاؤل."],
+["بلاغة: ما المحسن البديعي في «يعلم السر والعلن»؟ وما أثره؟","طباق بين السر والعلن، يوضح المعنى ويقويه بالتضاد."],
+["قراءة: اكتب فقرة قصيرة تشرح فيها كيف تميز الفكرة الرئيسة من التفاصيل في أي نص.","تُستخلص الفكرة الرئيسة من عنوان النص وتكرار المعنى وترابط الفقرات، أما التفاصيل فتشرح الفكرة أو تقدم أمثلة وأدلة عليها."],
+["نصوص: اكتب ثلاث قيم أخلاقية يمكن أن يدعو إليها نص بعنوان «الخلق جوهر الفضيلة»، مع توضيح قيمة واحدة.","من القيم: الصدق، الأمانة، الرحمة، احترام الآخرين. الصدق يجعل الثقة أساس العلاقات بين الناس."],
+["قصة: اذكر عناصر البناء القصصي، ثم وضّح كيف تساعد الأحداث في كشف صفات الشخصية.","العناصر: الشخصيات، الأحداث، الزمان، المكان، العقدة والحل. وتكشف الأحداث صفات الشخصية من خلال مواقفها واختياراتها."],
+["تعبير: اكتب فقرة حجاجية من 5 إلى 7 أسطر تقنع فيها زملاءك بأهمية القراءة.","إجابة نموذجية: القراءة طريق المعرفة وبناء الوعي؛ فهي توسع الخبرة وتنمي اللغة وتساعد الإنسان على التفكير. وقد أكدت التجارب أن القارئ أقدر على فهم العالم ومناقشة قضاياه. لذلك ينبغي أن نخصص وقتًا يوميًا للقراءة، ونختار كتبًا نافعة تناسب اهتماماتنا."],
+["تعبير نقدي: اكتب خطوات مختصرة لتحليل نص أدبي وإبداء رأيك فيه بطريقة موضوعية.","تحديد الفكرة والعاطفة، ملاحظة الألفاظ والصور والأساليب، بيان أثرها في المعنى، الاستشهاد من النص، ثم إصدار حكم نقدي معلل ومتوازن."]
+];
+const mc=document.getElementById('mcqs');
+questions.forEach((q,i)=>{let d=document.createElement('div');d.className='q';d.innerHTML=`<h3>${i+1}. ${q[0]}</h3><div class="options">${q.slice(1,5).map((v,j)=>`<label class="opt"><input type="radio" name="q${i}" value="${j}" onchange="check(${i},${j})"> ${'أبجد'[j]}) ${v}</label>`).join('')}</div><div class="feedback" id="f${i}"></div>`;mc.appendChild(d)});
+const es=document.getElementById('essays');
+essays.forEach((e,i)=>{let d=document.createElement('div');d.className='q';d.innerHTML=`<h3>${i+1}. ${e[0]}</h3><textarea id="e${i}" placeholder="اكتب إجابتك هنا..."></textarea><div class="model" id="m${i}"><b>الإجابة النموذجية:</b> ${e[1]}</div>`;es.appendChild(d)});
+let answers={},finished=false;
+function check(i,j){if(finished)return;answers[i]=j;let f=document.getElementById('f'+i);if(j===questions[i][5])f.innerHTML='<span class="correct">إجابة صحيحة ✓</span>';else f.innerHTML='<span class="wrong">إجابة غير صحيحة ✗</span> — الإجابة الصحيحة: '+ 'أبجد'[questions[i][5]];}
+function norm(s){return s.toLowerCase().replace(/[ًٌٍَُِّْـ،؛.!؟:"]/g,' ').split(/\s+/).filter(x=>x.length>2)}
+function showResult(){
+ if(finished)return;finished=true;clearInterval(clock);
+ let mcScore=0;questions.forEach((q,i)=>{if(answers[i]===q[5])mcScore+=1.5;});
+ let essayScore=0,detail=[];
+ essays.forEach((e,i)=>{let user=norm(document.getElementById('e'+i).value),model=norm(e[1]);let hits=model.filter(w=>user.includes(w)).length;let ratio=model.length?hits/model.length:0;let s=Math.min(3,Math.round(ratio*3*10)/10);if(user.length<4)s=0;essayScore+=s;detail.push(s);document.getElementById('m'+i).style.display='block';});
+ let total=Math.round((mcScore+essayScore)*10)/10;
+ let r=document.getElementById('result');r.style.display='block';
+ r.innerHTML=`<div class="score">النتيجة: ${total} / 60</div><p>الاختياري: ${mcScore} / 30</p><p>المقالي (تقدير آلي تقريبي): ${Math.round(essayScore*10)/10} / 30</p><p>${total>=48?'ممتاز! استمر في التقدم 🌟':total>=36?'أداء جيد، راجع النقاط التي أخطأت فيها.':'بداية جيدة؛ راجع الإجابات النموذجية وحاول مرة أخرى.'}</p><h3>درجات الأسئلة المقالية</h3>${detail.map((s,i)=>`<p>السؤال ${i+1}: ${s} / 3</p>`).join('')}<small>تنبيه: تصحيح المقالي آلي اعتمادًا على تشابه الكلمات، لذلك هو تقديري وقد لا يعكس جودة الصياغة أو صحة كل المعاني بدقة. راجع الإجابات النموذجية.</small>`;
+ r.scrollIntoView({behavior:'smooth'});
+}
+let seconds=3600;const timeEl=document.getElementById('time');
+let clock=setInterval(()=>{if(finished)return;seconds--;timeEl.textContent=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');if(seconds<=0)showResult()},1000);
+</script></body></html>
