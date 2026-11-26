@@ -263,7 +263,7 @@ function renderServices(q){q=(q||'').trim();let list=SERVICES;if(curPlat)list=li
 renderServices();$('svcSearch').oninput=e=>renderServices(e.target.value);
 document.querySelectorAll('#platChips .chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('#platChips .chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');curPlat=c.dataset.p;renderServices($('svcSearch').value)});
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
-function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=(s.qtys||QTYS).map(q=>`<option value="${q}">${fmt(q)}${s.unit?' '+s.unit:''} • ${money(Math.ceil(q*s.price/s.per))}</option>`).join('');$('fLink').placeholder=s.plat==='game'?'اكتب ID اللاعب (والسيرفر لو موجود)':'مثال: https://tiktok.com/@username أو @username';calc()}
+function renderQty(){const s=svc($('fService').value);try{const sv=localStorage.getItem('bs_link_'+s.id);if(sv!=null)$('fLink').value=sv}catch(_){}$('fQty').innerHTML=(s.qtys||QTYS).map(q=>`<option value="${q}">${fmt(q)}${s.unit?' '+s.unit:''} • ${money(Math.ceil(q*s.price/s.per))}</option>`).join('');$('fLink').placeholder=s.plat==='game'?'اكتب ID اللاعب (والسيرفر لو موجود)':'مثال: https://tiktok.com/@username أو @username';calc()}
 function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(Math.ceil(q*s.price/s.per));if($('fUnit'))$('fUnit').textContent=s.qtys?('سعر الوحدة: '+s.price+' جنيه لل'+s.unit):('السعر: '+money(s.price)+' لكل '+fmt(s.per))}
 function pick(id){if(!ME){$('authSec').scrollIntoView({behavior:'smooth'});return}$('fService').value=id;renderQty();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
 $('fService').onchange=renderQty;$('fQty').onchange=calc;renderQty();
@@ -397,7 +397,9 @@ $('orderBtn').onclick=async()=>{
    tx.update(uref,{balance:bal-price});
    tx.set(oref,{uid:ME.uid,service:s.name,serviceId:s.id,platform:s.platName,quantity:q,price:price,accountLink:link,status:'new',createdAt:firebase.firestore.FieldValue.serverTimestamp()});
   });
-  const ok=$('ordOk');ok.innerHTML=`✅ طلبك اتسجل واتخصم من رصيدك ${money(price)}.<br>رصيدك الحالي: ${money((PROFILE.balance||0)-price)}. هيتنفذ في أسرع وقت وتقدر تتابعه من "طلباتي".`;ok.style.display='block';
+  try{localStorage.setItem('bs_link_'+s.id,link)}catch(_){}
+  const ok=$('ordOk');ok.innerHTML=`✅ طلبك اتسجل واتخصم من رصيدك ${money(price)}.<br>رصيدك الحالي: ${money((PROFILE.balance||0)-price)}. هيتنفذ في أسرع وقت وتقدر تتابعه من "طلباتي".<br><a class="copy" style="display:inline-block;margin-top:8px;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/201558288143?text=${encodeURIComponent('طلب جديد 🛒%0aالخدمة: '+s.name+'%0aالكمية: '+fmt(q)+'%0aالحساب: '+link)}">💬 ابعت تفاصيل الطلب واتساب للمتابعة الأسرع</a>`;ok.style.display='block';
+  toast('✅ طلبك اتسجل بنجاح');
   $('fLink').value='';
   ok.scrollIntoView({behavior:'smooth',block:'center'});
  }catch(e){console.error(e);showErr('ordErr',e.message&&e.message.indexOf('كفاية')>=0?e.message:'حصلت مشكلة في تنفيذ الطلب. جرب تاني.')}
@@ -471,7 +473,7 @@ function startAdmin(){startAdminCounts();
    const csvBtn=curView==='allOrders'?`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><button class="btn sm" onclick="exportOrdersCSV()">⬇️ تصدير الطلبات CSV</button><select id="admStFilt" style="width:auto;padding:6px 10px" onchange="window._admStFilt=this.value;startAdmin()"><option value="">كل الحالات</option><option value="new" ${stFilt==='new'?'selected':''}>🕐 جديد</option><option value="in-progress" ${stFilt==='in-progress'?'selected':''}>⚙️ قيد التنفيذ</option><option value="done" ${stFilt==='done'?'selected':''}>✅ تم</option><option value="rejected" ${stFilt==='rejected'?'selected':''}>❌ مرفوض</option></select></div>`:'';
    $('adminList').innerHTML=csvBtn+(showDocs.length?showDocs.map(d=>{const o=d.data();const u=users[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
     return `<div class="row-item"><div class="top"><b>${esc(o.service)} • ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>
-    <div class="meta">العميل: ${esc(u.name||'')} ${esc(u.phone||'')}<br>الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}</div>
+    <div class="meta">العميل: ${esc(u.name||'')} ${esc(u.phone||'')}<br>الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}<br>${u.phone?`<a class="copy" style="text-decoration:none;display:inline-block;margin-top:4px" href="https://wa.me/${(''+u.phone).replace(/\D/g,'').replace(/^0/,'2')}" target="_blank" rel="noopener">💬 واتساب العميل</a>`:''}</div>
     <div class="acts"><button onclick="setOrderStatus('${d.id}','in-progress')">بدء التنفيذ ⚙️</button><button onclick="setOrderStatus('${d.id}','done')">تم التنفيذ ✅</button><button onclick="setOrderStatus('${d.id}','rejected')">رفض ❌</button><button class="del" onclick="delOrder('${d.id}')">مسح 🗑️</button></div></div>`
    }).join(''):'<div class="note" style="text-align:center;padding:20px">مفيش طلبات هنا.</div>');
   },e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
