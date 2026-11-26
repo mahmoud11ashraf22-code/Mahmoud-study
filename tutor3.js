@@ -290,12 +290,25 @@
     ['عام', 'مدة جلسة بومودورو:', ['25 دقيقة', '3 ساعات', '5 دقايق'], 0, '25 + 5 راحة.']
   ];
   var quiz = null;
-  function quizStart(subj) {
-    var pool = QB.filter(function (x) { return !subj || x[0] === subj; });
-    if (pool.length < 3) pool = QB.slice();
+  var EB = [];
+  var EXAMS = [['physics', 'فيزياء 2027'], ['english2027', 'إنجليزي 2027'], ['november', 'إنجليزي نوفمبر'], ['grammar', 'جرامر'], ['arabic', 'عربي بكالوريا'], ['networks', 'الشبكات']];
+  try { fetch('qbank.json?v=1').then(function (r) { return r.json(); }).then(function (a) { if (Array.isArray(a)) EB = a; }).catch(function () { }); } catch (e) { }
+  function ebItems(filter) {
+    return EB.filter(filter).map(function (x) { return [x.s, x.q, x.o, x.a, 'من امتحان: ' + x.t]; });
+  }
+  function quizStart(subj, exKey) {
+    var pool;
+    if (exKey) pool = ebItems(function (x) { return x.e === exKey; });
+    else if (subj === 'EXAMS') pool = ebItems(function () { return true; });
+    else if (subj) pool = QB.filter(function (x) { return x[0] === subj; }).concat(ebItems(function (x) { return x.s === subj; }));
+    else pool = QB.concat(ebItems(function () { return true; }));
+    if (pool.length < 3) pool = QB.concat(ebItems(function () { return true; }));
     pool = pool.slice().sort(function () { return Math.random() - 0.5; }).slice(0, 5);
     quiz = { q: pool, i: 0, ok: 0, wrong: [] };
     return quizAsk();
+  }
+  function quizMenu() {
+    return '<b>اختار الكويز 🎯</b><br>أسئلتي من امتحانات المنصة نفسها (' + (EB.length || 'عدة') + ' سؤال) + أسئلة عامة.' + fu(['اختبرني من الامتحانات', 'اختبرني من امتحان فيزياء 2027', 'اختبرني من امتحان إنجليزي 2027', 'اختبرني من امتحان إنجليزي نوفمبر', 'اختبرني من امتحان جرامر', 'اختبرني من امتحان عربي بكالوريا', 'اختبرني من امتحان الشبكات', 'اختبرني في عربي', 'اختبرني في فيزياء']);
   }
   function quizAsk() {
     var x = quiz.q[quiz.i];
@@ -319,7 +332,7 @@
   var SCHED_RE = /(اعمل(ي|لي)? (لي )?(جدول|خطه)|عايز (جدول|خطه)|عاوز (جدول|خطه)|نظم(لي)? (لي )?(مذاكرتي|وقتي)|جدول مذاكره|خطه مذاكره|جدول للمذاكره|ساعدني اذاكر)/;
   var REPLAN_RE = /(متاخر|اتاخرت|ضيعت|مذاكرتش|معرفتش اذاكر|فاتني|اعاده ترتيب|اعد ترتيب|عدل الجدول|غير الجدول|اعمل الجدول تاني)/;
   var flow = null;
-  var QUIZ_RE = /^(اختبرني|كويز|اسالني|quiz|اختبار سريع)( في (انجليزي|عربي|فيزياء|كيمياء|رياضيات|احياء))?$/;
+  var QUIZ_RE = /^(اختبرني|كويز|اسالني|quiz|اختبار سريع)( (في|من) .+)?$/;
   function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   function ls(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { } }
   function parseDate(t) {
@@ -434,7 +447,11 @@
   function scheduleRoute(q) {
     var n = norm(q);
     if (quiz) return quizHandle(q);
-    if (/^(اختبرني|كويز|اسالني|quiz|اختبار سريع|كويز (.+))$/.test(n) || /^اختبرني في (انجليزي|عربي|فيزياء|كيمياء|رياضيات|احياء)$/.test(n)) { var mm = n.match(/(انجليزي|عربي|فيزياء|كيمياء|رياضيات|احياء)/); var map = { 'انجليزي': 'إنجليزي', 'عربي': 'عربي', 'فيزياء': 'فيزياء', 'كيمياء': 'كيمياء', 'رياضيات': 'رياضيات', 'احياء': 'أحياء' }; return quizStart(mm ? map[mm[1]] : null); }
+    if (/^(اختبرني|كويز) من (الامتحانات|امتحانات المنصه)$/.test(n)) return quizStart('EXAMS');
+    var em = n.match(/^(اختبرني|كويز) من امتحان (.+)$/);
+    if (em) { var key = null; if (/فيزياء/.test(em[2])) key = 'physics'; else if (/نوفمبر/.test(em[2])) key = 'november'; else if (/جرامر|gerund/.test(em[2])) key = 'grammar'; else if (/انجليزي/.test(em[2])) key = 'english2027'; else if (/عربي/.test(em[2])) key = 'arabic'; else if (/شبكات/.test(em[2])) key = 'networks'; if (key) return quizStart(null, key); }
+    if (/^(اختبرني|كويز|quiz)$/.test(n)) return quizMenu();
+    if (/^(اسالني|اختبار سريع|اختبرني في (انجليزي|عربي|فيزياء|كيمياء|رياضيات|احياء|شبكات))$/.test(n)) { var mm = n.match(/(انجليزي|عربي|فيزياء|كيمياء|رياضيات|احياء|شبكات)/); var map = { 'شبكات': 'شبكات', 'انجليزي': 'إنجليزي', 'عربي': 'عربي', 'فيزياء': 'فيزياء', 'كيمياء': 'كيمياء', 'رياضيات': 'رياضيات', 'احياء': 'أحياء' }; return quizStart(mm ? map[mm[1]] : null); }
     if (flow && flow.step === 'checkin') { if (/(خلصت|ذاكرت|جزء|معرفتش|مذاكرتش|ما ذاكرتش|لسه)/.test(n)) return checkin(q); flow = null; }
     if (flow) return flowHandle(q);
     if (SCHED_RE.test(n) || n === 'اعملي جدول مذاكره') return startFlow();
@@ -495,7 +512,7 @@
   }
 
   /* ---------- ربط بالمدرّس الحالي (#t2): fallback أذكى + تبويب "أكتر" ---------- */
-  var EXTRA_CHIPS = ['اعملي جدول مذاكرة', 'اختبرني', 'اختبرني في إنجليزي', 'اختبرني في فيزياء', 'اختبرني في رياضيات', 'مستواي', 'كام يوم على الامتحان', 'فيزياء', 'كهرباء', 'حركة وقوى', 'كيمياء', 'كيمياء عضوية', 'رياضيات', 'جبر', 'هندسة', 'أحياء', 'الخلية والوراثة', 'جملة شرط', 'Passive Voice', 'Present Perfect', 'كتابة Essay', 'كلمات إنجليزي', 'قطعة Comprehension', 'النحو', 'بلاغة', 'تاريخ', 'جغرافيا', 'فلسفة', 'بومودورو', 'ملخص ذكي', 'حفظ', 'تكتيكات الامتحان', 'اختيار من متعدد', 'ليلة الامتحان', 'قلق الامتحان', 'مكان المذاكرة', 'أكل وصحة', 'السوشيال والألعاب', 'ثقة بالنفس', 'مادة ضعيفة', 'ضغط الأهل', 'راحة ذكية', 'تحديد الهدف', 'كلمة تشجيع', 'نصيحة'];
+  var EXTRA_CHIPS = ['اعملي جدول مذاكرة', 'اختبرني', 'اختبرني من الامتحانات', 'اختبرني من امتحان فيزياء 2027', 'اختبرني من امتحان إنجليزي 2027', 'اختبرني من امتحان إنجليزي نوفمبر', 'اختبرني من امتحان جرامر', 'اختبرني من امتحان عربي بكالوريا', 'اختبرني من امتحان الشبكات', 'مستواي', 'كام يوم على الامتحان', 'فيزياء', 'كهرباء', 'حركة وقوى', 'كيمياء', 'كيمياء عضوية', 'رياضيات', 'جبر', 'هندسة', 'أحياء', 'الخلية والوراثة', 'جملة شرط', 'Passive Voice', 'Present Perfect', 'كتابة Essay', 'كلمات إنجليزي', 'قطعة Comprehension', 'النحو', 'بلاغة', 'تاريخ', 'جغرافيا', 'فلسفة', 'بومودورو', 'ملخص ذكي', 'حفظ', 'تكتيكات الامتحان', 'اختيار من متعدد', 'ليلة الامتحان', 'قلق الامتحان', 'مكان المذاكرة', 'أكل وصحة', 'السوشيال والألعاب', 'ثقة بالنفس', 'مادة ضعيفة', 'ضغط الأهل', 'راحة ذكية', 'تحديد الهدف', 'كلمة تشجيع', 'نصيحة'];
   var ACT_LABEL = { planner: '📅 افتح الخطة', backlog: '📚 افتح التراكم', review: '🔁 افتح المراجعة', settings: '⚙️ الإعدادات' };
   function lastQuestion(row) {
     var p = row.previousElementSibling;
