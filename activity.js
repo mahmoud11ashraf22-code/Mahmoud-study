@@ -71,8 +71,6 @@
       kpi(d.scores, 'طلاب في لوحة المسابقات') +
       kpi(d.exams.total, 'تسليمات امتحانات', '+' + d.exams.today + ' النهاردة') +
       kpi(d.forum.total, 'منشورات المنتدى', '+' + d.forum.today + ' النهاردة') +
-      kpi(d.topups.total, 'طلبات شحن BOOST', d.topups.today + ' النهاردة') +
-      kpi(d.orders.total, 'طلبات BOOST', d.orders.today + ' النهاردة') +
       '</div>' +
       chart('طلاب نشطين آخر ٧ أيام (حسب آخر ظهور)', d.visitors.days, 'linear-gradient(180deg,#4ade80,#16a34a)') +
       chart('تسليمات الامتحانات آخر ٧ أيام', d.exams.days) +
@@ -92,7 +90,7 @@
     if (!ready()) { if (st) st.textContent = 'جارٍ تجهيز الاتصال...'; return; }
     if (st) st.textContent = 'جارٍ التحميل...';
     var db = fb().firestore();
-    Promise.all(['publicVisitors', 'examSubmissions', 'forumPosts', 'boostTopups', 'smmOrders', 'publicScores'].map(function (n) { return all(db, n); }))
+    Promise.all(['publicVisitors', 'examSubmissions', 'forumPosts', 'publicScores'].map(function (n) { return all(db, n); }))
       .then(function (r) {
         var failed = r.filter(function (x) { return x === null; }).length;
         function z(x) { return x || []; }
@@ -100,9 +98,7 @@
           visitors: stats(z(r[0]), 'lastSeen'),
           exams: stats(z(r[1]), 'createdAt'),
           forum: stats(z(r[2]), 'createdAt'),
-          topups: stats(z(r[3]), 'createdAt'),
-          orders: stats(z(r[4]), 'createdAt'),
-          scores: z(r[5]).length
+          scores: z(r[3]).length
         });
         if (st) st.textContent = failed ? ('تم التحميل (تعذر قراءة ' + failed + ' مجموعة)') : ('آخر تحديث: ' + new Date().toLocaleTimeString('ar-EG'));
       });
