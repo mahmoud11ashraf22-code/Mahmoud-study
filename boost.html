@@ -141,6 +141,8 @@ html{scroll-behavior:smooth}
 ::-webkit-scrollbar-track{background:#0a0f0c}
 ::-webkit-scrollbar-thumb{background:#1e3528;border-radius:99px}
 ::-webkit-scrollbar-thumb:hover{background:#2a4a38}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -189,7 +191,7 @@ html{scroll-behavior:smooth}
 <div id="dashSec" class="hidden">
 <div id="notifBar" class="hidden"></div>
 <div id="toastWrap"></div>
-<div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><span style="display:flex;gap:12px;align-items:center"><button id="notifBtn" onclick="toggleNotifPanel()" style="color:var(--gold);position:relative">🔔<span id="notifCount" class="hidden" style="position:absolute;top:-7px;left:-7px;background:var(--red);color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;font-weight:800"></span></button><button id="shareBtn" style="color:var(--green)">📤 شارك المنصة</button><button id="logoutBtn">تسجيل خروج</button></span></div>
+<div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><span style="display:flex;gap:12px;align-items:center"><button id="notifBtn" aria-label="الإشعارات" onclick="toggleNotifPanel()" style="color:var(--gold);position:relative">🔔<span id="notifCount" class="hidden" style="position:absolute;top:-7px;left:-7px;background:var(--red);color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;font-weight:800"></span></button><button id="shareBtn" style="color:var(--green)">📤 شارك المنصة</button><button id="logoutBtn">تسجيل خروج</button></span></div>
 <div id="notifPanel" class="panel hidden"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b>🔔 إشعاراتك</b><button class="copy" onclick="try{localStorage.setItem('bsn_'+ME.uid,'[]')}catch(_){}renderNotifInbox()">مسح الكل 🗑️</button></div><div id="notifInbox"></div></div>
 <div class="wallet"><div class="lbl">رصيد محفظتك</div><div class="bal" id="uBal">0</div><div class="lbl">جنيه</div></div>
 
@@ -555,7 +557,7 @@ async function setOrderStatus(id,st){
 }
 async function delOrder(id){if(!confirm('متأكد تمسح الطلب؟'))return;try{await store.collection('boostOrders').doc(id).delete()}catch(e){toast('تعذر المسح: '+(e.code||e.message),1)}}
 </script>
-<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="ارجع لفوق">↑</button>
+<button id="toTop" aria-label="ارجع لفوق الصفحة" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="ارجع لفوق">↑</button>
 <script>window.addEventListener('scroll',function(){var b=document.getElementById('toTop');if(b)b.classList.toggle('show',window.scrollY>400)},{passive:true});</script>
 <script>
 ['fPhoneAuth','fPass','fName'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('keydown',function(e){if(e.key==='Enter'){var b=document.getElementById('authBtn');if(b)b.click()}})});
