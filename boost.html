@@ -91,6 +91,10 @@ input:focus,select:focus{outline:none;border-color:var(--primary)}
 .wallet{background:linear-gradient(110deg,#12261c,#101a15);border:1px solid var(--primary);border-radius:var(--r);padding:22px;text-align:center;margin-bottom:16px}
 .wallet .bal{font-size:40px;font-weight:800;color:var(--gold)}
 .wallet .lbl{color:var(--muted);font-size:13px}
+.faq{border-bottom:1px solid var(--line);padding:10px 2px}
+.faq:last-child{border-bottom:0}
+.faq summary{cursor:pointer;font-weight:700;font-size:14.5px}
+.faq p{color:var(--muted);font-size:13.5px;line-height:1.8;margin:8px 0 2px}
 .userbar{display:flex;justify-content:space-between;align-items:center;background:#0e1512;border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:16px;font-size:14px}
 .userbar button{background:none;border:none;color:var(--red);font-family:'Cairo',sans-serif;font-weight:700;cursor:pointer;font-size:13px}
 footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:40px;line-height:2}
@@ -134,7 +138,7 @@ a{color:var(--green);text-decoration:none}
 
 <div id="dashSec" class="hidden">
 <div id="notifBar" class="hidden"></div>
-<div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><button id="logoutBtn">تسجيل خروج</button></div>
+<div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><span style="display:flex;gap:12px;align-items:center"><button id="shareBtn" style="color:var(--green)">📤 شارك المنصة</button><button id="logoutBtn">تسجيل خروج</button></span></div>
 <div class="wallet"><div class="lbl">رصيد محفظتك</div><div class="bal" id="uBal">0</div><div class="lbl">جنيه</div></div>
 
 <h3 class="sec">💳 شحن المحفظة</h3>
@@ -173,6 +177,13 @@ a{color:var(--green);text-decoration:none}
 
 <h3 class="sec">🧾 سجل المحفظة</h3>
 <div class="panel"><div id="myTx"><div class="note">لسه مفيش حركات.</div></div></div>
+<h3 class="sec">❓ أسئلة شائعة</h3>
+<div class="panel">
+ <details class="faq"><summary>⚡ التنفيذ بياخد قد إيه؟</summary><p>معظم الطلبات بتتنفذ خلال ساعات من قبولها. هيوصلك إشعار أول ما تبدأ و أول ما تخلص.</p></details>
+ <details class="faq"><summary>💳 إزاي أشحن محفظتي؟</summary><p>اكتب المبلغ ودوس "توليد كود الدفع"، حوّل فودافون كاش أو انستاباي وابعت الكود مع سكرينشوت التحويل على واتساب. الرصيد بيوصل بعد التأكيد.</p></details>
+ <details class="faq"><summary>🔁 لو الطلب اترفض؟</summary><p>ثمن الطلب بيرجع لمحفظتك كامل وتلقائي، وتقدر تطلب تاني بضغطة واحدة من زرار "اطلب تاني".</p></details>
+ <details class="faq"><summary>🎮 شحن الألعاب بيتم إزاي؟</summary><p>اكتب ID اللاعب صح (والسيرفر لو مطلوب) والشحن بيوصل على حسابك مباشرة. راجع الـ ID كويس قبل الطلب.</p></details>
+</div>
 </div>
 
 <h3 class="sec">🔐 لوحة الأدمن</h3>
@@ -259,6 +270,7 @@ $('authBtn').onclick=async()=>{
  btn.disabled=false;btn.textContent=regMode?'إنشاء الحساب':'دخول';
 };
 $('logoutBtn').onclick=()=>auth.signOut();
+$('shareBtn').onclick=()=>{const t=encodeURIComponent('MAHMOUD BOOST ⚡ شحن متابعين ولايكات وكوينز بيس وشدات ببجي وجواهر فري فاير بأحسن الأسعار 👇\nhttps://mahmoud11ashraf22-code.github.io/Mahmoud-study/boost.html');window.open('https://wa.me/?text='+t,'_blank')};
 auth.onAuthStateChanged(user=>{
  if(user&&ADMIN_UIDS.indexOf(user.uid)<0){ME=user;startDash()}else{ME=null;PROFILE=null;stopDash();if(user){/* admin handled separately */}}
 });
@@ -411,11 +423,13 @@ function startAdmin(){
  }else{
   let q=store.collection('boostOrders').limit(100);
   if(curView==='orders')q=store.collection('boostOrders').where('status','==','new').limit(100);
-  unsubAdmin=q.onSnapshot(s=>{
+  unsubAdmin=q.onSnapshot(async s=>{
    const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
-   $('adminList').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+   const uids=[...new Set(docs.map(d=>d.data().uid))],users={};
+   await Promise.all(uids.map(async u=>{try{const ud=await store.collection('boostUsers').doc(u).get();if(ud.exists)users[u]=ud.data()}catch(_){}}));
+   $('adminList').innerHTML=docs.length?docs.map(d=>{const o=d.data();const u=users[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
     return `<div class="row-item"><div class="top"><b>${esc(o.service)} • ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>
-    <div class="meta">الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}</div>
+    <div class="meta">العميل: ${esc(u.name||'')} ${esc(u.phone||'')}<br>الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}</div>
     <div class="acts"><button onclick="setOrderStatus('${d.id}','in-progress')">بدء التنفيذ ⚙️</button><button onclick="setOrderStatus('${d.id}','done')">تم التنفيذ ✅</button><button onclick="setOrderStatus('${d.id}','rejected')">رفض ❌</button><button class="del" onclick="delOrder('${d.id}')">مسح 🗑️</button></div></div>`
    }).join(''):'<div class="note" style="text-align:center;padding:20px">مفيش طلبات هنا.</div>';
   },e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
