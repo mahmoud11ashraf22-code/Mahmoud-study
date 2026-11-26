@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="MAHMOUD BOOST - منصة شحن سوشيال وألعاب: متابعين، لايكات، مشاهدات تيك توك وإنستجرام، وشحن ألعاب بالـ ID. محفظة فورية وتنفيذ سريع.">
+<meta name="theme-color" content="#0a0f0c">
+<meta property="og:title" content="MAHMOUD BOOST ⚡ شحن متابعين ولايكات وألعاب">
+<meta property="og:description" content="زوّد حسابك في دقائق: متابعين، لايكات، مشاهدات، وشحن ألعاب بالـ ID. سجّل، اشحن محفظتك، واطلب.">
+<meta property="og:type" content="website">
 <title>MAHMOUD BOOST | شحن متابعين ولايكات</title>
 <link rel="icon" href="https://mahmoud11ashraf22-code.github.io/Mahmoud-study/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -130,6 +135,12 @@ footer{font-size:11.5px}
 @media (max-width:640px){.howsteps{grid-template-columns:1fr;gap:8px}}
 #toTop{position:fixed;bottom:18px;left:18px;width:44px;height:44px;border-radius:50%;background:var(--green);color:#04150c;font-size:20px;font-weight:900;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:998}
 #toTop.show{opacity:1;pointer-events:auto}
+html{scroll-behavior:smooth}
+::selection{background:var(--green);color:#04150c}
+::-webkit-scrollbar{width:9px}
+::-webkit-scrollbar-track{background:#0a0f0c}
+::-webkit-scrollbar-thumb{background:#1e3528;border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:#2a4a38}
 </style>
 </head>
 <body>
@@ -152,6 +163,7 @@ footer{font-size:11.5px}
 <div class="howstep"><b>3️⃣</b>اطلب الخدمة وتتبعها لحد ما تتنفذ ✅</div>
 </div>
 <h3 class="sec">🛒 الخدمات والأسعار</h3>
+<div class="note" style="margin-top:-6px">💡 الأسعار بتتحدث من الإدارة باستمرار - السعر اللي قدامك هو الرسمي وقت الطلب.</div>
 <input id="svcSearch" type="text" placeholder="🔍 ابحث عن خدمة... مثال: تيك توك" style="margin-bottom:12px">
 <div class="chips" id="platChips">
  <button class="chip active" data-p="">الكل</button><button class="chip" data-p="tiktok">🎵 تيك توك</button><button class="chip" data-p="insta">📸 إنستجرام</button><button class="chip" data-p="game">🎮 ألعاب</button>
@@ -545,5 +557,9 @@ async function delOrder(id){if(!confirm('متأكد تمسح الطلب؟'))retu
 </script>
 <button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="ارجع لفوق">↑</button>
 <script>window.addEventListener('scroll',function(){var b=document.getElementById('toTop');if(b)b.classList.toggle('show',window.scrollY>400)},{passive:true});</script>
+<script>
+['fPhoneAuth','fPass','fName'].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener('keydown',function(e){if(e.key==='Enter'){var b=document.getElementById('authBtn');if(b)b.click()}})});
+var fl=document.getElementById('fLink');if(fl)fl.addEventListener('keydown',function(e){if(e.key==='Enter'){var b=document.getElementById('orderBtn');if(b)b.click()}});
+</script>
 </body>
 </html>
