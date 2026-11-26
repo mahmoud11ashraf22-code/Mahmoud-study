@@ -113,13 +113,13 @@ a{color:var(--green);text-decoration:none}
 <div class="wrap">
 <header>
 <img src="https://mahmoud11ashraf22-code.github.io/Mahmoud-study/icon-192.png" alt="MAHMOUD BOOST">
-<div><h1>MAHMOUD <b>BOOST</b></h1><p>منصة شحن متابعين ولايكات ومشاهدات ⚡</p></div>
+<div><h1>MAHMOUD <b>BOOST</b></h1><p>منصة شحن سوشيال وألعاب ⚡ متابعين، لايكات، كوينز بيس، شدات وجواهر</p></div>
 </header>
 
 <section class="hero">
 <h2>زوّد حسابك <span>في دقايق</span> 🚀</h2>
 <p>سجّل حسابك، اشحن محفظتك بفودافون كاش أو انستاباي، واطلب أي خدمة برصيدك فوراً. كل طلباتك وشحناتك محفوظة في حسابك.</p>
-<div class="badges"><span class="badge">👤 حساب ومحفظة خاصة بيك</span><span class="badge">⚡ تنفيذ سريع</span><span class="badge">🛡️ كود دفع لكل شحنة</span></div>
+<div class="badges"><span class="badge">👤 حساب ومحفظة خاصة بيك</span><span class="badge">⚡ تنفيذ سريع</span><span class="badge">🔔 إشعار لحظي بحالة طلبك</span><span class="badge">🛡️ كود دفع لكل شحنة</span><span class="badge">🎮 شحن ألعاب بالـ ID</span></div>
 </section>
 
 <div id="pubSec" class="hidden">
@@ -458,8 +458,10 @@ function startAdmin(){startAdminCounts();
    const uids=[...new Set(docs.map(d=>d.data().uid))],users={};
    await Promise.all(uids.map(async u=>{try{const ud=await store.collection('boostUsers').doc(u).get();if(ud.exists)users[u]=ud.data()}catch(_){}}));
    lastAdminDocs=docs;lastAdminUsers=users;
-   const csvBtn=curView==='allOrders'?'<div style="text-align:left;margin-bottom:8px"><button class="btn sm" onclick="exportOrdersCSV()">⬇️ تصدير الطلبات CSV</button></div>':'';
-   $('adminList').innerHTML=csvBtn+(docs.length?docs.map(d=>{const o=d.data();const u=users[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+   const stFilt=(curView==='allOrders'&&window._admStFilt)?window._admStFilt:'';
+   const showDocs=stFilt?docs.filter(d=>d.data().status===stFilt):docs;
+   const csvBtn=curView==='allOrders'?`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><button class="btn sm" onclick="exportOrdersCSV()">⬇️ تصدير الطلبات CSV</button><select id="admStFilt" style="width:auto;padding:6px 10px" onchange="window._admStFilt=this.value;startAdmin()"><option value="">كل الحالات</option><option value="new" ${stFilt==='new'?'selected':''}>🕐 جديد</option><option value="in-progress" ${stFilt==='in-progress'?'selected':''}>⚙️ قيد التنفيذ</option><option value="done" ${stFilt==='done'?'selected':''}>✅ تم</option><option value="rejected" ${stFilt==='rejected'?'selected':''}>❌ مرفوض</option></select></div>`:'';
+   $('adminList').innerHTML=csvBtn+(showDocs.length?showDocs.map(d=>{const o=d.data();const u=users[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
     return `<div class="row-item"><div class="top"><b>${esc(o.service)} • ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>
     <div class="meta">العميل: ${esc(u.name||'')} ${esc(u.phone||'')}<br>الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}</div>
     <div class="acts"><button onclick="setOrderStatus('${d.id}','in-progress')">بدء التنفيذ ⚙️</button><button onclick="setOrderStatus('${d.id}','done')">تم التنفيذ ✅</button><button onclick="setOrderStatus('${d.id}','rejected')">رفض ❌</button><button class="del" onclick="delOrder('${d.id}')">مسح 🗑️</button></div></div>`
