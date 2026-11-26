@@ -333,7 +333,7 @@ function renderNotifInbox(){const box=$('notifInbox');if(!box||!ME)return;let l=
  box.innerHTML=l.length?l.map((n,i)=>`<div class="ntf ${n.seen?'':'unseen'}" onclick="ntfSeen(${i})">${n.msg}<span class="ntf-time">${new Date(n.t).toLocaleString('ar-EG')}</span></div>`).join(''):'<div class="note">مفيش إشعارات لسه.</div>'}
 function ntfSeen(i){try{const k='bsn_'+ME.uid;let l=JSON.parse(localStorage.getItem(k)||'[]');if(l[i])l[i].seen=true;localStorage.setItem(k,JSON.stringify(l));renderNotifInbox()}catch(_){}}
 function toggleNotifPanel(){const p=$('notifPanel');p.classList.toggle('hidden');if(!p.classList.contains('hidden'))renderNotifInbox()}
-function stepsHtml(st){if(st==='rejected')return `<div class="steps"><div class="st on" style="color:#f55d5d">❌ الطلب اترفض • الرصيد رجع لمحفظتك</div></div>`;const i=st==='done'?3:st==='in-progress'?2:1;return `<div class="steps"><div class="st ${i>=1?'on':''}">🕐 قيد الانتظار</div><div class="st ${i>=2?'on':''}">⚙️ قيد التنفيذ</div><div class="st ${i>=3?'on':''}">✅ تم التنفيذ</div></div>`}
+function stepsHtml(st){if(st==='rejected')return `<div class="steps"><div class="st on" style="color:#f55d5d">❌ الطلب اترفض • الرصيد رجع لمحفظتك</div></div>`;const i=st==='done'?3:st==='in-progress'?2:1;return `<div class="steps"><div class="st ${i>=1?'on':''}">🕐 قيد الانتظار</div><div class="st ${i>=2?'on':''}">⚙️ قيد التنفيذ</div><div class="st ${i>=3?'on':''}">✅ تم التنفيذ</div></div>${i<3?`<div class="meta" style="margin-top:4px">⏱️ التنفيذ عادة من دقائق لـ ٢٤ ساعة حسب الخدمة</div>`:''}`}
 function renderTx(){
  if(!$('myTx'))return;
  const items=[];
@@ -465,12 +465,16 @@ function startAdmin(){startAdminCounts();
    const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
    const topUids=Object.entries(byUser).sort((a,b)=>b[1]-a[1]).slice(0,3);
    const unames={};await Promise.all(topUids.map(async([u])=>{try{const ud=await store.collection('boostUsers').doc(u).get();if(ud.exists)unames[u]=ud.data().name||ud.data().phone||u.slice(0,8)}catch(_){unames[u]=u.slice(0,8)}}));
+   const days=[...Array(7)].map((_,i)=>{const d0=day0-(6-i)*86400;let v=0;os.docs.forEach(d=>{const o=d.data();if(o.status==='rejected')return;const sc=o.createdAt?.seconds||0;if(sc>=d0&&sc<d0+86400)v+=o.price||0});return{v,d0}});
+   const mx=Math.max(...days.map(d=>d.v),1);
+   const chartHtml=`<div class="row-item"><div class="top"><b>📊 مبيعات آخر ٧ أيام</b></div><div style="display:flex;align-items:flex-end;gap:6px;height:70px;margin-top:10px">${days.map(d=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end"><div title="${money(d.v)}" style="width:100%;background:var(--green);border-radius:6px 6px 0 0;min-height:3px;height:${Math.round(d.v/mx*100)}%"></div><span style="font-size:10px;color:var(--muted)">${new Date(d.d0*1000).toLocaleDateString('ar-EG',{weekday:'short'})}</span></div>`).join('')}</div></div>`;
    $('adminList').innerHTML=`<div class="stat-grid">
     <div class="stat"><b>${money(today)}</b><span>💰 مبيعات اليوم</span></div>
     <div class="stat"><b>${money(week)}</b><span>📅 مبيعات آخر ٧ أيام</span></div>
     <div class="stat"><b>${money(total)}</b><span>🛒 إجمالي المبيعات (${fmt(os.docs.length)} طلب)</span></div>
     <div class="stat"><b>${money(charged)}</b><span>💳 إجمالي الشحنات (${fmt(chargedN)} عملية)</span></div>
    </div>
+   ${chartHtml}
    <div class="row-item"><div class="top"><b>🏆 أكتر خدمة متطلبة</b></div><div class="meta">${top?esc(top[0])+' • '+fmt(top[1])+' طلب':'لسه مفيش طلبات'}</div></div>
    <div class="row-item"><div class="top"><b>⭐ أفضل العملاء</b></div><div class="meta">${topUids.length?topUids.map(([u,v],i)=>['🥇','🥈','🥉'][i]+' '+esc(unames[u]||u.slice(0,8))+' • '+money(v)).join('<br>'):'لسه مفيش طلبات'}</div></div>`;
   }).catch(e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
@@ -495,7 +499,7 @@ function startAdmin(){startAdminCounts();
    lastAdminDocs=docs;lastAdminUsers=users;
    const stFilt=(curView==='allOrders'&&window._admStFilt)?window._admStFilt:'';
    const showDocs=stFilt?docs.filter(d=>d.data().status===stFilt):docs;
-   const csvBtn=curView==='allOrders'?`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><button class="btn sm" onclick="exportOrdersCSV()">⬇️ تصدير الطلبات CSV</button><select id="admStFilt" style="width:auto;padding:6px 10px" onchange="window._admStFilt=this.value;startAdmin()"><option value="">كل الحالات</option><option value="new" ${stFilt==='new'?'selected':''}>🕐 جديد</option><option value="in-progress" ${stFilt==='in-progress'?'selected':''}>⚙️ قيد التنفيذ</option><option value="done" ${stFilt==='done'?'selected':''}>✅ تم</option><option value="rejected" ${stFilt==='rejected'?'selected':''}>❌ مرفوض</option></select></div>`:'';
+   const csvBtn=curView==='allOrders'?`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap"><button class="btn sm" onclick="exportOrdersCSV()">⬇️ تصدير الطلبات CSV</button><input placeholder="🔍 ابحث بالخدمة أو اسم العميل أو رقم الطلب..." style="flex:1;min-width:170px;padding:6px 10px" oninput="admSearch(this.value)"><select id="admStFilt" style="width:auto;padding:6px 10px" onchange="window._admStFilt=this.value;startAdmin()"><option value="">كل الحالات</option><option value="new" ${stFilt==='new'?'selected':''}>🕐 جديد</option><option value="in-progress" ${stFilt==='in-progress'?'selected':''}>⚙️ قيد التنفيذ</option><option value="done" ${stFilt==='done'?'selected':''}>✅ تم</option><option value="rejected" ${stFilt==='rejected'?'selected':''}>❌ مرفوض</option></select></div>`:'';
    $('adminList').innerHTML=csvBtn+(showDocs.length?showDocs.map(d=>{const o=d.data();const u=users[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
     return `<div class="row-item"><div class="top"><b>${esc(o.service)} • ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>
     <div class="meta">العميل: ${esc(u.name||'')} ${esc(u.phone||'')}<br>الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}<br>${u.phone?`<a class="copy" style="text-decoration:none;display:inline-block;margin-top:4px" href="https://wa.me/${(''+u.phone).replace(/\D/g,'').replace(/^0/,'2')}?text=${encodeURIComponent('أهلًا '+(u.name||'')+' 👋 بنكلمك من MAHMOUD BOOST بخصوص طلبك: '+o.service+' (الكمية: '+fmt(o.quantity)+')')}" target="_blank" rel="noopener">💬 واتساب العميل</a>`:''}</div>
@@ -505,6 +509,7 @@ function startAdmin(){startAdminCounts();
  }
 }
 let lastAdminDocs=[],lastAdminUsers={};
+function admSearch(q){q=(q||'').trim();document.querySelectorAll('#adminList .row-item').forEach(r=>{r.style.display=!q||r.textContent.includes(q)?'':'none'})}
 function exportOrdersCSV(){if(!lastAdminDocs.length)return toast('مفيش طلبات للتصدير',1);
  const rows=[['رقم الطلب','العميل','التليفون','الخدمة','الكمية','السعر','الحالة','الحساب/ID','التاريخ']];
  lastAdminDocs.forEach(d=>{const o=d.data();const u=lastAdminUsers[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
