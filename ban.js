@@ -33,7 +33,7 @@
     var reason = info && info.reason ? '<p style="margin:10px 0;color:#ffd0d0">السبب: ' + esc(info.reason) + '</p>' : '';
     o.innerHTML = '<div style="max-width:420px;border:1px solid #7a2b2b;background:#1a0f0f;border-radius:18px;padding:26px">' +
       '<div style="font-size:54px">🚫</div>' +
-      '<h2 style="margin:10px 0">تم حظر حسابك</h2>' +
+      '<h2 style="margin:10px 0;color:#fff">تم حظر حسابك</h2>' +
       '<p style="line-height:1.8;margin:8px 0">تم إيقاف حسابك من منصة MAHMOUD STUDY ولا يمكنك استخدام التطبيق.</p>' + reason +
       '<p style="line-height:1.8;margin:8px 0;color:#cfd8d3">لو شايف إن ده حصل بالغلط، تواصل مع الإدارة على واتساب:</p>' +
       '<a href="https://wa.me/2' + CONTACT + '" style="display:inline-block;margin-top:8px;padding:12px 22px;border-radius:12px;background:#1fc07f;color:#04150e;font-weight:700;text-decoration:none">' + CONTACT + '</a>' +
