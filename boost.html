@@ -107,6 +107,10 @@ input:focus,select:focus{outline:none;border-color:var(--primary)}
 footer{text-align:center;color:var(--muted);font-size:12.5px;margin-top:40px;line-height:2}
 a{color:var(--green);text-decoration:none}
 .hidden{display:none!important}
+#toastWrap{position:fixed;bottom:18px;inset-inline:0;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:999;pointer-events:none}
+.toast{background:#1b2b23;border:1px solid var(--green);color:#eafff3;padding:10px 18px;border-radius:12px;font-weight:700;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.5);animation:tin .25s ease;pointer-events:auto;max-width:90vw;text-align:center}
+.toast.err{background:#2a1512;border-color:var(--red);color:#ffd9d9}
+@keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -148,6 +152,7 @@ a{color:var(--green);text-decoration:none}
 
 <div id="dashSec" class="hidden">
 <div id="notifBar" class="hidden"></div>
+<div id="toastWrap"></div>
 <div class="userbar"><span>أهلاً <b id="uName"></b> 👋</span><span style="display:flex;gap:12px;align-items:center"><button id="notifBtn" onclick="toggleNotifPanel()" style="color:var(--gold);position:relative">🔔<span id="notifCount" class="hidden" style="position:absolute;top:-7px;left:-7px;background:var(--red);color:#fff;border-radius:999px;font-size:10px;padding:1px 5px;font-weight:800"></span></button><button id="shareBtn" style="color:var(--green)">📤 شارك المنصة</button><button id="logoutBtn">تسجيل خروج</button></span></div>
 <div id="notifPanel" class="panel hidden"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b>🔔 إشعاراتك</b><button class="copy" onclick="try{localStorage.setItem('bsn_'+ME.uid,'[]')}catch(_){}renderNotifInbox()">مسح الكل 🗑️</button></div><div id="notifInbox"></div></div>
 <div class="wallet"><div class="lbl">رصيد محفظتك</div><div class="bal" id="uBal">0</div><div class="lbl">جنيه</div></div>
@@ -245,6 +250,9 @@ const fmt=n=>Number(n||0).toLocaleString('ar-EG');
 const money=n=>fmt(Math.round(n))+' جنيه';
 const svc=id=>SERVICES.find(s=>s.id===id);
 const esc=t=>String(t||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(msg,err){const w=$('toastWrap');if(!w)return alert(msg);const t=document.createElement('div');t.className='toast'+(err?' err':'');t.textContent=msg;w.appendChild(t);setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),320)},2800)}
+function timeAgo(sec){if(!sec)return '';const d=Math.floor(Date.now()/1000-sec);if(d<60)return 'دلوقتي';if(d<3600)return 'من '+fmt(Math.floor(d/60))+' دقيقة';if(d<86400)return 'من '+fmt(Math.floor(d/3600))+' ساعة';return 'من '+fmt(Math.floor(d/86400))+' يوم'}
+let _bal=-1;function animBal(to){const el=$('uBal');to=Math.round(to||0);const from=_bal<0?to:_bal;_bal=to;if(from===to){el.textContent=fmt(to);return}const t0=performance.now();const step=n=>{const p=Math.min(1,(n-t0)/600);el.textContent=fmt(Math.round(from+(to-from)*p));if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
 const STATUS_AR={new:'🕐 جديد','in-progress':'⚙️ قيد التنفيذ',done:'✅ تم التنفيذ',rejected:'❌ مرفوض',pending:'🕐 مستني التأكيد',approved:'✅ اتشحن'};
 function showErr(id,m){const e=$(id);e.textContent=m;e.style.display='block';setTimeout(()=>e.style.display='none',6000)}
 store.doc('boostSettings/prices').get().then(d=>{if(d.exists){const p=d.data();SERVICES.forEach(s=>{const k=s.id;if(p['price_'+k]!=null)s.price=p['price_'+k];if(p['per_'+k]!=null)s.per=p['per_'+k]});renderServices();renderQty()}}).catch(()=>{});
@@ -315,12 +323,12 @@ function renderTx(){
 function startDash(){
  $('authSec').classList.add('hidden');$('dashSec').classList.remove('hidden');$('pubSec').classList.remove('hidden');
  unsubProfile=store.collection('boostUsers').doc(ME.uid).onSnapshot(d=>{
-  if(!d.exists)return;PROFILE=d.data();$('uName').textContent=PROFILE.name||'';$('uBal').textContent=fmt(PROFILE.balance);
+  if(!d.exists)return;PROFILE=d.data();$('uName').textContent=PROFILE.name||'';animBal(PROFILE.balance);
  },e=>console.warn(e));
  unsubOrders=store.collection('boostOrders').where('uid','==',ME.uid).limit(50).onSnapshot(s=>{
   const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
   lastOrders=docs;lastOrderData={};docs.forEach(d=>lastOrderData[d.id]=d.data());
-  $('myOrders').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+  $('myOrders').innerHTML=docs.length?docs.map(d=>{const o=d.data();const t=o.createdAt&&o.createdAt.toDate?timeAgo(o.createdAt.seconds)+' • '+o.createdAt.toDate().toLocaleString('ar-EG',{day:'numeric',month:'short'}):'';
    return `<div class="row-item"><div class="top"><b>${esc(o.service)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>${stepsHtml(o.status)}<div class="meta">الكمية: ${fmt(o.quantity)} • السعر: ${money(o.price)}<br>رقم الطلب: <span style="font-family:monospace;font-size:11px">${d.id}</span> <button class="copy" onclick="event.stopPropagation();navigator.clipboard.writeText('${d.id}');this.textContent='اتنسخ ✅';setTimeout(()=>this.textContent='📋 نسخ',1500)">📋 نسخ</button><br>${t}</div><button class="copy" onclick="reorder('${d.id}')" style="margin-top:6px">🔁 اطلب تاني</button></div>`}).join(''):'<div class="note">لسه مفيش طلبات.</div>';
   let seen={};try{seen=JSON.parse(localStorage.getItem('bso_'+ME.uid)||'{}')}catch(_){}
   docs.forEach(d=>{const o=d.data();const prev=seen[d.id];
@@ -470,7 +478,7 @@ function startAdmin(){startAdminCounts();
  }
 }
 let lastAdminDocs=[],lastAdminUsers={};
-function exportOrdersCSV(){if(!lastAdminDocs.length)return alert('مفيش طلبات للتصدير');
+function exportOrdersCSV(){if(!lastAdminDocs.length)return toast('مفيش طلبات للتصدير',1);
  const rows=[['رقم الطلب','العميل','التليفون','الخدمة','الكمية','السعر','الحالة','الحساب/ID','التاريخ']];
  lastAdminDocs.forEach(d=>{const o=d.data();const u=lastAdminUsers[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
   rows.push([d.id,u.name||'',u.phone||'',o.service||'',o.quantity||'',o.price||'',STATUS_AR[o.status]||o.status||'',(o.accountLink||'').replace(/[\n\r,;]/g,' '),t])});
@@ -485,9 +493,9 @@ async function approveTopup(code,uid,amount){
    tx.update(uref,{balance:bal+amount});
    tx.update(tref,{status:'approved'});
   });
- }catch(e){alert('تعذر الشحن: '+(e.code||e.message))}
+ }catch(e){toast('تعذر الشحن: '+(e.code||e.message),1)}
 }
-async function rejectTopup(code){if(!confirm('رفض الشحنة '+code+'؟'))return;try{await store.collection('boostTopups').doc(code).update({status:'rejected'})}catch(e){alert('تعذر: '+(e.code||e.message))}}
+async function rejectTopup(code){if(!confirm('رفض الشحنة '+code+'؟'))return;try{await store.collection('boostTopups').doc(code).update({status:'rejected'})}catch(e){toast('تعذر: '+(e.code||e.message),1)}}
 async function setOrderStatus(id,st){
  if(st==='rejected'){
   if(!confirm('رفض الطلب وارجاع ثمنه لمحفظة العميل؟'))return;
@@ -496,12 +504,12 @@ async function setOrderStatus(id,st){
     const uref=store.collection('boostUsers').doc(o.uid);const ud=await tx.get(uref);
     if(ud.exists)tx.update(uref,{balance:(ud.data().balance||0)+(o.price||0)});
     tx.update(oref,{status:'rejected'})});
-  }catch(e){alert('تعذر الرفض: '+(e.code||e.message))}
+  }catch(e){toast('تعذر الرفض: '+(e.code||e.message),1)}
   return;
  }
- try{await store.collection('boostOrders').doc(id).update({status:st})}catch(e){alert('تعذر التحديث: '+(e.code||e.message))}
+ try{await store.collection('boostOrders').doc(id).update({status:st})}catch(e){toast('تعذر التحديث: '+(e.code||e.message),1)}
 }
-async function delOrder(id){if(!confirm('متأكد تمسح الطلب؟'))return;try{await store.collection('boostOrders').doc(id).delete()}catch(e){alert('تعذر المسح: '+(e.code||e.message))}}
+async function delOrder(id){if(!confirm('متأكد تمسح الطلب؟'))return;try{await store.collection('boostOrders').doc(id).delete()}catch(e){toast('تعذر المسح: '+(e.code||e.message),1)}}
 </script>
 </body>
 </html>
