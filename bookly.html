@@ -95,9 +95,13 @@ select option{background:#0e2118;color:var(--txt)}
 .sw input:checked+i:after{transform:translateX(-20px)}
 ::-webkit-scrollbar{width:8px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:8px}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(10,25,18,.92);backdrop-filter:blur(10px);border:1px solid rgba(37,211,102,.4);color:var(--txt);padding:11px 20px;border-radius:14px;font-size:14px;font-weight:700;z-index:99;transition:transform .3s,opacity .3s;opacity:0;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:90vw;text-align:center}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+#toast.bad{border-color:rgba(255,90,82,.5)}
 </style>
 </head>
 <body>
+<div id="toast"></div>
 <div class="wrap">
 
 <!-- ============ LANDING ============ -->
@@ -163,7 +167,7 @@ select option{background:#0e2118;color:var(--txt)}
 <div id="dp1">
 <div class="card">
 <label>لينك الحجز بتاعك (ابعته لعملائك)</label>
-<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink(this)">نسخ</button></div>
+<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink(this)">نسخ</button><button class="btn small warnb" onclick="shareLink()">واتساب 📤</button></div>
 </div>
 <div class="row" style="margin-bottom:10px">
 <input type="date" id="fltDate" onchange="renderBookings()">
@@ -298,6 +302,7 @@ select option{background:#0e2118;color:var(--txt)}
 <p class="muted" id="doneInfo"></p>
 <div class="codebox" id="doneCode"></div>
 <p class="muted">احتفظ بالكود ده عشان تتابع حالة حجزك</p>
+<button class="btn okb" onclick="copyCode(this)">انسخ الكود 📋</button>
 <button class="btn ghost" onclick="checkStatus()">متابعة الحجز</button>
 </div>
 </div>
@@ -398,6 +403,9 @@ $('slugIn').value=myBiz.slug||'';
 show('vDash');listenBookings();
 }
 function dashTab(n){[1,2,3].forEach(i=>{$('tb'+i).classList.toggle('on',i===n);$('dp'+i).classList.toggle('hide',i!==n);});}
+function toast(m,bad){const t=$('toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(t._h);t._h=setTimeout(()=>t.className='',2600);}
+function copyCode(el){navigator.clipboard?.writeText($('doneCode').textContent.trim());el.textContent='اتنسخ ✅';setTimeout(()=>el.textContent='انسخ الكود 📋',1500);}
+function shareLink(){const l=$('myLink').value;window.open('https://wa.me/?text='+encodeURIComponent('احجز معادك أونلاين من هنا 👇\n'+l),'_blank');}
 function copyLink(el){navigator.clipboard?.writeText($('myLink').value);el.textContent='تم ✅';setTimeout(()=>el.textContent='نسخ',1500);}
 async function saveSlug(){
 const s=$('slugIn').value.trim().toLowerCase();
@@ -519,6 +527,7 @@ const d=await db.collection('bookly_businesses').doc(PBID).get();
 if(!d.exists)return deadLink();
 PB=d.data();
 if(PB.active===false)return pausedLink();
+$('bDate').min=fmtDate(new Date());
 $('pIcon').textContent=ICONS[PB.type]||'📅';$('pName').textContent=PB.name;$('pType').textContent=TYPES[PB.type]||'';
 $('pSvcs').innerHTML=(PB.services||[]).map(s=>`<span class="chip">${esc(s.name)}${s.price?' · '+esc(s.price)+'ج':''}</span>`).join('');
 $('svcPick').innerHTML=(PB.services||[]).map((s,i)=>`<div class="svc" style="cursor:pointer" onclick="pickSvc(${i},this)"><div class="row"><b>${esc(s.name)}</b><span class="muted" style="flex:0 0 auto;font-size:12px">${s.dur} دقيقة${s.price?' · '+esc(s.price)+' جنيه':''}</span></div></div>`).join('')||'<div class="muted">النشاط لسه مضافش خدمات</div>';
@@ -611,14 +620,14 @@ if(!confirm('متأكد إنك عايز تلغي الحجز؟'))return;
 try{
 const ref=db.collection('bookly_businesses').doc(PBID).collection('bookings').doc(code);
 const d=await ref.get();
-if(!d.exists){alert('الكود ده مش موجود');return;}
+if(!d.exists){toast('الكود ده مش موجود',1);return;}
 const b=d.data();
 const batch=db.batch();
 batch.update(ref,{status:'cancelled'});
 batch.delete(db.collection('bookly_businesses').doc(PBID).collection('slots').doc(b.date+'_'+b.time));
 await batch.commit();
 findBooking(code);
-}catch(e){alert('حصل خطأ، حاول تاني');}
+}catch(e){toast('حصل خطأ، حاول تاني',1);}
 }
 function checkStatus(){const c=$('doneCode').textContent.trim();if(c)findBooking(c);}
 
@@ -674,10 +683,10 @@ async function approveSeller(uid,bizId){
 try{
 await db.collection('bookly_businesses').doc(bizId).update({active:true});
 await db.collection('bookly_activations').doc(uid).update({status:'approved'});
-}catch(e){alert('حصل خطأ: '+e.code);}
+}catch(e){toast('حصل خطأ: '+e.code,1);}
 }
 async function rejectSeller(uid){
-try{await db.collection('bookly_activations').doc(uid).update({status:'rejected'});}catch(e){alert('حصل خطأ');}
+try{await db.collection('bookly_activations').doc(uid).update({status:'rejected'});}catch(e){toast('حصل خطأ',1);}
 }
 async function saveAdminSettings(){
 const price=+$('adPrice').value||0,wallet=normPhone($('adWallet').value);
