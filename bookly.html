@@ -167,10 +167,11 @@ select option{background:#0e2118;color:var(--txt)}
 <div id="dp1">
 <div class="card">
 <label>لينك الحجز بتاعك (ابعته لعملائك)</label>
-<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink(this)">نسخ</button><button class="btn small warnb" onclick="shareLink()">واتساب 📤</button></div>
+<div class="linkbox"><input id="myLink" readonly><button class="btn small okb" onclick="copyLink(this)">نسخ</button><button class="btn small warnb" onclick="shareLink()">واتساب 📤</button><button class="btn small ghost" onclick="window.open($('myLink').value,'_blank')">معاينة 👁</button></div>
 </div>
 <div class="row" style="margin-bottom:10px">
 <input type="date" id="fltDate" onchange="renderBookings()">
+<button class="btn small ghost" style="flex:0 0 auto" onclick="fltDate.value=fmtDate(new Date());renderBookings()">النهارده</button>
 <button class="btn small ghost" style="flex:0 0 auto" onclick="fltDate.value='';renderBookings()">الكل</button>
 </div>
 <div id="bkList"></div>
@@ -259,6 +260,7 @@ select option{background:#0e2118;color:var(--txt)}
 <div id="vBuyer" class="hide">
 <div class="top"><div><b id="buyName">—</b><div class="muted">حساب مشتري</div></div>
 <button class="btn small ghost" onclick="logout()">خروج</button></div>
+<div class="card"><h2>عندك لينك نشاط؟ 🔗</h2><div class="linkbox"><input id="buyLink" placeholder="الصق اللينك أو اسم النشاط" style="direction:ltr;text-align:left"><button class="btn small okb" onclick="goLink()">فتح</button></div></div>
 <div class="card"><h2>حجوزاتي 📅</h2><div id="buyList"><div class="muted">بنجيب حجوزاتك...</div></div></div>
 </div>
 
@@ -289,6 +291,7 @@ select option{background:#0e2118;color:var(--txt)}
 <span class="num" id="depWalletShow"></span>
 <label>رقم التحويل / مرجع العملية</label><input id="cDepRef" placeholder="آخر 4 أرقام من رسالة التحويل" style="direction:ltr;text-align:left">
 </div>
+<div id="selSum" class="muted" style="text-align:center;margin:10px 0 2px;min-height:20px;font-weight:700"></div>
 <div class="err" id="bErr"></div>
 <button class="btn" onclick="submitBooking()">تأكيد الحجز ✅</button>
 </div>
@@ -406,6 +409,9 @@ function dashTab(n){[1,2,3].forEach(i=>{$('tb'+i).classList.toggle('on',i===n);$
 function toast(m,bad){const t=$('toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(t._h);t._h=setTimeout(()=>t.className='',2600);}
 function copyCode(el){navigator.clipboard?.writeText($('doneCode').textContent.trim());el.textContent='اتنسخ ✅';setTimeout(()=>el.textContent='انسخ الكود 📋',1500);}
 function shareLink(){const l=$('myLink').value;window.open('https://wa.me/?text='+encodeURIComponent('احجز معادك أونلاين من هنا 👇\n'+l),'_blank');}
+function goLink(){let v=$('buyLink').value.trim();if(!v)return toast('الصق اللينك الأول',1);
+if(v.includes('?')){location.href=location.pathname+'?'+v.split('?')[1];return;}
+location.href=location.pathname+'?s='+encodeURIComponent(v.replace(/^\?s=/,''));}
 function copyLink(el){navigator.clipboard?.writeText($('myLink').value);el.textContent='تم ✅';setTimeout(()=>el.textContent='نسخ',1500);}
 async function saveSlug(){
 const s=$('slugIn').value.trim().toLowerCase();
@@ -537,12 +543,12 @@ show('vBook');$('vFind').classList.remove('hide');$('pFooter').classList.remove(
 if(pubCode)findBooking(pubCode);
 }catch(e){deadLink();}
 }
-function pausedLink(){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>النشاط ده مش متاح حاليا ⏸️</h2></div>';}
-function deadLink(){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:40px"><h2>اللينك ده مش شغال ❌</h2><p class="muted">اتأكد من اللينك مع صاحب النشاط</p></div>';}
-function pickSvc(i,el){selSvc=PB.services[i];document.querySelectorAll('#svcPick .svc').forEach(x=>x.style.borderColor='');el.style.borderColor='var(--p)';$('stepTime').classList.remove('hide');$('stepInfo').classList.remove('hide');loadSlots();}
+function pausedLink(){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:60px"><div style="font-size:46px">⏸️</div><h2>النشاط ده مش متاح حاليا</h2><p class="muted" style="margin:8px 0 4px">صاحب النشاط واقف الحجوزات مؤقتا، جرب تاني بعدين</p><a class="btn ghost" href="'+location.pathname+'">الصفحة الرئيسية 🏠</a></div>';}
+function deadLink(){document.querySelector('.wrap').innerHTML='<div class="card" style="text-align:center;margin-top:60px"><div style="font-size:46px">🔗</div><h2>اللينك ده مش شغال</h2><p class="muted" style="margin:8px 0 4px">اتأكد من اللينك مع صاحب النشاط</p><a class="btn ghost" href="'+location.pathname+'">الصفحة الرئيسية 🏠</a></div>';}
+function pickSvc(i,el){selSvc=PB.services[i];document.querySelectorAll('#svcPick .svc').forEach(x=>x.style.borderColor='');el.style.borderColor='var(--p)';$('stepTime').classList.remove('hide');$('stepInfo').classList.remove('hide');updSum();loadSlots();}
 async function loadSlots(){
 selSlot=null;
-const ds=$('bDate').value;if(!ds||!selSvc)return;
+const ds=$('bDate').value;updSum();if(!ds||!selSvc)return;
 const sch=PB.schedule||{days:[0,1,2,3,4,5,6],from:'10:00',to:'22:00',step:30};
 if((sch.offDates||[]).includes(ds)){$('slotBox').innerHTML='<div class="muted" style="margin-top:8px">اليوم ده أجازة 🌴 اختار يوم تاني</div>';return;}
 const wd=new Date(ds+'T12:00:00').getDay();
@@ -563,7 +569,8 @@ out.push(`<div class="slot ${taken.has(tt)||past||inBreak?'off':''}" data-t="${t
 }
 $('slotBox').innerHTML=out.length?`<div class="slots">${out.join('')}</div>`:'<div class="muted" style="margin-top:8px">مفيش مواعيد فاضية في اليوم ده</div>';
 }
-function pickSlot(el){document.querySelectorAll('.slot').forEach(x=>x.classList.remove('on'));el.classList.add('on');selSlot=el.dataset.t;}
+function pickSlot(el){document.querySelectorAll('.slot').forEach(x=>x.classList.remove('on'));el.classList.add('on');selSlot=el.dataset.t;updSum();}
+function updSum(){const el=$('selSum');if(!el)return;const ds=$('bDate').value;el.textContent=selSvc?('📌 '+selSvc.name+(ds?' — '+ds:'')+(selSlot?' — '+t12(selSlot):'')):'';el.style.color=selSlot?'#8ff0c6':'';}
 async function submitBooking(){
 const name=$('cName').value.trim(),ph=normPhone($('cPhone').value),ds=$('bDate').value;
 if(!selSvc){$('bErr').textContent='اختار الخدمة الأول';return;}
@@ -703,11 +710,13 @@ $('buyName').textContent=b.name;
 show('vBuyer');
 try{
 const q=await db.collection('bookly_buyers').doc(auth.currentUser.uid).collection('bookings').get();
-const rows=[];
-for(const p of q.docs){const pd=p.data();try{const live=await db.collection('bookly_businesses').doc(pd.bizId).collection('bookings').doc(pd.code).get();if(live.exists)rows.push(live.data());}catch(e){}}
+const rows=[];const bizNames={};
+for(const p of q.docs){const pd=p.data();try{const live=await db.collection('bookly_businesses').doc(pd.bizId).collection('bookings').doc(pd.code).get();if(live.exists){const x=live.data();
+if(!bizNames[pd.bizId]){try{const bd=await db.collection('bookly_businesses').doc(pd.bizId).get();bizNames[pd.bizId]=bd.exists?bd.data().name:'';}catch(e){bizNames[pd.bizId]='';}}
+x._bizName=bizNames[pd.bizId];rows.push(x);}}catch(e){}}
 const list=rows.sort((a,b2)=>(b2.date+b2.time).localeCompare(a.date+a.time));
 $('buyList').innerHTML=list.length?list.map(x=>`
-<div class="bk"><div class="top" style="margin:0"><div><b>${esc(x.service)}</b> <span class="muted" style="font-size:12px">${x.date} ${t12(x.time)}</span></div>
+<div class="bk"><div class="top" style="margin:0"><div><b>${esc(x.service)}</b>${x._bizName?' <span class="muted" style="font-size:12px">@ '+esc(x._bizName)+'</span>':''} <span class="muted" style="font-size:12px">${x.date} ${t12(x.time)}</span></div>
 <span class="st ${SCLS[x.status]||'p'}">${STXT[x.status]||x.status}</span></div></div>`).join(''):'<div class="muted">لسه مفيش حجوزات برقمك. احجز من لينك أي نشاط بنفس رقمك وهتظهر هنا.</div>';
 }catch(e){$('buyList').innerHTML='<div class="muted">حصل خطأ في التحميل</div>';}
 }
