@@ -113,6 +113,23 @@ a{color:var(--green);text-decoration:none}
 @keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .skel{height:52px;border-radius:12px;background:linear-gradient(90deg,#131c17 25%,#1b2921 50%,#131c17 75%);background-size:200% 100%;animation:skl 1.2s infinite;margin-bottom:8px}
 @keyframes skl{to{background-position:-200% 0}}
+@media (max-width:640px){
+body{padding:10px}
+.hero{padding:20px 16px!important}
+.hero h1{font-size:22px!important}
+.userbar{flex-wrap:wrap;gap:8px;font-size:13px}
+.grid{grid-template-columns:1fr}
+.wallet .bal{font-size:34px!important}
+.acts button{flex:1;min-width:110px}
+.tabs button{flex:1;font-size:12.5px;padding:8px 4px}
+footer{font-size:11.5px}
+}
+.howsteps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.howstep{background:#101a14;border:1px solid #1e3528;border-radius:14px;padding:14px 10px;text-align:center;font-size:13.5px;line-height:1.8}
+.howstep b{display:block;font-size:22px;margin-bottom:4px}
+@media (max-width:640px){.howsteps{grid-template-columns:1fr;gap:8px}}
+#toTop{position:fixed;bottom:18px;left:18px;width:44px;height:44px;border-radius:50%;background:var(--green);color:#04150c;font-size:20px;font-weight:900;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:998}
+#toTop.show{opacity:1;pointer-events:auto}
 </style>
 </head>
 <body>
@@ -129,6 +146,11 @@ a{color:var(--green);text-decoration:none}
 </section>
 
 <div id="pubSec" class="hidden">
+<div class="howsteps">
+<div class="howstep"><b>1️⃣</b>سجّل حسابك برقم موبايلك في ثواني</div>
+<div class="howstep"><b>2️⃣</b>اشحن محفظتك بفودافون كاش أو انستاباي</div>
+<div class="howstep"><b>3️⃣</b>اطلب الخدمة وتتبعها لحد ما تتنفذ ✅</div>
+</div>
 <h3 class="sec">🛒 الخدمات والأسعار</h3>
 <input id="svcSearch" type="text" placeholder="🔍 ابحث عن خدمة... مثال: تيك توك" style="margin-bottom:12px">
 <div class="chips" id="platChips">
@@ -315,9 +337,9 @@ function stepsHtml(st){if(st==='rejected')return `<div class="steps"><div class=
 function renderTx(){
  if(!$('myTx'))return;
  const items=[];
- lastTopups.forEach(d=>{const o=d.data();const dt=(o.createdAt&&o.createdAt.toDate)?o.createdAt.toDate().toLocaleString('ar-EG'):'';const lbl='شحنة '+esc(d.id);
+ lastTopups.forEach(d=>{const o=d.data();const dt=(o.createdAt&&o.createdAt.toDate)?timeAgo(o.createdAt.seconds):'';const lbl='شحنة '+esc(d.id);
   items.push({t:o.createdAt?.seconds||0,html:o.status==='approved'?`<div class="row-item"><div class="top"><b>➕ ${money(o.amount)}</b><span class="pill approved">${lbl}</span></div><div class="meta">اتشنت لمحفظتك • ${dt}</div></div>`:o.status==='rejected'?`<div class="row-item"><div class="top"><b>❌ ${money(o.amount)}</b><span class="pill rejected">${lbl}</span></div><div class="meta">اترفضت • ${dt}</div></div>`:`<div class="row-item"><div class="top"><b>🕐 ${money(o.amount)}</b><span class="pill pending">${lbl}</span></div><div class="meta">مستنية التأكيد • ${dt}</div></div>`})});
- lastOrders.forEach(d=>{const o=d.data();const dt=(o.createdAt&&o.createdAt.toDate)?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+ lastOrders.forEach(d=>{const o=d.data();const dt=(o.createdAt&&o.createdAt.toDate)?timeAgo(o.createdAt.seconds):'';
   items.push({t:o.createdAt?.seconds||0,html:`<div class="row-item"><div class="top"><b>➖ ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div><div class="meta">${esc(o.service)} • الكمية: ${fmt(o.quantity)} • ${dt}</div></div>`})});
  items.sort((a,b)=>b.t-a.t);
  $('myTx').innerHTML=items.length?items.slice(0,30).map(i=>i.html).join(''):'<div class="note">لسه مفيش حركات.</div>';
@@ -516,5 +538,7 @@ async function setOrderStatus(id,st){
 }
 async function delOrder(id){if(!confirm('متأكد تمسح الطلب؟'))return;try{await store.collection('boostOrders').doc(id).delete()}catch(e){toast('تعذر المسح: '+(e.code||e.message),1)}}
 </script>
+<button id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="ارجع لفوق">↑</button>
+<script>window.addEventListener('scroll',function(){var b=document.getElementById('toTop');if(b)b.classList.toggle('show',window.scrollY>400)},{passive:true});</script>
 </body>
 </html>
