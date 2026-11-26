@@ -85,6 +85,9 @@ input:focus,select:focus{outline:none;border-color:var(--primary)}
 .stat{background:#0e1512;border:1px solid var(--line);border-radius:14px;padding:16px 10px;text-align:center}
 .stat b{display:block;font-size:20px;color:#37d99c;margin-bottom:6px}
 .stat span{font-size:12px;color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{background:#0e1512;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 16px;font-family:'Cairo',sans-serif;font-weight:700;font-size:13px;cursor:pointer}
+.chip.active{background:linear-gradient(115deg,#10ae80,#37d99c);color:#04150e;border-color:transparent}
 .tabs{display:flex;gap:8px;justify-content:center;margin:14px 0;flex-wrap:wrap}
 .tabs button{background:#0e1512;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:8px 22px;font-family:'Cairo',sans-serif;font-weight:700;font-size:14px;cursor:pointer}
 .tabs button.active{background:linear-gradient(115deg,#10ae80,#37d99c);color:#04150e;border-color:transparent}
@@ -122,6 +125,9 @@ a{color:var(--green);text-decoration:none}
 <div id="pubSec" class="hidden">
 <h3 class="sec">🛒 الخدمات والأسعار</h3>
 <input id="svcSearch" type="text" placeholder="🔍 ابحث عن خدمة... مثال: تيك توك" style="margin-bottom:12px">
+<div class="chips" id="platChips">
+ <button class="chip active" data-p="">الكل</button><button class="chip" data-p="tiktok">🎵 تيك توك</button><button class="chip" data-p="insta">📸 إنستجرام</button><button class="chip" data-p="game">🎮 ألعاب</button>
+</div>
 <div class="grid" id="servicesGrid"></div>
 </div>
 
@@ -169,7 +175,7 @@ a{color:var(--green);text-decoration:none}
 <label>الخدمة</label><select id="fService"></select>
 <label>الكمية</label><select id="fQty"></select>
 <label>رابط الحساب أو البوست</label>
-<input id="fLink" type="text" placeholder="مثال: https://tiktok.com/@username أو @username">
+<input id="fLink" type="text" placeholder="مثال: https://tiktok.com/@username أو @username" style="direction:ltr;text-align:right">
 <div class="total"><span>الإجمالي:</span><b id="fTotal">-</b></div>
 <div class="note" id="fUnit" style="margin-top:2px;text-align:left"></div>
 <div class="note">الخصم بيتم من رصيد محفظتك فور تأكيد الطلب.</div>
@@ -244,8 +250,10 @@ function showErr(id,m){const e=$(id);e.textContent=m;e.style.display='block';set
 store.doc('boostSettings/prices').get().then(d=>{if(d.exists){const p=d.data();SERVICES.forEach(s=>{const k=s.id;if(p['price_'+k]!=null)s.price=p['price_'+k];if(p['per_'+k]!=null)s.per=p['per_'+k]});renderServices();renderQty()}}).catch(()=>{});
 document.querySelectorAll('.copy[data-c]').forEach(b=>b.onclick=()=>{navigator.clipboard.writeText(b.dataset.c);b.textContent='اتنسخ ✅';setTimeout(()=>b.textContent='نسخ الرقم',1800)});
 
-function renderServices(q){q=(q||'').trim();const list=q?SERVICES.filter(s=>(s.name+s.platName+s.desc).includes(q)):SERVICES;$('servicesGrid').innerHTML=list.length?list.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span>${s.plat==='game'?'<span class="newbadge">جديد 🔥</span>':''}<h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${s.qtys?'يبدأ من '+money(s.price*s.qtys[0]):money(s.price)+' <small>/ '+fmt(s.per)+'</small>'}</div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join(''):'<div class="note">مفيش خدمة بالاسم ده.</div>'}
+let curPlat='';
+function renderServices(q){q=(q||'').trim();let list=SERVICES;if(curPlat)list=list.filter(s=>s.plat===curPlat);if(q)list=list.filter(s=>(s.name+s.platName+s.desc).includes(q));$('servicesGrid').innerHTML=list.length?list.map(s=>`<div class="card"><span class="plat ${s.plat}">${s.icon} ${s.platName}</span>${s.plat==='game'?'<span class="newbadge">جديد 🔥</span>':''}<h4>${s.name}</h4><div class="desc">${s.desc}</div><div class="price">${s.qtys?'يبدأ من '+money(s.price*s.qtys[0]):money(s.price)+' <small>/ '+fmt(s.per)+'</small>'}</div><button class="btn" onclick="pick('${s.id}')">اطلب الخدمة</button></div>`).join(''):'<div class="note">مفيش خدمة بالاسم ده.</div>'}
 renderServices();$('svcSearch').oninput=e=>renderServices(e.target.value);
+document.querySelectorAll('#platChips .chip').forEach(c=>c.onclick=()=>{document.querySelectorAll('#platChips .chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');curPlat=c.dataset.p;renderServices($('svcSearch').value)});
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
 function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=(s.qtys||QTYS).map(q=>`<option value="${q}">${fmt(q)}${s.unit?' '+s.unit:''} • ${money(Math.ceil(q*s.price/s.per))}</option>`).join('');$('fLink').placeholder=s.plat==='game'?'اكتب ID اللاعب (والسيرفر لو موجود)':'مثال: https://tiktok.com/@username أو @username';calc()}
 function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(Math.ceil(q*s.price/s.per));if($('fUnit'))$('fUnit').textContent=s.qtys?('سعر الوحدة: '+s.price+' جنيه لل'+s.unit):('السعر: '+money(s.price)+' لكل '+fmt(s.per))}
