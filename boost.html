@@ -171,6 +171,7 @@ a{color:var(--green);text-decoration:none}
 <label>رابط الحساب أو البوست</label>
 <input id="fLink" type="text" placeholder="مثال: https://tiktok.com/@username أو @username">
 <div class="total"><span>الإجمالي:</span><b id="fTotal">-</b></div>
+<div class="note" id="fUnit" style="margin-top:2px;text-align:left"></div>
 <div class="note">الخصم بيتم من رصيد محفظتك فور تأكيد الطلب.</div>
 <button class="btn" id="orderBtn">تأكيد الطلب ✅</button>
 <div class="status-err" id="ordErr"></div>
@@ -247,7 +248,7 @@ function renderServices(q){q=(q||'').trim();const list=q?SERVICES.filter(s=>(s.n
 renderServices();$('svcSearch').oninput=e=>renderServices(e.target.value);
 $('fService').innerHTML=SERVICES.map(s=>`<option value="${s.id}">${s.icon} ${s.name}</option>`).join('');
 function renderQty(){const s=svc($('fService').value);$('fQty').innerHTML=(s.qtys||QTYS).map(q=>`<option value="${q}">${fmt(q)}${s.unit?' '+s.unit:''} • ${money(Math.ceil(q*s.price/s.per))}</option>`).join('');$('fLink').placeholder=s.plat==='game'?'اكتب ID اللاعب (والسيرفر لو موجود)':'مثال: https://tiktok.com/@username أو @username';calc()}
-function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(Math.ceil(q*s.price/s.per))}
+function calc(){const s=svc($('fService').value),q=+$('fQty').value;$('fTotal').textContent=money(Math.ceil(q*s.price/s.per));if($('fUnit'))$('fUnit').textContent=s.qtys?('سعر الوحدة: '+s.price+' جنيه لل'+s.unit):('السعر: '+money(s.price)+' لكل '+fmt(s.per))}
 function pick(id){if(!ME){$('authSec').scrollIntoView({behavior:'smooth'});return}$('fService').value=id;renderQty();$('fService').scrollIntoView({behavior:'smooth',block:'center'})}
 $('fService').onchange=renderQty;$('fQty').onchange=calc;renderQty();
 
@@ -390,6 +391,9 @@ $('orderBtn').onclick=async()=>{
 <script>
 /* ====== الأدمن ====== */
 let adminUser=null,unsubAdmin=null,curView='topups';
+function startAdminCounts(){if(window._admCnt)return;window._admCnt=true;
+ store.collection('boostTopups').where('status','==','pending').limit(100).onSnapshot(sn=>{const b=document.querySelector('#adminPanel .tabs button[data-f=topups]');if(b)b.textContent='شحنات مستنية 🕐'+(sn.size?' ('+sn.size+')':'')});
+ store.collection('boostOrders').where('status','==','new').limit(100).onSnapshot(sn=>{const b=document.querySelector('#adminPanel .tabs button[data-f=orders]');if(b)b.textContent='طلبات جديدة 🛒'+(sn.size?' ('+sn.size+')':'')});}
 $('loginBtn').onclick=async()=>{
  const e=$('loginErr');e.style.display='none';
  try{
@@ -405,7 +409,7 @@ $('loginBtn').onclick=async()=>{
 };
 $('adminLogoutBtn').onclick=async()=>{await auth.signOut();adminUser=null;if(unsubAdmin)unsubAdmin();$('adminPanel').classList.add('hidden');$('adminLogin').classList.remove('hidden')};
 document.querySelectorAll('#adminPanel .tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#adminPanel .tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');curView=b.dataset.f;startAdmin()});
-function startAdmin(){
+function startAdmin(){startAdminCounts();
  if(unsubAdmin)unsubAdmin();
  if(curView==='stats'){
   $('adminList').innerHTML='<div class="note" style="text-align:center;padding:20px">جارٍ حساب الإحصائيات...</div>';
@@ -445,14 +449,23 @@ function startAdmin(){
    const docs=s.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
    const uids=[...new Set(docs.map(d=>d.data().uid))],users={};
    await Promise.all(uids.map(async u=>{try{const ud=await store.collection('boostUsers').doc(u).get();if(ud.exists)users[u]=ud.data()}catch(_){}}));
-   $('adminList').innerHTML=docs.length?docs.map(d=>{const o=d.data();const u=users[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+   lastAdminDocs=docs;lastAdminUsers=users;
+   const csvBtn=curView==='allOrders'?'<div style="text-align:left;margin-bottom:8px"><button class="btn sm" onclick="exportOrdersCSV()">⬇️ تصدير الطلبات CSV</button></div>':'';
+   $('adminList').innerHTML=csvBtn+(docs.length?docs.map(d=>{const o=d.data();const u=users[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
     return `<div class="row-item"><div class="top"><b>${esc(o.service)} • ${money(o.price)}</b><span class="pill ${o.status}">${STATUS_AR[o.status]||o.status}</span></div>
     <div class="meta">العميل: ${esc(u.name||'')} ${esc(u.phone||'')}<br>الكمية: ${fmt(o.quantity)}<br>الحساب: ${esc(o.accountLink)}<br>${t}</div>
     <div class="acts"><button onclick="setOrderStatus('${d.id}','in-progress')">بدء التنفيذ ⚙️</button><button onclick="setOrderStatus('${d.id}','done')">تم التنفيذ ✅</button><button onclick="setOrderStatus('${d.id}','rejected')">رفض ❌</button><button class="del" onclick="delOrder('${d.id}')">مسح 🗑️</button></div></div>`
-   }).join(''):'<div class="note" style="text-align:center;padding:20px">مفيش طلبات هنا.</div>';
+   }).join(''):'<div class="note" style="text-align:center;padding:20px">مفيش طلبات هنا.</div>');
   },e=>{$('adminList').innerHTML='<div class="note">تعذر التحميل: '+esc(e.code||'')+'</div>'});
  }
 }
+let lastAdminDocs=[],lastAdminUsers={};
+function exportOrdersCSV(){if(!lastAdminDocs.length)return alert('مفيش طلبات للتصدير');
+ const rows=[['رقم الطلب','العميل','التليفون','الخدمة','الكمية','السعر','الحالة','الحساب/ID','التاريخ']];
+ lastAdminDocs.forEach(d=>{const o=d.data();const u=lastAdminUsers[o.uid]||{};const t=o.createdAt&&o.createdAt.toDate?o.createdAt.toDate().toLocaleString('ar-EG'):'';
+  rows.push([d.id,u.name||'',u.phone||'',o.service||'',o.quantity||'',o.price||'',STATUS_AR[o.status]||o.status||'',(o.accountLink||'').replace(/[\n\r,;]/g,' '),t])});
+ const csv='\ufeff'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='boost-orders.csv';a.click();}
 async function approveTopup(code,uid,amount){
  if(!confirm('تأكيد شحن '+fmt(amount)+' جنيه للعميل ده؟'))return;
  try{
