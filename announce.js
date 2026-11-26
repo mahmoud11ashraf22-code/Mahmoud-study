@@ -1,6 +1,6 @@
 /* MAHMOUD STUDY: إعلان صغير "جرّب المدرّس الذكي" - بينتهي لوحده بعد 24 ساعة */
 (function () {
-  var EXPIRE = Date.parse('2026-11-27T23:30:00Z'); /* = 28 نوفمبر 2026، 1:30 ص بتوقيت القاهرة */
+  var EXPIRE = Date.parse('2026-11-27T23:45:00Z'); /* = 28 نوفمبر 2026، 1:45 ص بتوقيت القاهرة */
   if (Date.now() >= EXPIRE) return;
   try { if (localStorage.getItem('ann_tutor_x') === '1') return; } catch (e) { }
   var bar = null;
