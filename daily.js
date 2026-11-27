@@ -69,7 +69,7 @@
     if (!ov) return;
     var set = settings(), p = plan(false), h = '';
     h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:18px">📅 جدول اليوم</b><button id="d6x" style="border:0;background:transparent;color:#fff;font-size:22px;cursor:pointer">✕</button></div>';
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px;font-size:12px">';
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px;font-size:12px;color:#d6d9ff">';
     h += '<label>البداية<input id="d6st" type="time" value="' + ('0' + Math.floor(set.start / 60)).slice(-2) + ':' + ('0' + (set.start % 60)).slice(-2) + '" style="width:100%"></label>';
     h += '<label>ساعات المذاكرة<select id="d6h" style="width:100%">' + opts([1, 2, 3, 4, 5, 6, 7, 8], Math.round(set.hours), function (v) { return v + ' س'; }) + '</select></label>';
     h += '<label>الجلسة<select id="d6s" style="width:100%">' + opts([25, 30, 45, 50, 60], set.sess, function (v) { return v + ' د'; }) + '</select></label>';
