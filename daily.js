@@ -276,3 +276,52 @@
   setInterval(homeCard, 2000);
 })();
 
+
+
+/* MAHMOUD STUDY: لينكات اليوتيوب بتفتح جوه المنصة في نافذة مشغّل */
+(function () {
+  'use strict';
+  var box = null;
+  function ytInfo(u) {
+    try {
+      var x = new URL(u, location.href), h = x.hostname.replace(/^www\.|^m\./, ''), id = '', list = x.searchParams.get('list');
+      if (h === 'youtu.be') id = x.pathname.slice(1).split('/')[0];
+      else if (h === 'youtube.com' || h === 'music.youtube.com' || h === 'youtube-nocookie.com') {
+        if (x.pathname === '/watch') id = x.searchParams.get('v') || '';
+        else { var m = x.pathname.match(/^\/(embed|shorts|live|v)\/([\w-]{6,})/); if (m) id = m[2]; }
+        if (!id && x.pathname === '/playlist' && list) return { list: list, url: u };
+      } else return null;
+      if (!/^[\w-]{6,15}$/.test(id) && !list) return null;
+      var t = x.searchParams.get('t') || x.searchParams.get('start') || '', sec = 0, tm = String(t).match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/);
+      if (tm) sec = (+tm[1] || 0) * 3600 + (+tm[2] || 0) * 60 + (+tm[3] || 0);
+      return { id: /^[\w-]{6,15}$/.test(id) ? id : '', list: list, start: sec, url: u };
+    } catch (e) { return null; }
+  }
+  function close() { if (box && box.parentNode) box.parentNode.removeChild(box); box = null; document.documentElement.style.overflow = ''; }
+  function play(info) {
+    close();
+    var src = info.id ? 'https://www.youtube-nocookie.com/embed/' + info.id + '?rel=0&playsinline=1&autoplay=1' + (info.start ? '&start=' + info.start : '') + (info.list ? '&list=' + encodeURIComponent(info.list) : '')
+      : 'https://www.youtube-nocookie.com/embed/videoseries?list=' + encodeURIComponent(info.list) + '&rel=0&playsinline=1&autoplay=1';
+    box = document.createElement('div');
+    box.style.cssText = 'position:fixed;inset:0;z-index:200000;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;direction:rtl;padding:10px;box-sizing:border-box';
+    box.onclick = function (e) { if (e.target === box) close(); };
+    var w = document.createElement('div');
+    w.style.cssText = 'width:100%;max-width:900px;background:#14162b;border-radius:16px;padding:10px;box-sizing:border-box;color:#fff;font-family:inherit';
+    w.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b>▶ مشغّل الفيديو</b><button type="button" id="ytx" style="border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:6px 14px;font:inherit;font-weight:800;cursor:pointer">✕ إغلاق</button></div>' +
+      '<div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden"><iframe id="ytf" src="' + src + '" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture;fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
+      '<div style="font-size:12px;opacity:.8;margin-top:8px;text-align:center">لو الفيديو مش بيشتغل (صاحبه مانع التشغيل خارج يوتيوب) <a href="#" id="ytout" style="color:#8ab4ff;font-weight:800">افتحه في يوتيوب</a></div>';
+    box.appendChild(w); document.body.appendChild(box); document.documentElement.style.overflow = 'hidden';
+    w.querySelector('#ytx').onclick = close;
+    w.querySelector('#ytout').onclick = function (e) { e.preventDefault(); realOpen.call(window, info.url, '_blank', 'noopener'); };
+  }
+  var realOpen = window.open;
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!a || a.id === 'ytout') return;
+    var info = ytInfo(a.getAttribute('href')); if (!info) return;
+    e.preventDefault(); e.stopPropagation(); play(info);
+  }, true);
+  window.open = function (u) { var info = u && ytInfo(String(u)); if (info) { play(info); return null; } return realOpen.apply(window, arguments); };
+  window.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box) close(); });
+  window.openYT = function (u) { var i = ytInfo(u); if (i) play(i); };
+})();
