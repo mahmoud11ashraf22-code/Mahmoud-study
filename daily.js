@@ -300,16 +300,16 @@
   function close() { if (box && box.parentNode) box.parentNode.removeChild(box); box = null; document.documentElement.style.overflow = ''; }
   function play(info) {
     close();
-    var src = info.id ? 'https://www.youtube-nocookie.com/embed/' + info.id + '?rel=0&playsinline=1&autoplay=1' + (info.start ? '&start=' + info.start : '') + (info.list ? '&list=' + encodeURIComponent(info.list) : '')
-      : 'https://www.youtube-nocookie.com/embed/videoseries?list=' + encodeURIComponent(info.list) + '&rel=0&playsinline=1&autoplay=1';
+    var src = info.id ? 'https://www.youtube-nocookie.com/embed/' + info.id + '?rel=0&playsinline=1&autoplay=1&iv_load_policy=3&hl=ar&color=white&cc_lang_pref=ar' + (info.start ? '&start=' + info.start : '') + (info.list ? '&list=' + encodeURIComponent(info.list) : '')
+      : 'https://www.youtube-nocookie.com/embed/videoseries?list=' + encodeURIComponent(info.list) + '&rel=0&playsinline=1&autoplay=1&iv_load_policy=3&hl=ar&color=white';
     box = document.createElement('div');
     box.style.cssText = 'position:fixed;inset:0;z-index:200000;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;direction:rtl;padding:10px;box-sizing:border-box';
     box.onclick = function (e) { if (e.target === box) close(); };
     var w = document.createElement('div');
-    w.style.cssText = 'width:100%;max-width:900px;background:#14162b;border-radius:16px;padding:10px;box-sizing:border-box;color:#fff;font-family:inherit';
-    w.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b>▶ مشغّل الفيديو</b><button type="button" id="ytx" style="border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:6px 14px;font:inherit;font-weight:800;cursor:pointer">✕ إغلاق</button></div>' +
-      '<div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden"><iframe id="ytf" src="' + src + '" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture;fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
-      '<div style="font-size:12px;opacity:.8;margin-top:8px;text-align:center">لو الفيديو مش بيشتغل (صاحبه مانع التشغيل خارج يوتيوب) <a href="#" id="ytout" style="color:#8ab4ff;font-weight:800">افتحه في يوتيوب</a></div>';
+    w.style.cssText = 'width:100%;max-width:900px;background:linear-gradient(160deg,#171a35,#0d0f22);border-radius:20px;padding:12px;box-sizing:border-box;color:#fff;font-family:inherit;border:1px solid rgba(120,200,160,.35);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(31,160,112,.25)';
+    w.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="display:flex;align-items:center;gap:9px"><img src="icon-192.png" alt="" style="width:32px;height:32px;border-radius:9px"><div><b style="font-size:15px;letter-spacing:.5px">MAHMOUD STUDY</b><div style="font-size:11px;opacity:.7">🎧 درس مسجّل</div></div></div><button type="button" id="ytx" style="border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:7px 14px;font:inherit;font-weight:800;cursor:pointer">✕ إغلاق</button></div>' +
+      '<div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 0 0 2px rgba(31,160,112,.5)"><iframe id="ytf" src="' + src + '" title="MAHMOUD STUDY" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture;fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
+      '<div style="font-size:11px;opacity:.55;margin-top:9px;text-align:center">ذاكر صح مع MAHMOUD STUDY • <a href="#" id="ytout" style="color:inherit;text-decoration:underline">لو الفيديو مش بيشتغل اضغط هنا</a></div>';
     box.appendChild(w); document.body.appendChild(box); document.documentElement.style.overflow = 'hidden';
     w.querySelector('#ytx').onclick = close;
     w.querySelector('#ytout').onclick = function (e) { e.preventDefault(); realOpen.call(window, info.url, '_blank', 'noopener'); };
@@ -325,3 +325,4 @@
   window.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box) close(); });
   window.openYT = function (u) { var i = ytInfo(u); if (i) play(i); };
 })();
+
