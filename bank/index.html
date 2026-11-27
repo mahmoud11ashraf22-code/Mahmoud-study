@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0b3d2e">
+<title>🎲 بنك الحظ</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:radial-gradient(circle at 50% 0,#14604a,#07281e 70%);color:#fff;font-family:Tahoma,'Segoe UI',Arial,sans-serif;min-height:100vh}
+button{font-family:inherit;cursor:pointer}
+#setup,#game{max-width:1000px;margin:0 auto;padding:10px}
+.hide{display:none!important}
+h1{text-align:center;margin:14px 0 4px;font-size:34px;text-shadow:0 3px 0 #0006}
+.sub{text-align:center;opacity:.8;margin-bottom:14px}
+.card{background:#ffffff14;border:1px solid #ffffff22;border-radius:16px;padding:12px;margin:10px 0}
+.row{display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap}
+.row input[type=text]{flex:1;min-width:100px;padding:10px;border-radius:10px;border:0;font-size:16px;font-family:inherit}
+.row select{padding:10px;border-radius:10px;border:0;font-size:15px;font-family:inherit}
+.btn{background:linear-gradient(#ffd54a,#f5a400);color:#3b2600;border:0;border-radius:12px;padding:12px 18px;font-size:17px;font-weight:700;box-shadow:0 4px 0 #a36b00}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #a36b00}
+.btn.g{background:linear-gradient(#5fe08a,#1fae57);color:#05301a;box-shadow:0 4px 0 #0f6b34}
+.btn.r{background:linear-gradient(#ff8a80,#e53935);color:#fff;box-shadow:0 4px 0 #8e1a17}
+.btn.d{background:#ffffff26;color:#fff;box-shadow:0 4px 0 #0005}
+.btn.s{padding:8px 12px;font-size:14px}
+.btn:disabled{opacity:.4}
+#wrap{display:flex;flex-direction:column;gap:10px;align-items:center}
+#boardBox{width:min(100vw - 12px,620px,calc(100vh - 150px));width:min(calc(100vw - 12px),620px);aspect-ratio:1}
+#board{direction:ltr;width:100%;height:100%;display:grid;grid-template:repeat(11,1fr)/repeat(11,1fr);gap:1px;background:#0a2a20;border:3px solid #0a2a20;border-radius:10px;position:relative}
+.sq{background:#dff3e4;color:#10261b;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;text-align:center;cursor:pointer;direction:rtl;line-height:1.05}
+.sq .bar{width:100%;height:24%;min-height:5px;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:700;gap:0}
+.sq .nm{font-size:clamp(5.5px,1.55vw,9.5px);font-weight:700;padding:1px;word-break:break-word}
+.sq .pr{font-size:clamp(5px,1.3vw,8px);opacity:.75;margin-top:auto}
+.sq .ic{font-size:clamp(10px,3vw,20px);margin-top:1px}
+.sq.corner{background:#fff3c4}
+.sq.mort{filter:grayscale(1) brightness(.8)}
+.sq .own{position:absolute;inset:auto 0 0 0;height:4px}
+.sq .tk{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;pointer-events:none;align-content:center}
+.tk span{font-size:clamp(9px,2.8vw,19px);filter:drop-shadow(0 1px 1px #000a);transition:transform .15s}
+.sq.cur{box-shadow:inset 0 0 0 2px #ff0}
+#center{grid-area:2/2/11/11;background:radial-gradient(circle,#1c7a5c,#0e4a37);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;direction:rtl;text-align:center;overflow:hidden}
+#logo{font-size:clamp(16px,5vw,34px);font-weight:900;transform:rotate(-8deg);text-shadow:0 3px 0 #0007;color:#ffd54a;border:3px solid #ffd54a;border-radius:10px;padding:2px 10px}
+#dice{display:flex;gap:10px;font-size:clamp(34px,11vw,64px);line-height:1}
+.die{background:#fff;color:#111;border-radius:10px;padding:0 4px;box-shadow:0 3px 0 #0006}
+.die.roll{animation:sh .25s infinite}
+@keyframes sh{0%{transform:rotate(-12deg)}50%{transform:rotate(14deg) translateY(-4px)}100%{transform:rotate(-12deg)}}
+#msg{font-size:clamp(10px,2.8vw,15px);min-height:2.6em;max-width:92%}
+#panel{width:100%;max-width:620px}
+#ctrl{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:4px 0}
+#players{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.pl{background:#ffffff14;border:2px solid transparent;border-radius:12px;padding:8px;font-size:14px;position:relative}
+.pl.on{border-color:#ffd54a;background:#ffd54a22}
+.pl.out{opacity:.35;text-decoration:line-through}
+.pl .mn{font-weight:800;font-size:18px;color:#8dffb0}
+.dots{display:flex;flex-wrap:wrap;gap:2px;margin-top:4px;min-height:10px}
+.dots i{width:12px;height:12px;border-radius:3px;display:inline-block;border:1px solid #0008}
+.dots i.m{opacity:.35}
+#logbox{background:#0005;border-radius:12px;padding:8px;max-height:110px;overflow:auto;font-size:12.5px;margin-top:8px}
+#logbox div{padding:1px 0;border-bottom:1px solid #ffffff10}
+#ov{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;z-index:50;padding:10px}
+#md{background:#fff;color:#1b1b1b;border-radius:18px;padding:14px;width:min(94vw,440px);max-height:88vh;overflow:auto;box-shadow:0 10px 40px #000}
+#md h3{margin:0 0 6px;font-size:20px}
+#md .bt{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.deed{border:2px solid #222;border-radius:8px;overflow:hidden;margin:6px 0}
+.deed .hd{padding:10px;text-align:center;color:#fff;font-weight:800;font-size:18px;text-shadow:0 1px 2px #0008}
+.deed table{width:100%;font-size:14px;border-collapse:collapse}
+.deed td{padding:3px 10px;border-bottom:1px solid #eee}
+.deed td:last-child{text-align:left;font-weight:700}
+.mrow{display:flex;align-items:center;gap:6px;padding:6px;border-bottom:1px solid #eee;font-size:14px}
+.mrow .c{width:14px;height:30px;border-radius:4px;flex:none}
+.mrow .n{flex:1}
+.mrow .bs{display:flex;gap:4px}
+.chk{display:flex;align-items:center;gap:6px;padding:4px;font-size:14px}
+.big{font-size:44px;text-align:center}
+.tt{font-size:12px;opacity:.7;text-align:center;margin-top:6px}
+#toast{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#111d;color:#fff;padding:8px 16px;border-radius:20px;z-index:99;font-size:14px;pointer-events:none}
+@media(min-width:900px){#wrap{flex-direction:row;align-items:flex-start;justify-content:center}#boardBox{width:min(620px,calc(100vh - 30px))}#panel{width:340px}}
+</style>
+</head>
+<body>
+<div id="setup">
+  <h1>🎲 بنك الحظ</h1>
+  <div class="sub">لعبة العقارات والمدن المصرية — اشتري، ابني، وأفلس خصومك!</div>
+  <div class="card">
+    <b>عدد اللاعبين</b>
+    <div class="row" id="cnt"></div>
+    <div id="pset"></div>
+  </div>
+  <div class="card">
+    <div class="row"><b>الفلوس في البداية:</b>
+      <select id="startMoney"><option value="1000">١٠٠٠ ج</option><option value="1500" selected>١٥٠٠ ج</option><option value="2500">٢٥٠٠ ج</option></select>
+      <b>سرعة اللعب:</b>
+      <select id="speed"><option value="1">عادي</option><option value="0.5">سريع</option><option value="0.1">سريع جدًا</option></select>
+    </div>
+    <div class="row"><label><input type="checkbox" id="parkPot"> 🅿️ جوائز الضرايب تتجمع في الاستراحة</label></div>
+  </div>
+  <div class="row" style="justify-content:center">
+    <button class="btn g" id="startBtn">▶️ ابدأ اللعب</button>
+    <button class="btn d" id="contBtn">⏯ كمّل اللعبة المحفوظة</button>
+    <button class="btn d" id="rulesBtn">📖 القواعد</button>
+  </div>
+</div>
+
+<div id="game" class="hide">
+  <div id="wrap">
+    <div id="boardBox"><div id="board"><div id="center">
+      <div id="logo">بنك الحظ</div>
+      <div id="dice"><span class="die">⚀</span><span class="die">⚀</span></div>
+      <div id="msg"></div>
+    </div></div></div>
+    <div id="panel">
+      <div id="ctrl"></div>
+      <div id="players"></div>
+      <div id="logbox"></div>
+      <div class="row" style="justify-content:center;margin-top:8px">
+        <button class="btn d s" id="muteBtn">🔊</button>
+        <button class="btn d s" id="menuBtn">☰ قائمة</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="ov" class="hide"><div id="md"></div></div>
+<div id="toast" class="hide"></div>
+
+<script>
+'use strict';
+/* ========== DATA ========== */
+const GC={brown:'#8b5a2b',lb:'#7ec8f0',pink:'#e0559e',orange:'#f39a2b',red:'#d9322e',yellow:'#f2d12e',green:'#2fa35a',dk:'#2a4aa8',rail:'#444',util:'#888'};
+const GN={brown:'بني',lb:'سماوي',pink:'وردي',orange:'برتقالي',red:'أحمر',yellow:'أصفر',green:'أخضر',dk:'أزرق غامق',rail:'محطات',util:'شركات'};
+const S=[
+ {t:'go',n:'البداية',ic:'🏁'},
+ {t:'p',n:'سيوة',g:'brown',pr:60,hc:50,r:[2,10,30,90,160,250]},
+ {t:'chest',n:'صندوق الحظ',ic:'🎁'},
+ {t:'p',n:'مطروح',g:'brown',pr:60,hc:50,r:[4,20,60,180,320,450]},
+ {t:'tax',n:'ضريبة الدخل',pr:200,ic:'💸'},
+ {t:'rail',n:'محطة رمسيس',pr:200,ic:'🚆'},
+ {t:'p',n:'الفيوم',g:'lb',pr:100,hc:50,r:[6,30,90,270,400,550]},
+ {t:'chance',n:'فرصة',ic:'❓'},
+ {t:'p',n:'بني سويف',g:'lb',pr:100,hc:50,r:[6,30,90,270,400,550]},
+ {t:'p',n:'المنيا',g:'lb',pr:120,hc:50,r:[8,40,100,300,450,600]},
+ {t:'jail',n:'السجن (زيارة)',ic:'⛓️'},
+ {t:'p',n:'أسيوط',g:'pink',pr:140,hc:100,r:[10,50,150,450,625,750]},
+ {t:'util',n:'شركة الكهرباء',pr:150,ic:'💡'},
+ {t:'p',n:'سوهاج',g:'pink',pr:140,hc:100,r:[10,50,150,450,625,750]},
+ {t:'p',n:'قنا',g:'pink',pr:160,hc:100,r:[12,60,180,500,700,900]},
+ {t:'rail',n:'محطة مصر',pr:200,ic:'🚆'},
+ {t:'p',n:'الأقصر',g:'orange',pr:180,hc:100,r:[14,70,200,550,750,950]},
+ {t:'chest',n:'صندوق الحظ',ic:'🎁'},
+ {t:'p',n:'أسوان',g:'orange',pr:180,hc:100,r:[14,70,200,550,750,950]},
+ {t:'p',n:'الغردقة',g:'orange',pr:200,hc:100,r:[16,80,220,600,800,1000]},
+ {t:'park',n:'استراحة مجانية',ic:'🅿️'},
+ {t:'p',n:'دمياط',g:'red',pr:220,hc:150,r:[18,90,250,700,875,1050]},
+ {t:'chance',n:'فرصة',ic:'❓'},
+ {t:'p',n:'المنصورة',g:'red',pr:220,hc:150,r:[18,90,250,700,875,1050]},
+ {t:'p',n:'طنطا',g:'red',pr:240,hc:150,r:[20,100,300,750,925,1100]},
+ {t:'rail',n:'محطة سيدي جابر',pr:200,ic:'🚆'},
+ {t:'p',n:'الإسماعيلية',g:'yellow',pr:260,hc:150,r:[22,110,330,800,975,1150]},
+ {t:'p',n:'بورسعيد',g:'yellow',pr:260,hc:150,r:[22,110,330,800,975,1150]},
+ {t:'util',n:'شركة المياه',pr:150,ic:'🚰'},
+ {t:'p',n:'السويس',g:'yellow',pr:280,hc:150,r:[24,120,360,850,1025,1200]},
+ {t:'gojail',n:'اذهب للسجن',ic:'👮'},
+ {t:'p',n:'شرم الشيخ',g:'green',pr:300,hc:200,r:[26,130,390,900,1100,1275]},
+ {t:'p',n:'دهب',g:'green',pr:300,hc:200,r:[26,130,390,900,1100,1275]},
+ {t:'chest',n:'صندوق الحظ',ic:'🎁'},
+ {t:'p',n:'الإسكندرية',g:'green',pr:320,hc:200,r:[28,150,450,1000,1200,1400]},
+ {t:'rail',n:'محطة الجيزة',pr:200,ic:'🚆'},
+ {t:'chance',n:'فرصة',ic:'❓'},
+ {t:'p',n:'الجيزة',g:'dk',pr:350,hc:200,r:[35,175,500,1100,1300,1500]},
+ {t:'tax',n:'ضريبة رفاهية',pr:100,ic:'💎'},
+ {t:'p',n:'القاهرة',g:'dk',pr:400,hc:200,r:[50,200,600,1400,1700,2000]}
+];
+S.forEach((s,i)=>s.i=i);
+const OWNABLE=s=>s.t==='p'||s.t==='rail'||s.t==='util';
+const groupOf=s=>s.t==='p'?s.g:s.t;
+const GROUPS={};S.forEach(s=>{if(OWNABLE(s)){(GROUPS[groupOf(s)]=GROUPS[groupOf(s)]||[]).push(s.i)}});
+const TOKENS=['🚗','🐪','✈️','🎩','🐎','⛵'];
+const PCOL=['#ff5252','#40c4ff','#ffd740','#b388ff','#69f0ae','#ff9e40'];
+const CHANCE=[
+ {t:'تقدّم لـ البداية وخد ٢٠٠ ج',f:async(p)=>moveTo(p,0,true)},
+ {t:'تقدّم للقاهرة 🏙️',f:async(p)=>moveTo(p,39,true)},
+ {t:'تقدّم لأسيوط',f:async(p)=>moveTo(p,11,true)},
+ {t:'تقدّم لشرم الشيخ 🏖️',f:async(p)=>moveTo(p,31,true)},
+ {t:'تقدّم لأقرب محطة، ولو ليها مالك ادفع ضعف الإيجار',f:async(p)=>{const r=[5,15,25,35];let t=r.find(x=>x>p.pos)??5;await moveTo(p,t,true,{rail2:true})}},
+ {t:'البنك بيدفعلك أرباح ٥٠ ج',f:async(p)=>gain(p,50)},
+ {t:'اخرج من السجن مجانًا (احتفظ بالكارت)',f:async(p)=>{p.jc++;G.chance.held=true},jail:true},
+ {t:'ارجع ٣ خطوات',f:async(p)=>moveTo(p,(p.pos+37)%40,false)},
+ {t:'اذهب مباشرة للسجن 👮',f:async(p)=>goJail(p)},
+ {t:'صيانة عقاراتك: ٢٥ ج لكل بيت و١٠٠ ج لكل فندق',f:async(p)=>repairs(p,25,100)},
+ {t:'غرامة سرعة: ادفع ١٥ ج',f:async(p)=>pay(p,15,null)},
+ {t:'تقدّم لمحطة رمسيس 🚆',f:async(p)=>moveTo(p,5,true)},
+ {t:'عيد ميلادك 🎂 خد ٥٠ ج من كل لاعب',f:async(p)=>eachPays(p,50,true)},
+ {t:'رئيس مجلس الإدارة: ادفع ٥٠ ج لكل لاعب',f:async(p)=>eachPays(p,50,false)},
+ {t:'تقدّم لـ الأقصر',f:async(p)=>moveTo(p,16,true)},
+ {t:'كسبت مسابقة! خد ١٠٠ ج',f:async(p)=>gain(p,100)}
+];
+const CHEST=[
+ {t:'خطأ بنكي لصالحك: خد ٢٠٠ ج',f:async(p)=>gain(p,200)},
+ {t:'أتعاب الدكتور: ادفع ٥٠ ج',f:async(p)=>pay(p,50,null)},
+ {t:'بعت أسهم: خد ٥٠ ج',f:async(p)=>gain(p,50)},
+ {t:'اخرج من السجن مجانًا (احتفظ بالكارت)',f:async(p)=>{p.jc++;G.chest.held=true},jail:true},
+ {t:'اذهب مباشرة للسجن 👮',f:async(p)=>goJail(p)},
+ {t:'ورثت ١٠٠ ج من عمك',f:async(p)=>gain(p,100)},
+ {t:'عيد الأضحى: خد ١٠ ج من كل لاعب',f:async(p)=>eachPays(p,10,true)},
+ {t:'استرداد ضرائب: خد ٢٠ ج',f:async(p)=>gain(p,20)},
+ {t:'تأمين على الحياة: خد ١٠٠ ج',f:async(p)=>gain(p,100)},
+ {t:'مصاريف مستشفى: ادفع ١٠٠ ج',f:async(p)=>pay(p,100,null)},
+ {t:'مصاريف مدرسة: ادفع ٥٠ ج',f:async(p)=>pay(p,50,null)},
+ {t:'مكافأة: خد ٢٥ ج',f:async(p)=>gain(p,25)},
+ {t:'إصلاح العقارات: ٤٠ ج لكل بيت و١١٥ ج لكل فندق',f:async(p)=>repairs(p,40,115)},
+ {t:'تقدّم لـ البداية وخد ٢٠٠ ج',f:async(p)=>moveTo(p,0,true)}
+];
+/* ========== STATE ========== */
+let G=null,SPEED=1,MUTE=false,AUTO=location.hash==='#auto',STOP=false;
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,AUTO?0:ms*SPEED));
+const fmt=n=>n.toLocaleString('ar-EG')+' ج';
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const rnd=n=>Math.floor(Math.random()*n);
+/* ---- sound ---- */
+let AC=null;
+function beep(f=440,d=.08,type='sine',v=.08){if(MUTE||AUTO)return;try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d)}catch(e){}}
+const sfx={step:()=>beep(520,.04,'square',.03),dice:()=>{beep(200,.05,'square');setTimeout(()=>beep(260,.05,'square'),70)},cash:()=>{beep(880,.07);setTimeout(()=>beep(1175,.1),80)},pay:()=>{beep(300,.12,'sawtooth',.05)},win:()=>[523,659,784,1046].forEach((f,i)=>setTimeout(()=>beep(f,.2),i*140)),bad:()=>beep(150,.3,'sawtooth',.06)};
+function toast(t){const e=$('toast');e.textContent=t;e.classList.remove('hide');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.add('hide'),1800)}
+function log(t){G.log.push(t);const b=$('logbox');const d=document.createElement('div');d.textContent=t;b.prepend(d);while(b.children.length>60)b.lastChild.remove();$('msg').textContent=t}
+/* ========== SETUP ========== */
+let pcount=4;
+function drawSetup(){
+  $('cnt').innerHTML='';
+  [2,3,4,5,6].forEach(n=>{const b=document.createElement('button');b.className='btn s '+(n===pcount?'g':'d');b.textContent=n;b.onclick=()=>{pcount=n;drawSetup()};$('cnt').appendChild(b)});
+  const old=[...document.querySelectorAll('#pset .row')].map(r=>({n:r.querySelector('input').value,a:r.querySelector('select').value}));
+  $('pset').innerHTML='';
+  for(let i=0;i<pcount;i++){
+    const r=document.createElement('div');r.className='row';
+    r.innerHTML=`<span style="font-size:26px">${TOKENS[i]}</span><input type="text" maxlength="12" value="${old[i]?old[i].n:(i===0?'أنا':'لاعب '+(i+1))}"><select><option value="h">👤 إنسان</option><option value="a">🤖 كمبيوتر</option></select>`;
+    r.querySelector('select').value=old[i]?old[i].a:(i===0?'h':'a');
+    r.style.borderRight='6px solid '+PCOL[i];r.style.paddingRight='8px';
+    $('pset').appendChild(r);
+  }
+}
+function startNew(){
+  const rows=[...document.querySelectorAll('#pset .row')];
+  const money=+$('startMoney').value;
+  SPEED=+$('speed').value;
+  G={players:rows.map((r,i)=>({name:r.querySelector('input').value.trim()||('لاعب '+(i+1)),ai:r.querySelector('select').value==='a',tk:TOKENS[i],col:PCOL[i],money,pos:0,jail:0,jc:0,out:false})),
+     props:{},turn:0,chance:{order:shuffle([...CHANCE.keys()]),k:0,held:false},chest:{order:shuffle([...CHEST.keys()]),k:0,held:false},
+     log:[],pot:0,usePot:$('parkPot').checked,speed:SPEED,over:false,rounds:0};
+  S.forEach(s=>{if(OWNABLE(s))G.props[s.i]={o:-1,h:0,m:false}});
+  enter();
+}
+function enter(){$('setup').classList.add('hide');$('game').classList.remove('hide');buildBoard();render();$('logbox').innerHTML='';loop()}
+function save(){try{if(!G.over)localStorage.setItem('bankelhaz_save',JSON.stringify(G))}catch(e){}}
+/* ========== BOARD ========== */
+function cellPos(i){if(i<=10)return[11,11-i];if(i<20)return[11-(i-10),1];if(i===20)return[1,1];if(i<30)return[1,i-19];if(i===30)return[1,11];return[i-29,11]}
+function buildBoard(){
+  const b=$('board');[...b.querySelectorAll('.sq')].forEach(x=>x.remove());
+  S.forEach(s=>{
+    const d=document.createElement('div');d.className='sq'+([0,10,20,30].includes(s.i)?' corner':'');d.id='sq'+s.i;
+    const [r,c]=cellPos(s.i);d.style.gridRow=r;d.style.gridColumn=c;
+    let h='';
+    if(s.t==='p')h+=`<div class="bar" style="background:${GC[s.g]}" id="bar${s.i}"></div><div class="nm">${s.n}</div><div class="pr">${s.pr}</div>`;
+    else if(s.t==='rail'||s.t==='util')h+=`<div class="ic">${s.ic}</div><div class="nm">${s.n}</div><div class="pr">${s.pr}</div>`;
+    else h+=`<div class="ic">${s.ic}</div><div class="nm">${s.n}</div>${s.pr?`<div class="pr">${s.pr}</div>`:''}`;
+    h+='<div class="own" id="own'+s.i+'"></div><div class="tk" id="tk'+s.i+'"></div>';
+    d.innerHTML=h;d.onclick=()=>showDeed(s.i);b.appendChild(d);
+  });
+}
+function render(){
+  if(!G)return;
+  S.forEach(s=>{
+    const tk=$('tk'+s.i);tk.innerHTML=G.players.map(p=>(!p.out&&p.pos===s.i)?`<span>${p.tk}</span>`:'').join('');
+    const q=G.props[s.i];const sq=$('sq'+s.i);
+    if(q){
+      $('own'+s.i).style.background=q.o>=0?G.players[q.o].col:'transparent';
+      sq.classList.toggle('mort',q.m);
+      const bar=$('bar'+s.i);if(bar)bar.textContent=q.h===5?'🏨':'🏠'.repeat(q.h);
+    }
+    sq.classList.toggle('cur',!!G.players[G.turn]&&G.players[G.turn].pos===s.i&&!G.players[G.turn].out);
+  });
+  $('players').innerHTML=G.players.map((p,i)=>{
+    const mine=Object.entries(G.props).filter(([k,v])=>v.o===i).map(([k,v])=>{const s=S[k];return `<i class="${v.m?'m':''}" style="background:${GC[groupOf(s)]}"></i>`}).join('');
+    return `<div class="pl ${i===G.turn&&!p.out?'on':''} ${p.out?'out':''}" style="border-right:6px solid ${p.col}"><div>${p.tk} <b>${p.name}</b> ${p.ai?'🤖':''}${p.jail?' ⛓️':''}${p.jc?' 🎟️×'+p.jc:''}</div><div class="mn">${fmt(p.money)}</div><div class="dots">${mine}</div></div>`;
+  }).join('')+(G.usePot?`<div class="pl">🅿️ الاستراحة: <b>${fmt(G.pot)}</b></div>`:'');
+}
+function dieFace(n){return '⚀⚁⚂⚃⚄⚅'[n-1]}
+/* ========== MODAL ========== */
+function modal(html,btns){
+  return new Promise(res=>{
+    if(AUTO){res(btns&&btns.length?btns[0].v:null);return}
+    $('md').innerHTML=html+'<div class="bt"></div>';
+    const bt=$('md').querySelector('.bt');
+    (btns||[]).forEach(b=>{const e=document.createElement('button');e.className='btn '+(b.c||'');e.innerHTML=b.t;if(b.dis)e.disabled=true;e.onclick=()=>{$('ov').classList.add('hide');res(b.v)};bt.appendChild(e)});
+    $('ov').classList.remove('hide');
+  });
+}
+function closeModal(){$('ov').classList.add('hide')}
+function ctrl(btns){
+  const c=$('ctrl');c.innerHTML='';
+  return new Promise(res=>{
+    btns.forEach(b=>{const e=document.createElement('button');e.className='btn '+(b.c||'');e.innerHTML=b.t;e.onclick=()=>{if(b.v==='_keep'){b.fn();return}c.innerHTML='';res(b.v)};c.appendChild(e)});
+    if(!btns.length)res(null);
+  });
+}
+function sideBtns(p){return [{t:'🏗 إدارة',c:'d s',v:'_keep',fn:()=>manage(p)},{t:'🤝 تبادل',c:'d s',v:'_keep',fn:()=>tradeUI(p)}]}
+/* ========== RULES HELPERS ========== */
+const owner=i=>G.props[i].o;
+const ownedBy=(pi)=>Object.keys(G.props).filter(k=>G.props[k].o===pi).map(Number);
+function hasSet(pi,g){return GROUPS[g].every(i=>G.props[i].o===pi)}
+function countOwned(pi,g){return GROUPS[g].filter(i=>G.props[i].o===pi).length}
+function rentOf(i,roll,mult){
+  const s=S[i],q=G.props[i];if(q.o<0||q.m)return 0;
+  let r=0;
+  if(s.t==='p'){
+    if(q.h>0)r=s.r[q.h];
+    else r=s.r[0]*(hasSet(q.o,s.g)&&!GROUPS[s.g].some(x=>G.props[x].m)?2:1);
+  }else if(s.t==='rail'){r=25*Math.pow(2,countOwned(q.o,'rail')-1);if(mult)r*=2}
+  else{const n=countOwned(q.o,'util');r=(mult?10:(n===2?10:4))*(roll||7)}
+  return r;
+}
+function netWorth(p){let w=p.money;ownedBy(G.players.indexOf(p)).forEach(i=>{const s=S[i],q=G.props[i];w+=q.m?s.pr/2:s.pr;if(s.t==='p')w+=q.h*s.hc})}
+function canBuild(pi,i){
+  const s=S[i],q=G.props[i];if(s.t!=='p'||q.o!==pi||q.m||q.h>=5)return false;
+  if(!hasSet(pi,s.g))return false;if(GROUPS[s.g].some(x=>G.props[x].m))return false;
+  if(G.players[pi].money<s.hc)return false;
+  return q.h<=Math.min(...GROUPS[s.g].map(x=>G.props[x].h));
+}
+function canSell(pi,i){const s=S[i],q=G.props[i];if(s.t!=='p'||q.o!==pi||q.h<=0)return false;return q.h>=Math.max(...GROUPS[s.g].map(x=>G.props[x].h))}
+function canMort(pi,i){const s=S[i],q=G.props[i];if(q.o!==pi||q.m)return false;if(s.t==='p'&&GROUPS[s.g].some(x=>G.props[x].h>0))return false;return true}
+const unmortCost=i=>Math.ceil(S[i].pr/2*1.1);
+function build(pi,i){const s=S[i],p=G.players[pi];p.money-=s.hc;G.props[i].h++;sfx.cash();log(`${p.name} بنى ${G.props[i].h===5?'فندق 🏨':'بيت 🏠'} في ${s.n}`)}
+function sellHouse(pi,i){const s=S[i],p=G.players[pi];p.money+=s.hc/2;G.props[i].h--;log(`${p.name} باع بيت في ${s.n}`)}
+function mortgage(pi,i){const p=G.players[pi];p.money+=S[i].pr/2;G.props[i].m=true;log(`${p.name} رهن ${S[i].n}`)}
+function unmortgage(pi,i){const p=G.players[pi];p.money-=unmortCost(i);G.props[i].m=false;log(`${p.name} فك رهن ${S[i].n}`)}
+function totalHouses(pi){let h=0,H=0;ownedBy(pi).forEach(i=>{const q=G.props[i];if(S[i].t==='p'){if(q.h===5)H++;else h+=q.h}});return[h,H]}
+/* ========== MONEY ========== */
+async function gain(p,a){p.money+=a;sfx.cash();log(`${p.name} استلم ${fmt(a)}`);render()}
+async function pay(p,a,to){ // to: player object or null(bank)
+  if(a<=0)return true;
+  const ok=await ensureFunds(p,a,to);
+  if(ok){p.money-=a;if(to)to.money+=a;else if(G.usePot)G.pot+=a;sfx.pay();render();return true}
+  await bankrupt(p,to);return false;
+}
+async function repairs(p,h,H){const [a,b]=totalHouses(G.players.indexOf(p));await pay(p,a*h+b*H,null)}
+async function eachPays(p,a,collect){
+  for(const q of G.players){if(q===p||q.out||p.out)continue;
+    if(collect)await pay(q,a,p);else await pay(p,a,q)}
+}
+async function ensureFunds(p,a,to){
+  const pi=G.players.indexOf(p);
+  while(p.money<a){
+    if(p.ai){if(!aiRaise(pi))return false}
+    else{
+      const r=await manage(p,a,to);
+      if(r==='bankrupt')return false;
+    }
+  }
+  return true;
+}
+function aiRaise(pi){
+  // sell houses first
+  let best=null;
+  for(const i of ownedBy(pi)){if(canSell(pi,i)){if(!best||S[i].hc>S[best].hc)best=i}}
+  if(best!==null){sellHouse(pi,best);return true}
+  const m=ownedBy(pi).filter(i=>canMort(pi,i)).sort((a,b)=>S[a].pr-S[b].pr);
+  if(m.length){mortgage(pi,m[0]);return true}
+  return false;
+}
+async function bankrupt(p,to){
+  const pi=G.players.indexOf(p);
+  log(`💀 ${p.name} أفلس!`+(to?` وكل ممتلكاته راحت لـ ${to.name}`:''));sfx.bad();
+  const ti=to?G.players.indexOf(to):-1;
+  for(const i of ownedBy(pi)){const q=G.props[i];
+    if(q.h>0){q.h=0}
+    q.o=ti;
+    if(ti<0){q.m=false}
+  }
+  if(to){to.money+=Math.max(0,p.money);to.jc+=p.jc}
+  p.money=0;p.out=true;p.jc=0;p.jail=0;
+  if(!to){/* bank: props already unowned (auction skipped) */}
+  render();
+  if(!AUTO)await modal(`<div class="big">💀</div><h3 style="text-align:center">${p.name} أفلس!</h3><div class="tt">${to?'ممتلكاته انتقلت لـ '+to.name:'ممتلكاته رجعت للبنك'}</div>`,[{t:'تمام',v:1}]);
+  if(to&&!to.ai&&ti>=0){/* transferred mortgaged props: nothing extra */}
+  checkWin();
+}
+function checkWin(){
+  const alive=G.players.filter(x=>!x.out);
+  if(alive.length<=1&&!G.over){G.over=true;localStorage.removeItem('bankelhaz_save');sfx.win();
+    modal(`<div class="big">🏆</div><h3 style="text-align:center">${alive[0]?alive[0].name:'—'} كسب اللعبة!</h3><div class="tt">${alive[0]?'الرصيد: '+fmt(alive[0].money):''}</div>`,[{t:'🔄 لعبة جديدة',c:'g',v:'new'}]).then(()=>{if(!AUTO)location.reload()});
+    if(AUTO)window.__winner=alive[0]&&alive[0].name;
+  }
+}
+/* ========== MOVEMENT ========== */
+async function moveTo(p,dest,forward,opts){
+  // animated walk forward (or jump for backward)
+  if(forward){
+    while(p.pos!==dest){p.pos=(p.pos+1)%40;if(p.pos===0){await gain(p,200);log(`${p.name} عدّى على البداية: +٢٠٠ ج`)}render();sfx.step();await sleep(110)}
+  }else{p.pos=dest;render();await sleep(300)}
+  await land(p,opts||{});
+}
+async function goJail(p){p.pos=10;p.jail=3;G.doubles=0;G.jailed=true;log(`${p.name} راح السجن ⛓️`);sfx.bad();render();await sleep(400)}
+async function drawCard(p,deck,list,label){
+  const d=deck;let idx;
+  do{idx=d.order[d.k%d.order.length];d.k++}while(list[idx].jail&&d.held);
+  const c=list[idx];
+  log(`${label}: ${c.t}`);
+  await modal(`<div class="big">${label==='فرصة'?'❓':'🎁'}</div><h3 style="text-align:center">${label}</h3><p style="text-align:center;font-size:17px">${c.t}</p>`,[{t:'تمام',v:1}]);
+  await c.f(p);
+}
+async function land(p,opts){
+  const s=S[p.pos],pi=G.players.indexOf(p);
+  if(p.out)return;
+  if(OWNABLE(s)){
+    const q=G.props[s.i];
+    if(q.o<0){await offerBuy(p,s)}
+    else if(q.o!==pi&&!q.m){
+      const r=rentOf(s.i,G.lastRoll,opts.rail2||(opts.util10&&s.t==='util'));
+      const to=G.players[q.o];
+      log(`${p.name} دفع إيجار ${fmt(r)} لـ ${to.name} على ${s.n}`);
+      await pay(p,r,to);
+    }else if(q.o!==pi&&q.m)log(`${s.n} مرهونة، مفيش إيجار`);
+    else log(`${p.name} وصل ملكه: ${s.n}`);
+  }else if(s.t==='tax'){log(`${p.name} دفع ${s.n} ${fmt(s.pr)}`);await pay(p,s.pr,null)}
+  else if(s.t==='chance')await drawCard(p,G.chance,CHANCE,'فرصة');
+  else if(s.t==='chest')await drawCard(p,G.chest,CHEST,'صندوق الحظ');
+  else if(s.t==='gojail')await goJail(p);
+  else if(s.t==='park'){if(G.usePot&&G.pot>0){await gain(p,G.pot);log(`🅿️ ${p.name} خد جوايز الاستراحة ${fmt(G.pot)}`);G.pot=0}else log(`${p.name} في الاستراحة 😎`)}
+  else if(s.t==='go')log(`${p.name} على البداية`);
+  else if(s.t==='jail')log(`${p.name} بيزور السجن بس`);
+  render();
+}
+/* ========== BUY / AUCTION ========== */
+function aiWantsBuy(p,s){
+  const pi=G.players.indexOf(p);
+  if(p.money<s.pr)return false;
+  const g=groupOf(s);const mine=countOwned(pi,g);
+  const reserve=mine>0||s.t==='rail'?60:150;
+  const completes=mine===GROUPS[g].length-1;
+  const othersBlock=GROUPS[g].some(x=>G.props[x].o>=0&&G.props[x].o!==pi);
+  if(completes)return p.money-s.pr>=20;
+  if(othersBlock&&s.t==='p'&&p.money-s.pr<reserve*2)return false;
+  return p.money-s.pr>=reserve;
+}
+async function offerBuy(p,s){
+  let buy=false;
+  if(p.ai)buy=aiWantsBuy(p,s);
+  else{
+    if(p.money<s.pr){await modal(deedHTML(s.i)+`<p style="color:#c62828;text-align:center">مش معاك فلوس تشتريها (${fmt(s.pr)}). هتتعرض في مزاد.</p>`,[{t:'تمام',v:1}])}
+    else buy=await modal(deedHTML(s.i)+`<p style="text-align:center;font-size:16px">تشتري <b>${s.n}</b> بـ <b>${fmt(s.pr)}</b>؟</p>`,[{t:'✅ اشتري',c:'g',v:true},{t:'🔨 مزاد',c:'d',v:false}]);
+  }
+  if(buy){p.money-=s.pr;G.props[s.i].o=G.players.indexOf(p);sfx.cash();log(`${p.name} اشترى ${s.n} بـ ${fmt(s.pr)}`);render()}
+  else await auction(s);
+}
+async function auction(s){
+  log(`🔨 مزاد على ${s.n}`);
+  let bid=0,leader=-1;let active=G.players.map((p,i)=>i).filter(i=>!G.players[i].out&&G.players[i].money>0);
+  if(active.length<1)return;
+  let passes=new Set();let guard=0;
+  while(guard++<200){
+    const cand=active.filter(i=>!passes.has(i));
+    if(cand.length===0||(cand.length===1&&leader===cand[0]))break;
+    for(const i of cand){
+      if(passes.has(i))continue;
+      if(leader===i)continue;
+      const p=G.players[i];
+      const inc=[10,50,100];
+      let nb=null;
+      if(p.ai){
+        const g=groupOf(s);const val=s.pr*(countOwned(i,g)>0?1.1:.7)+(countOwned(i,g)===GROUPS[g].length-1?s.pr*.6:0);
+        const limit=Math.min(p.money-30,val);
+        const step=bid<s.pr*.5?10:20;
+        if(bid+step<=limit&&Math.random()<.85)nb=bid+step;
+      }else{
+        const ch=await modal(`<h3>🔨 مزاد: ${s.n}</h3><div class="tt">سعرها ${fmt(s.pr)}</div><p style="text-align:center">أعلى عرض: <b>${bid?fmt(bid)+' ('+G.players[leader].name+')':'لسه مفيش'}</b></p><p style="text-align:center">دور <b>${p.name}</b> (معاك ${fmt(p.money)})</p>`,
+          inc.map(x=>({t:'+'+x,c:'g',v:bid+x,dis:bid+x>p.money})).concat([{t:'انسحب',c:'r',v:null}]));
+        nb=ch;
+      }
+      if(nb===null||nb>p.money){passes.add(i)}else{bid=nb;leader=i;log(`${p.name} عرض ${fmt(bid)}`)}
+      if(active.filter(j=>!passes.has(j)).length<=1&&leader>=0)break;
+    }
+    if(leader>=0&&active.filter(j=>!passes.has(j)&&j!==leader).length===0)break;
+    if(leader<0&&active.every(j=>passes.has(j)))break;
+  }
+  if(leader>=0){const p=G.players[leader];p.money-=bid;G.props[s.i].o=leader;sfx.cash();log(`🔨 ${p.name} كسب المزاد وأخد ${s.n} بـ ${fmt(bid)}`)}
+  else log('مفيش حد اشترى، فضلت للبنك');
+  render();
+}
+/* ========== DEED / MANAGE UI ========== */
+function deedHTML(i){
+  const s=S[i];const q=G.props[i];
+  let h=`<div class="deed"><div class="hd" style="background:${GC[groupOf(s)]}">${s.ic?s.ic+' ':''}${s.n}</div><table>`;
+  if(s.t==='p'){
+    h+=`<tr><td>الإيجار</td><td>${s.r[0]} ج</td></tr><tr><td>بالمجموعة كاملة</td><td>${s.r[0]*2} ج</td></tr>`;
+    for(let k=1;k<=4;k++)h+=`<tr><td>${'🏠'.repeat(k)}</td><td>${s.r[k]} ج</td></tr>`;
+    h+=`<tr><td>🏨 فندق</td><td>${s.r[5]} ج</td></tr><tr><td>تكلفة البيت/الفندق</td><td>${s.hc} ج</td></tr>`;
+  }else if(s.t==='rail')h+=`<tr><td>محطة واحدة</td><td>25 ج</td></tr><tr><td>محطتين</td><td>50 ج</td></tr><tr><td>٣ محطات</td><td>100 ج</td></tr><tr><td>٤ محطات</td><td>200 ج</td></tr>`;
+  else if(s.t==='util')h+=`<tr><td>شركة واحدة</td><td>٤ × النرد</td></tr><tr><td>الشركتين</td><td>١٠ × النرد</td></tr>`;
+  if(OWNABLE(s))h+=`<tr><td>السعر</td><td>${s.pr} ج</td></tr><tr><td>الرهن</td><td>${s.pr/2} ج</td></tr>`;
+  h+='</table></div>';
+  if(q)h+=`<div class="tt">${q.o>=0?'المالك: <b>'+G.players[q.o].name+'</b>'+(q.m?' (مرهونة)':'')+(s.t==='p'&&q.h?' — '+(q.h===5?'🏨':'🏠'.repeat(q.h)):''):'متاحة للشراء'}</div>`;
+  return h;
+}
+async function showDeed(i){
+  if(!G||$('ov').classList.contains('hide')===false)return;
+  const s=S[i];
+  if(OWNABLE(s))await modal(deedHTML(i),[{t:'إغلاق',v:1}]);
+  else await modal(`<div class="big">${s.ic}</div><h3 style="text-align:center">${s.n}</h3>${s.t==='go'?'<p style="text-align:center">كل مرة تعدّي من هنا تاخد ٢٠٠ ج</p>':s.t==='tax'?'<p style="text-align:center">ادفع '+s.pr+' ج للبنك</p>':s.t==='jail'?'<p style="text-align:center">لو وقفت هنا بتزور بس</p>':s.t==='gojail'?'<p style="text-align:center">أي حد يقف هنا يروح السجن</p>':s.t==='park'?'<p style="text-align:center">راحة. '+(G.usePot?'وتاخد جوايز الضرايب المتجمعة':'')+'</p>':'<p style="text-align:center">اسحب كارت</p>'}`,[{t:'إغلاق',v:1}]);
+}
+async function manage(p,debt,to){
+  const pi=G.players.indexOf(p);
+  while(true){
+    let h=`<h3>🏗 إدارة ممتلكات ${p.name}</h3><div>الرصيد: <b>${fmt(p.money)}</b></div>`;
+    if(debt)h+=`<div style="color:#c62828;font-weight:700;margin:6px 0">لازم تدفع ${fmt(debt)}${to?' لـ '+to.name:''}. ${p.money>=debt?'كده تمام ✅':'بيع بيوت أو ارهن عشان تجمع الفلوس'}</div>`;
+    const mine=ownedBy(pi).sort((a,b)=>a-b);
+    if(!mine.length)h+='<p>معكش ممتلكات.</p>';
+    const btns=[];
+    h+=mine.map(i=>{
+      const s=S[i],q=G.props[i];
+      return `<div class="mrow"><div class="c" style="background:${GC[groupOf(s)]}"></div><div class="n">${s.n} ${s.t==='p'&&q.h?(q.h===5?'🏨':'🏠'.repeat(q.h)):''} ${q.m?'<small>(مرهونة)</small>':''}</div><div class="bs" id="mb${i}"></div></div>`;
+    }).join('');
+    $('md').innerHTML=h+'<div class="bt" id="mbt"></div>';
+    $('ov').classList.remove('hide');
+    const act=await new Promise(res=>{
+      mine.forEach(i=>{
+        const s=S[i],q=G.props[i],box=$('mb'+i);
+        const add=(t,c,f,dis)=>{const b=document.createElement('button');b.className='btn s '+c;b.textContent=t;b.disabled=!!dis;b.onclick=()=>res(f);box.appendChild(b)};
+        if(s.t==='p'){
+          add('🏠 +'+s.hc,'g',()=>build(pi,i),!canBuild(pi,i));
+          if(q.h>0)add('بيع بيت','r',()=>sellHouse(pi,i),!canSell(pi,i));
+        }
+        if(q.m)add('فك '+unmortCost(i),'g',()=>unmortgage(pi,i),p.money<unmortCost(i)||!!debt);
+        else add('رهن +'+S[i].pr/2,'d',()=>mortgage(pi,i),!canMort(pi,i));
+      });
+      const bt=$('mbt');
+      const done=document.createElement('button');done.className='btn g';done.textContent=debt?'💵 ادفع':'تمام';
+      done.disabled=!!debt&&p.money<debt;done.onclick=()=>res('done');bt.appendChild(done);
+      if(debt){const b=document.createElement('button');b.className='btn r';b.textContent='💀 أعلن إفلاسي';b.onclick=()=>res('bankrupt');bt.appendChild(b)}
+    });
+    if(act==='done'){closeModal();return 'ok'}
+    if(act==='bankrupt'){closeModal();return 'bankrupt'}
+    act();render();
+  }
+}
+/* ========== TRADE ========== */
+function propValue(i,forPi){
+  const s=S[i],q=G.props[i];let v=q.m?s.pr*.5:s.pr;
+  if(s.t==='p')v+=q.h*s.hc*.5;
+  const g=groupOf(s);
+  if(forPi!==undefined&&forPi>=0&&countOwned(forPi,g)===GROUPS[g].length-1&&!q.m)v*=1.5;
+  return v;
+}
+async function tradeUI(p){
+  if(G.busy)return;
+  const pi=G.players.indexOf(p);
+  const others=G.players.map((x,i)=>i).filter(i=>i!==pi&&!G.players[i].out);
+  if(!others.length)return;
+  const who=await modal('<h3>🤝 تبادل مع مين؟</h3>',others.map(i=>({t:G.players[i].tk+' '+G.players[i].name,c:'d',v:i})).concat([{t:'إلغاء',c:'r',v:null}]));
+  if(who===null)return;
+  const q=G.players[who];
+  const tradable=i=>{const s=S[i];return !(s.t==='p'&&GROUPS[s.g].some(x=>G.props[x].h>0))};
+  const mine=ownedBy(pi).filter(tradable),theirs=ownedBy(who).filter(tradable);
+  const list=(arr,pre)=>arr.map(i=>`<label class="chk"><input type="checkbox" data-${pre}="${i}"><span style="width:12px;height:18px;border-radius:3px;background:${GC[groupOf(S[i])]};display:inline-block"></span>${S[i].n}${G.props[i].m?' (مرهونة)':''}</label>`).join('')||'<div class="tt">مفيش</div>';
+  const html=`<h3>🤝 تبادل: ${p.name} ⇄ ${q.name}</h3><b>إنت بتدي:</b><div>فلوس: <input id="gm" type="number" min="0" max="${p.money}" value="0" style="width:90px;padding:6px"> ج</div>${list(mine,'g')}<hr><b>إنت بتاخد:</b><div>فلوس: <input id="tm" type="number" min="0" max="${q.money}" value="0" style="width:90px;padding:6px"> ج</div>${list(theirs,'t')}`;
+  $('md').innerHTML=html+'<div class="bt" id="tbt"></div>';$('ov').classList.remove('hide');
+  const act=await new Promise(res=>{
+    const bt=$('tbt');
+    const b1=document.createElement('button');b1.className='btn g';b1.textContent='📨 ابعت العرض';b1.onclick=()=>res(true);
+    const b2=document.createElement('button');b2.className='btn r';b2.textContent='إلغاء';b2.onclick=()=>res(false);bt.append(b1,b2);
+  });
+  if(!act){closeModal();return}
+  const gm=Math.max(0,Math.min(p.money,+$('gm').value||0)),tm=Math.max(0,Math.min(q.money,+$('tm').value||0));
+  const gp=[...document.querySelectorAll('#md input[data-g]:checked')].map(x=>+x.dataset.g),tp=[...document.querySelectorAll('#md input[data-t]:checked')].map(x=>+x.dataset.t);
+  closeModal();
+  if(!gm&&!tm&&!gp.length&&!tp.length)return;
+  let ok;
+  if(q.ai){
+    const giveV=tp.reduce((a,i)=>a+propValue(i,who),0)+tm;
+    const getV=gp.reduce((a,i)=>a+propValue(i,who),0)+gm;
+    // penalize handing the human a full set
+    let danger=0;gp.forEach(i=>{const g=groupOf(S[i]);if(countOwned(pi,g)+gp.filter(x=>groupOf(S[x])===g).length-0>=GROUPS[g].length)danger+=S[i].pr*.4});
+    tp.forEach(i=>{const g=groupOf(S[i]);const nowMine=GROUPS[g].filter(x=>G.props[x].o===pi||gp.includes(x)).length;if(nowMine===GROUPS[g].length)danger+=S[i].pr*.6});
+    ok=getV>=giveV*1.08+danger;
+    await modal(`<div class="big">${ok?'🤝':'🙅'}</div><h3 style="text-align:center">${q.name} ${ok?'وافق':'رفض'} العرض</h3>`,[{t:'تمام',v:1}]);
+  }else{
+    ok=await modal(`<h3>${q.name}، ${p.name} بيعرض عليك:</h3><p>بياخد: ${tm?fmt(tm):''} ${tp.map(i=>S[i].n).join('، ')||(tm?'':'—')}</p><p>بيديك: ${gm?fmt(gm):''} ${gp.map(i=>S[i].n).join('، ')||(gm?'':'—')}</p>`,[{t:'✅ موافق',c:'g',v:true},{t:'❌ أرفض',c:'r',v:false}]);
+  }
+  if(ok){
+    p.money+=tm-gm;q.money+=gm-tm;
+    gp.forEach(i=>G.props[i].o=who);tp.forEach(i=>G.props[i].o=pi);
+    sfx.cash();log(`🤝 تبادل بين ${p.name} و ${q.name}`);render();
+  }
+}
+/* ========== AI MANAGEMENT ========== */
+function aiManage(p){
+  const pi=G.players.indexOf(p);
+  // unmortgage when rich
+  for(const i of ownedBy(pi)){if(G.props[i].m&&p.money>unmortCost(i)+400){unmortgage(pi,i)}}
+  // build on best groups
+  let guard=0;
+  while(guard++<12){
+    const cands=ownedBy(pi).filter(i=>canBuild(pi,i)&&p.money-S[i].hc>=250);
+    if(!cands.length)break;
+    cands.sort((a,b)=>S[b].pr-S[a].pr);
+    build(pi,cands[0]);
+  }
+  render();
+}
+/* ========== AI TRADES ========== */
+async function aiTrades(p){
+  const pi=G.players.indexOf(p);
+  G.cool=G.cool||{};
+  for(const g of Object.keys(GROUPS)){
+    if(g==='rail'||g==='util')continue;
+    const ids=GROUPS[g];
+    if(countOwned(pi,g)!==ids.length-1)continue;
+    const miss=ids.find(i=>G.props[i].o!==pi);
+    const o=G.props[miss].o;if(o<0)continue;
+    const q=G.players[o];if(q.out)continue;
+    if(G.props[miss].h>0)continue;
+    const key=pi+'_'+miss;if((G.cool[key]||0)>G.rounds)continue;
+    const price=S[miss].pr;
+    const offer=Math.min(Math.round(price*1.8/10)*10,p.money-80);
+    if(offer<price*1.2)continue;
+    G.cool[key]=G.rounds+(q.ai?8:25);
+    // owner is giving up a prop; refuse if it completes nothing special but needs > 1.25x
+    let ok;
+    if(q.ai)ok=offer>=propValue(miss,o)*1.25+(countOwned(o,g)>1?price*.3:0);
+    else ok=await modal(`<div class="big">🤝</div><h3 style="text-align:center">${p.name} عايز يشتري ${S[miss].n}</h3><p style="text-align:center">بيعرض ${fmt(offer)} (سعرها ${fmt(price)}). توافق؟</p>`,[{t:'✅ بيع',c:'g',v:true},{t:'❌ لا',c:'r',v:false}]);
+    if(ok){p.money-=offer;q.money+=offer;G.props[miss].o=pi;sfx.cash();log(`🤝 ${p.name} اشترى ${S[miss].n} من ${q.name} بـ ${fmt(offer)}`);render()}
+    else log(`${q.name} رفض عرض ${p.name} على ${S[miss].n}`);
+  }
+}
+/* ========== TURN LOOP ========== */
+async function rollDice(p){
+  const d=document.querySelectorAll('.die');
+  d.forEach(x=>x.classList.add('roll'));sfx.dice();
+  for(let k=0;k<6;k++){d[0].textContent=dieFace(1+rnd(6));d[1].textContent=dieFace(1+rnd(6));await sleep(80)}
+  const a=1+rnd(6),b=1+rnd(6);d[0].textContent=dieFace(a);d[1].textContent=dieFace(b);d.forEach(x=>x.classList.remove('roll'));
+  return[a,b];
+}
+async function loop(){
+  while(!G.over&&!STOP){
+    const p=G.players[G.turn];
+    if(p.out){nextTurn();continue}
+    G.busy=true;
+    save();render();
+    await playTurn(p);
+    G.busy=false;
+    if(G.over)break;
+    nextTurn();
+    if(AUTO&&++G.rounds>6000){window.__winner='timeout';STOP=true}
+  }
+}
+function nextTurn(){do{G.turn=(G.turn+1)%G.players.length}while(G.players[G.turn].out&&!G.over)}
+async function playTurn(p){
+  const pi=G.players.indexOf(p);
+  G.doubles=0;G.jailed=false;G.tradedThisTurn=false;
+  toast(`دور ${p.tk} ${p.name}`);
+  while(!p.out&&!G.over){
+    if(p.ai){aiManage(p);if(!G.tradedThisTurn){G.tradedThisTurn=true;await aiTrades(p);aiManage(p)}}
+    // jail
+    let skipMove=false;
+    let forced=null;
+    if(p.jail>0){
+      let choice='roll';
+      if(p.ai){choice=p.jc>0?'card':(p.money>500&&p.jail<3?'pay':'roll');if(p.jc===0&&p.money>900)choice='pay'}
+      else{
+        const bts=[{t:'🎲 ارمي (دبل يخرجك)',c:'g',v:'roll'}];
+        if(p.money>=50)bts.push({t:'💵 ادفع ٥٠ ج',c:'',v:'pay'});
+        if(p.jc>0)bts.push({t:'🎟️ استخدم كارت الخروج',c:'d',v:'card'});
+        G.busy=false;
+        $('msg').textContent=`${p.name} في السجن (${p.jail} محاولات)`;
+        choice=await modal(`<div class="big">⛓️</div><h3 style="text-align:center">${p.name} في السجن</h3><p style="text-align:center">باقي ${p.jail} محاولات. اختار:</p>`,bts);
+        G.busy=true;
+      }
+      if(choice==='card'){p.jc--;if(G.chance.held&&!G.chest.held)G.chance.held=false;else if(G.chest.held&&!G.chance.held)G.chest.held=false;else G.chance.held=false;p.jail=0;log(`${p.name} استخدم كارت الخروج من السجن`)}
+      else if(choice==='pay'){if(p.money>=50){await pay(p,50,null);p.jail=0;log(`${p.name} دفع ٥٠ ج وخرج من السجن`)}}
+      if(p.jail>0){
+        const [a,b]=await rollDice(p);log(`🎲 ${p.name}: ${a} + ${b}`);
+        if(a===b){p.jail=0;log(`${p.name} جاب دبل وخرج من السجن!`);skipMove=true;forced=[a,b]}
+        else{
+          p.jail--;
+          if(p.jail===0){log(`${p.name} اتأخر في السجن، يدفع ٥٠ ج`);await pay(p,50,null)}
+          else log(`${p.name} لسه في السجن`);
+          if(p.jail>0||p.out){render();await sleep(500);return}
+          forced=[a,b];skipMove=true;
+        }
+      }
+      if(forced&&p.jail===0){
+        const[a,b]=forced;G.lastRoll=a+b;G.dd=[a,b];
+        await moveTo(p,(p.pos+a+b)%40,true);
+        render();await sleep(300);return; // no extra turn after jail exit
+      }
+    }
+    // normal roll
+    if(!p.ai){
+      G.busy=false;
+      await ctrl([{t:'🎲 ارمي النرد',c:'g',v:'roll'}].concat(sideBtns(p)));
+      G.busy=true;
+    }else await sleep(500);
+    const [a,b]=await rollDice(p);
+    G.lastRoll=a+b;log(`🎲 ${p.name}: ${a} + ${b} = ${a+b}${a===b?' (دبل!)':''}`);
+    if(a===b)G.doubles++;else G.doubles=0;
+    if(G.doubles>=3){log(`${p.name} جاب ٣ دبل ورا بعض: السجن!`);await goJail(p);return}
+    await moveTo(p,(p.pos+a+b)%40,true);
+    render();
+    if(p.out||G.over)return;
+    if(G.jailed){return}
+    if(a===b&&!p.out){
+      if(!p.ai){G.busy=false;await ctrl([{t:'🎲 دبل! ارمي تاني',c:'g',v:'again'}].concat(sideBtns(p)));G.busy=true}
+      else await sleep(400);
+      continue;
+    }
+    break;
+  }
+  if(!p.out&&!G.over){
+    if(!p.ai){G.busy=false;await ctrl([{t:'✅ إنهاء الدور',c:'g',v:'end'}].concat(sideBtns(p)));G.busy=true}
+    else{aiManage(p);await sleep(600)}
+  }
+  $('ctrl').innerHTML='';
+}
+/* ========== MENU / INIT ========== */
+async function menu(){
+  const c=await modal('<h3>☰ القائمة</h3>',[{t:'📖 القواعد',c:'d',v:'rules'},{t:'🔄 لعبة جديدة',c:'r',v:'new'},{t:'إغلاق',v:null}]);
+  if(c==='rules')rules();else if(c==='new'){if(confirm('تبدأ لعبة جديدة؟ اللعبة الحالية هتتمسح.')){localStorage.removeItem('bankelhaz_save');location.reload()}}
+}
+function rules(){return modal(`<h3>📖 القواعد</h3><div style="font-size:14px;line-height:1.7">
+• ارمي النرد وامشي. لو وقفت على مدينة ملهاش مالك تقدر تشتريها، ولو رفضت بتتباع في <b>مزاد</b>.<br>
+• لو وقفت على ملك حد، بتدفعله إيجار.<br>
+• لو معاك كل مدن نفس اللون، الإيجار يتضاعف وتقدر تبني 🏠 (حتى ٤ بيوت ثم 🏨 فندق). لازم تبني بالتساوي.<br>
+• المحطات 🚆 والشركات 💡 إيجارها بيزيد بعدد اللي معاك.<br>
+• كل ما تعدّي على البداية تاخد ٢٠٠ ج.<br>
+• ❓ فرصة و 🎁 صندوق الحظ: اسحب كارت.<br>
+• السجن ⛓️: تخرج بدبل أو بدفع ٥٠ ج أو بكارت. ٣ دبل ورا بعض = سجن.<br>
+• الرهن: ارهن ممتلكاتك للبنك وخد نص سعرها (فكّها بسعرها +١٠٪). المرهونة مفيهاش إيجار.<br>
+• 🤝 تبادل: اعرض على أي لاعب مدن وفلوس.<br>
+• لو معكش فلوس تدفع: بيع بيوت أو ارهن، ولو مش كفاية بتفلس. آخر واحد يفضل يكسب 🏆
+</div>`,[{t:'تمام',v:1}])}
+$('startBtn').onclick=startNew;
+$('rulesBtn').onclick=rules;
+$('menuBtn').onclick=menu;
+$('muteBtn').onclick=()=>{MUTE=!MUTE;$('muteBtn').textContent=MUTE?'🔇':'🔊'};
+$('contBtn').onclick=()=>{
+  try{const s=JSON.parse(localStorage.getItem('bankelhaz_save')||'null');if(!s){toast('مفيش لعبة محفوظة');return}G=s;SPEED=G.speed||1;G.busy=false;enter()}catch(e){toast('مفيش لعبة محفوظة')}
+};
+drawSetup();
+if(!localStorage.getItem('bankelhaz_save'))$('contBtn').style.display='none';
+if(AUTO){window.__auto=()=>{pcount=4;drawSetup();document.querySelectorAll('#pset select').forEach(s=>s.value='a');startNew()}}
+</script>
+</body>
+</html>
