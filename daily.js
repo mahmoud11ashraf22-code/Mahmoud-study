@@ -117,7 +117,7 @@
     var curN = p ? p.N : defN;
     h += '<div style="display:flex;gap:6px;align-items:flex-end;margin-bottom:8px;font-size:12px;color:#d6d9ff"><label style="flex:1">عدد الأيام<select id="d7n" style="width:100%">' +
       choices.map(function (v) { return '<option value="' + v + '"' + (v == curN ? ' selected' : '') + '>' + v + ' يوم' + (ex && v === ex ? ' (لحد الامتحان)' : '') + '</option>'; }).join('') + '</select></label>' +
-      '<button id="d7go" style="flex:1;padding:10px;border:0;border-radius:11px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(135deg,#1fa070,#0b6b48);cursor:pointer">' + (p ? '🔄 ابني الخطة من جديد' : '✨ ابني خطة الأيام') + '</button></div>';
+      '<button id="d7go" style="flex:1;padding:10px;border:0;border-radius:11px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(135deg,#3b6cf0,#1f3fa8);cursor:pointer">' + (p ? '🔄 ابني الخطة من جديد' : '✨ ابني خطة الأيام') + '</button></div>';
     if (!p) {
       if (!subjectsLeft().length) return h + '<div style="padding:14px;text-align:center;opacity:.9">مفيش دروس متراكمة متسجلة لسه.<br>ضيف موادك وعدد الدروس المتراكمة في صفحة التراكمات وبعدين ابني الخطة.<br><br><button id="d6bk" style="border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:800;cursor:pointer">📚 افتح التراكمات</button></div>';
       return h + '<div style="padding:14px;text-align:center;opacity:.9">اختار عدد الأيام واضغط "ابني خطة الأيام" وهقولك كل يوم تذاكر إيه وكام درس.</div>';
@@ -155,7 +155,7 @@
     });
   }
   function tabsHtml() {
-    var st = function (on) { return 'flex:1;padding:9px;border:0;border-radius:10px;font:inherit;font-weight:800;cursor:pointer;color:#fff;background:' + (on ? 'linear-gradient(135deg,#1fa070,#0b6b48)' : 'rgba(255,255,255,.1)'); };
+    var st = function (on) { return 'flex:1;padding:9px;border:0;border-radius:10px;font:inherit;font-weight:800;cursor:pointer;color:#fff;background:' + (on ? 'linear-gradient(135deg,#3b6cf0,#1f3fa8)' : 'rgba(255,255,255,.1)'); };
     return '<div style="display:flex;gap:6px;margin-bottom:10px"><button id="d7t1" style="' + st(tab === 'today') + '">⏱ جدول اليوم</button><button id="d7t2" style="' + st(tab === 'days') + '">🗓 خطة الأيام</button></div>';
   }
   function bindTabs() {
@@ -181,7 +181,7 @@
     h += '<label>ساعات المذاكرة<select id="d6h" style="width:100%">' + opts([1, 2, 3, 4, 5, 6, 7, 8], Math.round(set.hours), function (v) { return v + ' س'; }) + '</select></label>';
     h += '<label>الجلسة<select id="d6s" style="width:100%">' + opts([25, 30, 45, 50, 60], set.sess, function (v) { return v + ' د'; }) + '</select></label>';
     h += '<label>البريك<select id="d6b" style="width:100%">' + opts([5, 10, 15], set.brk, function (v) { return v + ' د'; }) + '</select></label></div>';
-    h += '<button id="d6go" style="width:100%;padding:11px;border:0;border-radius:11px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(135deg,#1fa070,#0b6b48);cursor:pointer;margin-bottom:10px">🔄 وزّع تراكمي على اليوم</button>';
+    h += '<button id="d6go" style="width:100%;padding:11px;border:0;border-radius:11px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(135deg,#3b6cf0,#1f3fa8);cursor:pointer;margin-bottom:10px">🔄 وزّع تراكمي على اليوم</button>';
     if (!p) {
       h += '<div style="padding:14px;text-align:center;opacity:.9">مفيش دروس متراكمة متسجلة لسه.<br>ضيف موادك وعدد الدروس المتراكمة في صفحة التراكمات وأنا أقسمها عليك.<br><br><button id="d6bk" style="border:0;border-radius:10px;padding:10px 16px;font:inherit;font-weight:800;cursor:pointer">📚 افتح التراكمات</button></div>';
     } else {
@@ -249,7 +249,7 @@
     if (loggedIn()) {
       if (!fab) {
         fab = document.createElement('button'); fab.type = 'button'; fab.textContent = '📅 جدولي';
-        fab.style.cssText = 'position:fixed;left:12px;bottom:84px;z-index:99990;border:0;border-radius:22px;padding:10px 14px;font:800 14px inherit;color:#fff;background:linear-gradient(135deg,#1fa070,#0b6b48);box-shadow:0 6px 16px rgba(0,0,0,.4);cursor:pointer';
+        fab.style.cssText = 'position:fixed;left:12px;bottom:84px;z-index:99990;border:0;border-radius:22px;padding:10px 14px;font:800 14px inherit;color:#fff;background:linear-gradient(135deg,#3b6cf0,#1f3fa8);box-shadow:0 6px 16px rgba(0,0,0,.4);cursor:pointer';
         fab.onclick = open; document.body.appendChild(fab);
       }
     } else if (fab) { fab.parentNode.removeChild(fab); fab = null; }
@@ -259,7 +259,7 @@
   function tutorBtn() {
     var box = $('t4big'); if (!box || $('d6tb')) return;
     var b = document.createElement('button'); b.id = 'd6tb'; b.type = 'button'; b.textContent = '📅 جدول اليوم';
-    b.style.cssText = 'flex:1 1 30%;padding:10px 4px;font-size:13px;border:0;border-radius:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,#1fa070,#0b6b48);cursor:pointer';
+    b.style.cssText = 'flex:1 1 30%;padding:10px 4px;font-size:13px;border:0;border-radius:12px;font-weight:800;color:#fff;background:linear-gradient(135deg,#3b6cf0,#1f3fa8);cursor:pointer';
     b.onclick = open; box.insertBefore(b, box.firstChild);
   }
   setInterval(tutorBtn, 2000);
@@ -268,8 +268,8 @@
     var home = $('home'); if (!home || $('d6home')) return;
     var hero = home.querySelector('.hero'); if (!hero) return;
     var c = document.createElement('div'); c.id = 'd6home';
-    c.style.cssText = 'margin:12px 0;padding:14px;border-radius:16px;background:linear-gradient(135deg,#1fa070,#0b6b48);color:#fff;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 8px 22px rgba(31,160,112,.35)';
-    c.innerHTML = '<div style="font-size:30px">📅</div><div style="flex:1"><b style="font-size:16px">جدول اليوم التلقائي</b><div style="font-size:13px;opacity:.92;margin-top:2px">قسّم تراكمك على ساعات وبريكات في ضغطة واحدة</div></div><div style="font-weight:800;background:#fff;color:#0b6b48;border-radius:10px;padding:8px 12px">افتح ›</div>';
+    c.style.cssText = 'margin:12px 0;padding:14px;border-radius:16px;background:linear-gradient(135deg,#3b6cf0,#1f3fa8);color:#fff;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 8px 22px rgba(59,108,240,.35)';
+    c.innerHTML = '<div style="font-size:30px">📅</div><div style="flex:1"><b style="font-size:16px">جدول اليوم التلقائي</b><div style="font-size:13px;opacity:.92;margin-top:2px">قسّم تراكمك على ساعات وبريكات في ضغطة واحدة</div></div><div style="font-weight:800;background:#fff;color:#1f3fa8;border-radius:10px;padding:8px 12px">افتح ›</div>';
     c.onclick = open;
     if (hero.nextSibling) hero.parentNode.insertBefore(c, hero.nextSibling); else hero.parentNode.appendChild(c);
   }
@@ -306,9 +306,9 @@
     box.style.cssText = 'position:fixed;inset:0;z-index:200000;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;direction:rtl;padding:10px;box-sizing:border-box';
     box.onclick = function (e) { if (e.target === box) close(); };
     var w = document.createElement('div');
-    w.style.cssText = 'width:100%;max-width:900px;background:linear-gradient(160deg,#171a35,#0d0f22);border-radius:20px;padding:12px;box-sizing:border-box;color:#fff;font-family:inherit;border:1px solid rgba(120,200,160,.35);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(31,160,112,.25)';
+    w.style.cssText = 'width:100%;max-width:900px;background:linear-gradient(160deg,#171a35,#0d0f22);border-radius:20px;padding:12px;box-sizing:border-box;color:#fff;font-family:inherit;border:1px solid rgba(120,200,160,.35);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(59,108,240,.25)';
     w.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="display:flex;align-items:center;gap:9px"><img src="icon-192.png" alt="" style="width:32px;height:32px;border-radius:9px"><div><b style="font-size:15px;letter-spacing:.5px">MAHMOUD STUDY</b><div style="font-size:11px;opacity:.7">🎧 درس مسجّل</div></div></div><button type="button" id="ytx" style="border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:7px 14px;font:inherit;font-weight:800;cursor:pointer">✕ إغلاق</button></div>' +
-      '<div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 0 0 2px rgba(31,160,112,.5)"><iframe id="ytf" src="' + src + '" title="MAHMOUD STUDY" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture;fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
+      '<div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 0 0 2px rgba(59,108,240,.5)"><iframe id="ytf" src="' + src + '" title="MAHMOUD STUDY" style="position:absolute;inset:0;width:100%;height:100%;border:0" allow="accelerometer;autoplay;encrypted-media;gyroscope;picture-in-picture;fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>' +
       '<div style="font-size:11px;opacity:.55;margin-top:9px;text-align:center">ذاكر صح مع MAHMOUD STUDY • <a href="#" id="ytout" style="color:inherit;text-decoration:underline">لو الفيديو مش بيشتغل اضغط هنا</a></div>';
     box.appendChild(w); document.body.appendChild(box); document.documentElement.style.overflow = 'hidden';
     w.querySelector('#ytx').onclick = close;
@@ -325,4 +325,5 @@
   window.addEventListener('keydown', function (e) { if (e.key === 'Escape' && box) close(); });
   window.openYT = function (u) { var i = ytInfo(u); if (i) play(i); };
 })();
+
 
