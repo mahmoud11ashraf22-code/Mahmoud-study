@@ -498,7 +498,7 @@
   function bigButton() {
     var card = $('t2'); if (!card || $('t3big')) return;
     var b = document.createElement('button'); b.id = 't3big'; b.type = 'button'; b.textContent = '📅 اعملي جدول مذاكرة';
-    b.style.cssText = 'display:block;width:calc(100% - 24px);margin:10px 12px 4px;padding:14px;border:0;border-radius:14px;font:inherit;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#1fa070,#0b6b48);cursor:pointer;box-shadow:0 6px 18px rgba(31,160,112,.35)';
+    b.style.cssText = 'display:block;width:calc(100% - 24px);margin:10px 12px 4px;padding:14px;border:0;border-radius:14px;font:inherit;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,#3b6cf0,#1f3fa8);cursor:pointer;box-shadow:0 6px 18px rgba(59,108,240,.35)';
     var head = card.querySelector('.t2-head');
     if (head && head.nextSibling) card.insertBefore(b, head.nextSibling); else card.appendChild(b);
   }
@@ -566,3 +566,4 @@
   window.tutor3Build = BUILD; window.tutor3Answer = answer;
   var tries = 0, iv = setInterval(function () { if (init() || ++tries > 60) clearInterval(iv); }, 500);
 })();
+
