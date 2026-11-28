@@ -237,7 +237,7 @@
       var box = document.createElement('div'); box.id = 't4big'; box.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:6px 12px';
       [['🎯 كويز ذكي', 'كويز ذكي'], ['🔁 راجع أخطائي', 'راجع أخطائي في الكويز'], ['📓 دفتر أخطائي', 'دفتر أخطائي'], ['📝 ملخص', 'ملخص'], ['📊 تقريري', 'تقريري']].forEach(function (p) {
         var b = document.createElement('button'); b.type = 'button'; b.textContent = p[0]; b.setAttribute('data-q', p[1]);
-        b.style.cssText = 'flex:1 1 30%;padding:10px 4px;font-size:13px;border:0;border-radius:12px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(135deg,#5b6cf0,#3a45b8);cursor:pointer';
+        b.style.cssText = 'flex:1 1 30%;padding:10px 4px;font-size:13px;border:0;border-radius:12px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(135deg,#3b6cf0,#1f3fa8);cursor:pointer';
         box.appendChild(b);
       });
       var after = $('t3big') || card.querySelector('.t2-head');
@@ -252,3 +252,4 @@
   window.tutor4Build = BUILD; window.tutor4Route = route;
   var tries = 0, iv = setInterval(function () { if (init() || ++tries > 60) clearInterval(iv); }, 500);
 })();
+
