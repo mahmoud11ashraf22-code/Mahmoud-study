@@ -361,3 +361,140 @@
   }
   setInterval(card, 2000);
 })();
+
+
+/* MAHMOUD STUDY: المدرّس الذكي 5 - أذاكر إيه النهارده، فاضل كام يوم، ذاكر معايا (جلسة تركيز)، تحفيز، نصايح تركيز. مجاني وعلى الجهاز، من غير قراءات فايربيز */
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function norm(s) {
+    return String(s || '').toLowerCase().replace(/[\u064B-\u065F\u0670\u0640]/g, '')
+      .replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي')
+      .replace(/[؟?!.,،؛:"'()\[\]]/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+  function jget(k, d) { try { var v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } }
+  function num(x) { x = Number(x); return isFinite(x) ? x : 0; }
+  function ds(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function DB() { try { return loadDB() || {}; } catch (e) { return {}; } }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function chips(list) { return '<div class="t2-fu">' + list.map(function (t) { return '<button data-q="' + esc(t) + '">' + esc(t) + '</button>'; }).join('') + '</div>'; }
+  function addRow(html, me) {
+    var lg = $('t2log'); if (!lg) return;
+    var r = document.createElement('div'); r.className = 't2-row' + (me ? ' me' : '');
+    var b = document.createElement('span'); b.className = 't2-b';
+    if (me) b.textContent = html; else b.innerHTML = html;
+    r.appendChild(b); lg.appendChild(r); lg.scrollTop = lg.scrollHeight; return r;
+  }
+  function left() {
+    var out = [];
+    (DB().subjects || []).forEach(function (x) { var l = Math.max(0, num(x.backlog) - num(x.backlogDone)); if (l > 0) out.push({ name: x.name, left: l, diff: Math.min(5, Math.max(1, num(x.difficulty) || 3)) }); });
+    out.sort(function (a, b) { return b.left * (1 + b.diff * .35) - a.left * (1 + a.diff * .35); });
+    return out;
+  }
+  function examDays() {
+    var ed = (DB().profile || {}).examDate; if (!ed) return 0;
+    var t = new Date(ed + 'T00:00:00'); if (isNaN(t)) return 0;
+    return Math.ceil((t - new Date()) / 86400000);
+  }
+  var BTN = '<button class="t2-act" type="button" onclick="openDaysPlan()">🗓 افتح خطة الأيام</button> ';
+
+  function today() {
+    var p = jget('d7_plan', null), t = ds(new Date()), L = left();
+    if (p && p.days) {
+      var di = -1; p.days.forEach(function (d, i) { if (d.date === t) di = i; });
+      if (di > -1) {
+        var d = p.days[di], rows = d.items.map(function (it) {
+          var dn = p.done && p.done[di + '|' + it.name];
+          return '<div>' + (dn ? '✅ ' : '⬜ ') + '<b>' + esc(it.name) + '</b> • ' + it.n + ' ' + (it.n > 1 ? 'دروس' : 'درس') + '</div>';
+        }).join('');
+        var late = 0; p.days.forEach(function (x, i) { if (x.date < t) x.items.forEach(function (it) { if (!(p.done && p.done[i + '|' + it.name])) late += it.n; }); });
+        return '📅 <b>مطلوب منك النهارده</b> (يوم ' + (di + 1) + ' من ' + p.days.length + '):' + rows + (late ? '<div style="margin-top:6px">⚠️ متأخر عليك ' + late + ' درس من أيام فاتت، افتح الخطة وأعد التوزيع.</div>' : '<div style="margin-top:6px">ابدأ بالأصعب وانت فايق 💪</div>') + BTN + chips(['ذاكر معايا', 'كويز ذكي']);
+      }
+    }
+    if (L.length) {
+      var top = L.slice(0, 3).map(function (s) { return '<div>📌 <b>' + esc(s.name) + '</b> • فاضل ' + s.left + ' درس</div>'; }).join('');
+      return '📅 معملتش خطة أيام لسه، بس من تراكمك أنصحك تبدأ النهارده بـ:' + top + '<div style="margin-top:6px">اعمل خطة بالأيام وأنا أقولك كل يوم تذاكر إيه.</div>' + BTN + chips(['ذاكر معايا', 'اعملي جدول مذاكرة']);
+    }
+    return '📚 مفيش تراكم متسجل، ضيف موادك في صفحة التراكمات وأقولك تذاكر إيه كل يوم. أو ابدأ بكويز سريع.' + chips(['كويز ذكي', 'ملخص']);
+  }
+  function countdown() {
+    var n = examDays(), L = left(), tot = L.reduce(function (a, s) { return a + s.left; }, 0);
+    if (!(DB().profile || {}).examDate) return '⏳ ماحطيتش تاريخ الامتحان لسه. حطه في الإعدادات وأحسبلك كام درس في اليوم.';
+    if (n < 1) return '⏳ ميعاد الامتحان جه أو عدى. عدّل التاريخ في الإعدادات لو في امتحان جاي.';
+    var per = tot ? Math.ceil(tot / n) : 0;
+    return '⏳ فاضل <b>' + n + '</b> يوم على الامتحان.' + (tot ? '<div>تراكمك: <b>' + tot + '</b> درس، يعني محتاج حوالي <b>' + per + '</b> ' + (per > 1 ? 'دروس' : 'درس') + ' في اليوم.</div>' : '<div>مفيش تراكم، ركّز على المراجعة والكويزات 👏</div>') + (n <= 7 ? '<div>الأسبوع الأخير: راجع الأخطاء وحل نماذج، ومتبدأش حاجة جديدة.</div>' : '') + BTN + chips(['أذاكر إيه النهارده', 'ذاكر معايا']);
+  }
+  var MOT = ['كل درس بتخلصه النهارده هو حمل بيتشال عن كتافك بكرة 💪', 'مش لازم تبقى مثالي، لازم تبدأ. افتح درس واحد دلوقتي وخلاص.', 'اللي بيذاكر ٢٥ دقيقة بتركيز أحسن من اللي بيقعد ٣ ساعات بالموبايل في إيده 😉', 'التعب ده مؤقت، والنتيجة اللي هتفرح بيها هتفضل. كمّل 🔥', 'ابدأ بأصعب مادة وانت فايق، الباقي هيبقى أسهل بكتير.', 'كل غلطة بتعملها في الكويز دلوقتي هي نقطة مش هتضيع منك في الامتحان 🎯', 'خد بريك ٥ دقايق، اشرب مية، ورجّع لمذاكرتك. انت ماشي صح 👏'];
+  var TIPS = ['🧘 جرب قاعدة ٢ دقيقة: ابدأ أي درس ٢ دقيقة بس. غالبًا هتكمل.', '📵 حط الموبايل في أوضة تانية أو على وضع الطيران وقت الجلسة.', '🍅 ذاكر ٢٥ دقيقة وبريك ٥. اضغط "ذاكر معايا" وأنا أحسبهالك.', '✍️ بدل ما تقرأ بس، اقفل الكتاب وحاول تفتكر اللي قريته واكتبه.', '💧 اشرب مية وخد نفس عميق، والمذاكرة بعد الأكل التقيل بتنعّس.', '🎧 جرب موسيقى هادية من غير كلام أو صوت مطر.'];
+  function motivate() { return pick(MOT) + chips(['ذاكر معايا', 'أذاكر إيه النهارده']); }
+  function focusTips() { return '🧠 مش قادر تركز؟ جرب ده:<div style="margin:6px 0">' + pick(TIPS) + '</div><div>' + pick(TIPS) + '</div>' + chips(['ذاكر معايا', 'حفزني']); }
+
+  var run = null, iv = null;
+  function beep() { try { var c = new (window.AudioContext || window.webkitAudioContext)(), o = c.createOscillator(), g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 880; g.gain.value = .2; o.start(); setTimeout(function () { o.stop(); c.close(); }, 700); } catch (e) { } try { navigator.vibrate && navigator.vibrate([300, 150, 300]); } catch (e) { } }
+  function fmt(s) { return ('0' + Math.floor(s / 60)).slice(-2) + ':' + ('0' + s % 60).slice(-2); }
+  function stopRun() { clearInterval(iv); run = null; }
+  function focus() {
+    if (run) return '🍅 فيه جلسة شغالة بالفعل: <b id="t5tm2">' + fmt(Math.max(0, Math.round((run.end - Date.now()) / 1000))) + '</b> فاضلة. كمّل!' + chips(['وقف الجلسة']);
+    var L = left(), sub = L.length ? L[0].name : 'مادتك', min = 25;
+    run = { end: Date.now() + min * 60000 };
+    clearInterval(iv);
+    iv = setInterval(function () {
+      if (!run) return;
+      var s = Math.max(0, Math.round((run.end - Date.now()) / 1000)), el = $('t5tm');
+      if (el) el.textContent = fmt(s);
+      if (s <= 0) {
+        stopRun(); beep();
+        var lg = jget('t5_sessions', {}), d = ds(new Date()); lg[d] = (lg[d] || 0) + 1; try { localStorage.setItem('t5_sessions', JSON.stringify(lg)); } catch (e) { }
+        addRow('🎉 خلصت جلسة تركيز ٢٥ دقيقة! (النهارده: ' + lg[d] + ' جلسة). خد بريك ٥ دقايق، وبعدين اختبر نفسك.' + chips(['كويز ذكي', 'ذاكر معايا']), false);
+      }
+    }, 500);
+    return '🍅 يلا نبدأ جلسة تركيز <b>٢٥ دقيقة</b> على <b>' + esc(sub) + '</b>.<div style="font-size:30px;font-weight:800;text-align:center;margin:8px 0;font-variant-numeric:tabular-nums" id="t5tm">25:00</div>قفل الموبايل عن أي حاجة تانية وركز. هنبّهك لما تخلص.' + chips(['وقف الجلسة']);
+  }
+  function route(q) {
+    var n = norm(q);
+    if (/^(وقف الجلسه|وقف الجلسة|الغي الجلسه)/.test(n)) { if (!run) return '🍅 مفيش جلسة شغالة.'; stopRun(); return '⏹ وقفت الجلسة. لما تبقى جاهز قولي "ذاكر معايا".'; }
+    if (/^(ذاكر معايا|جلسه تركيز|ابدا جلسه|بومودورو|pomodoro)/.test(n)) return focus();
+    if (/(اذاكر ايه|اذاكر اي |اذاكر ايه النهارده|مطلوب مني|خطه اليوم|ايه المطلوب)/.test(n + ' ') && !/^كويز/.test(n)) return today();
+    if (/^(فاضل كام|كام يوم|فاضل ايه|المتبقي|العد التنازلي)/.test(n) || /فاضل كام يوم/.test(n)) return countdown();
+    if (/^(حفزني|حمسني|شجعني|مش قادر اذاكر|زهقت|تعبت)/.test(n)) return motivate();
+    if (/(مش قادر اركز|مش بركز|تشتت|اركز ازاي|مش عارف اركز|نصايح تركيز|نصيحه تركيز)/.test(n)) return focusTips();
+    return null;
+  }
+  function would(q) { return route_dry(q); }
+  function route_dry(q) {
+    var n = norm(q);
+    return /^(وقف الجلسه|الغي الجلسه|ذاكر معايا|جلسه تركيز|ابدا جلسه|بومودورو|pomodoro|فاضل كام|كام يوم|فاضل ايه|المتبقي|العد التنازلي|حفزني|حمسني|شجعني|مش قادر اذاكر|زهقت|تعبت)/.test(n) || /(اذاكر ايه|اذاكر اي |مطلوب مني|خطه اليوم|ايه المطلوب|فاضل كام يوم|مش قادر اركز|مش بركز|تشتت|اركز ازاي|مش عارف اركز|نصايح تركيز|نصيحه تركيز)/.test(n + ' ');
+  }
+  function go(q, inp) {
+    var r = route(q); if (r == null) return false;
+    if (inp) inp.value = '';
+    addRow(q, true); setTimeout(function () { addRow(r, false); }, 300); return true;
+  }
+  window.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest ? e.target.closest('#t2chips button,.t2-fu button,#t2send,#t5big button') : null; if (!t) return;
+    var q, inp = $('t2inp');
+    if (t.id === 't2send') q = inp ? inp.value : ''; else q = (t.getAttribute('data-q') || t.textContent || '').trim();
+    if (!q || !would(q)) return;
+    if (go(q, t.id === 't2send' ? inp : null)) { e.stopImmediatePropagation(); e.preventDefault(); }
+  }, true);
+  window.addEventListener('keydown', function (e) {
+    if (!e.target || e.target.id !== 't2inp' || (e.key !== 'Enter' && e.keyCode !== 13)) return;
+    var q = e.target.value; if (!q.trim() || !would(q)) return;
+    if (go(q, e.target)) { e.stopImmediatePropagation(); e.preventDefault(); }
+  }, true);
+  function init() {
+    var card = $('t2'); if (!card || !$('t2log')) return;
+    if ($('t5big')) return;
+    var box = document.createElement('div'); box.id = 't5big'; box.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin:6px 12px';
+    [['📅 أذاكر إيه النهارده؟', 'أذاكر إيه النهارده'], ['🍅 ذاكر معايا', 'ذاكر معايا'], ['⏳ فاضل كام يوم', 'فاضل كام يوم'], ['💪 حفزني', 'حفزني'], ['🧘 مش قادر أركز', 'مش قادر أركز']].forEach(function (p) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = p[0]; b.setAttribute('data-q', p[1]);
+      b.style.cssText = 'flex:1 1 30%;padding:10px 4px;font-size:13px;border:0;border-radius:12px;font:inherit;font-weight:800;color:#2b1700;background:linear-gradient(135deg,#ffc247,#ff9f1a);cursor:pointer';
+      box.appendChild(b);
+    });
+    var after = $('t4big') || $('t3big') || card.querySelector('.t2-head');
+    if (after && after.nextSibling) card.insertBefore(box, after.nextSibling); else card.appendChild(box);
+  }
+  setInterval(init, 1500);
+  window.tutor5Route = route;
+})();
