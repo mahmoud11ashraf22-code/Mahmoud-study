@@ -327,3 +327,37 @@
 })();
 
 
+
+
+/* MAHMOUD STUDY: زرار شارك المنصة مع صحابك على واتساب */
+(function () {
+  'use strict';
+  var BASE = 'https://mahmoud11ashraf22-code.github.io/Mahmoud-study/';
+  function myLink() {
+    try {
+      var cards = document.querySelectorAll('.card');
+      for (var i = 0; i < cards.length; i++) {
+        if ((cards[i].textContent || '').indexOf('ده لينكك الخاص') > -1) {
+          var inp = cards[i].querySelector('input'); if (inp && /^https?:/.test(inp.value)) return inp.value;
+          var a = cards[i].querySelector('a[href*="ref="]'); if (a) return a.href;
+        }
+      }
+    } catch (e) { }
+    return BASE;
+  }
+  function share() {
+    var msg = 'ياصحبي جربت منصة MAHMOUD STUDY للمذاكرة 📚🔥\nجداول مذاكرة، امتحانات بتصحيح فوري، مدرّس ذكي ومنافسة مع زمايلك، ومجانية.\nسجّل من هنا:\n' + myLink();
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+  }
+  window.shareStudy = share;
+  function card() {
+    var home = document.getElementById('home'); if (!home || document.getElementById('shHome')) return;
+    var anchor = document.getElementById('d6home') || home.querySelector('.hero'); if (!anchor) return;
+    var c = document.createElement('div'); c.id = 'shHome';
+    c.style.cssText = 'margin:12px 0;padding:14px;border-radius:16px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 8px 22px rgba(37,211,102,.3)';
+    c.innerHTML = '<div style="font-size:30px">📲</div><div style="flex:1"><b style="font-size:16px">شارك المنصة مع صحابك</b><div style="font-size:13px;opacity:.95;margin-top:2px">رسالة جاهزة على واتساب ولينكك الخاص</div></div><div style="font-weight:800;background:#fff;color:#128c7e;border-radius:10px;padding:8px 12px">ابعت ›</div>';
+    c.onclick = share;
+    if (anchor.nextSibling) anchor.parentNode.insertBefore(c, anchor.nextSibling); else anchor.parentNode.appendChild(c);
+  }
+  setInterval(card, 2000);
+})();
